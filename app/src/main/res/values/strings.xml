@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">运达</string>
+    <string name="title_log">记录</string>
+    <string name="title_mission">任务</string>
+    <string name="title_resource">资料</string>
+    <string name="title_breakdown">故障</string>
+    <string name="title_person">个人</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

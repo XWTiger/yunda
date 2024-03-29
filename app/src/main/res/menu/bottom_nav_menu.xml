@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/navigation_breakdown"
+        android:icon="@drawable/breakdown3"
+        android:title="@string/title_breakdown" />
+
+    <item
+        android:id="@+id/navigation_log"
+        android:icon="@drawable/ic_log"
+        android:title="@string/title_log" />
+
+    <item
+        android:id="@+id/navigation_mission"
+        android:icon="@drawable/ic_mission"
+        android:title="@string/title_mission" />
+
+    <item
+        android:id="@+id/navigation_resource"
+        android:icon="@drawable/resource"
+        android:title="@string/title_resource" />
+
+    <item
+        android:id="@+id/navigation_person"
+        android:icon="@drawable/ic_user"
+        android:title="@string/title_person" />
+
+</menu>
