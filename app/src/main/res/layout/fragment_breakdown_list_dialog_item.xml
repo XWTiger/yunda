@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="left"
+    android:id="@+id/pause_dialog"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:gravity="left"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="11dp"
+            android:layout_marginTop="4dp"
+            android:src="@drawable/problem_catalog"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/green" />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:paddingLeft="@dimen/list_item_spacing"
+            android:paddingTop="@dimen/list_item_spacing_half"
+            android:paddingRight="@dimen/list_item_spacing"
+            android:paddingBottom="@dimen/list_item_spacing_half"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/green"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="故障分类"
+            tools:text="故障分类" />
+    </LinearLayout>
+
+
+    <Spinner
+        android:id="@+id/problem_catalog_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        app:layout_constraintTop_toBottomOf="@+id/text"
+        tools:layout_editor_absoluteX="11dp"></Spinner>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/imageView_2"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="11dp"
+            android:src="@drawable/problem_handyman_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/green" />
+        <TextView
+            android:id="@+id/text_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:background="?attr/selectableItemBackground"
+            android:paddingLeft="@dimen/list_item_spacing"
+            android:paddingTop="@dimen/list_item_spacing_half"
+            android:paddingRight="@dimen/list_item_spacing"
+            android:paddingBottom="@dimen/list_item_spacing_half"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/green"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="故障描述"
+            tools:text="故障描述" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/problem_desc"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"/>
+
+    <LinearLayout
+        android:id="@+id/list_problem_vedio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/imageView_3"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="11dp"
+            android:src="@drawable/pic_problem"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/green" />
+        <TextView
+            android:id="@+id/text_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:paddingLeft="@dimen/list_item_spacing"
+            android:paddingTop="@dimen/list_item_spacing_half"
+            android:paddingRight="@dimen/list_item_spacing"
+            android:paddingBottom="@dimen/list_item_spacing_half"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/green"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="故障照片及视频"
+            tools:text="故障照片及视频" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/add_problem_vedio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageButton
+            android:id="@+id/imageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/pic_add" />
+        <com.google.android.material.chip.ChipGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:id="@+id/chip2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="test"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                />
+
+        </com.google.android.material.chip.ChipGroup>
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/imageView_4"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="11dp"
+            android:src="@drawable/problem_check_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/green" />
+        <TextView
+            android:id="@+id/text_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:paddingLeft="@dimen/list_item_spacing"
+            android:paddingTop="@dimen/list_item_spacing_half"
+            android:paddingRight="@dimen/list_item_spacing"
+            android:paddingBottom="@dimen/list_item_spacing_half"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/green"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="故障是否已经处理"
+            tools:text="故障是否已经处理" />
+
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="是否" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/imageView_5"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="11dp"
+            android:src="@drawable/pic_problem"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/green" />
+        <TextView
+            android:id="@+id/text_5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:paddingLeft="@dimen/list_item_spacing"
+            android:paddingTop="@dimen/list_item_spacing_half"
+            android:paddingRight="@dimen/list_item_spacing"
+            android:paddingBottom="@dimen/list_item_spacing_half"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/green"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="恢复照片及视频"
+            tools:text="恢复照片及视频" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/problem_recover_vedio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageButton
+            android:id="@+id/imageButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/pic_add" />
+    </LinearLayout>
+    <Button
+        android:id="@+id/inspection_finished"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="160dp"
+        android:backgroundTint="@color/green"
+        android:text="提交"
+        android:textColor="@color/white"
+        app:layout_constraintTop_toBottomOf="@+id/inspection_list"
+        tools:layout_editor_absoluteX="161dp" />
+</LinearLayout>
+

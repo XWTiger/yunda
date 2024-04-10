@@ -1,9 +1,13 @@
 package com.tiger.yunda.ui.home.inspection;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,6 +23,8 @@ import android.widget.TextView;
 import com.tiger.yunda.R;
 import com.tiger.yunda.databinding.FragmentHomeBinding;
 import com.tiger.yunda.databinding.FragmentInspectionListBinding;
+import com.tiger.yunda.ui.common.BreakDownListDialogFragment;
+import com.tiger.yunda.ui.common.CameraContentBean;
 import com.tiger.yunda.ui.home.inspection.placeholder.PlaceholderContent;
 
 import java.util.List;
@@ -41,6 +47,7 @@ public class InspectionFragment extends Fragment {
     public InspectionFragment() {
     }
 
+    private BreakDownListDialogFragment breakDownListDialogFragment;
     com.tiger.yunda.databinding.FragmentInspectionBinding binding;
     LayoutInflater inflater;
     // TODO: Customize parameter initialization
@@ -65,11 +72,31 @@ public class InspectionFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         this.inflater = inflater;
         binding = com.tiger.yunda.databinding.FragmentInspectionBinding.inflate(inflater, container, false);
         ViewHolder viewHolder =  new ViewHolder(binding, PlaceholderContent.ITEMS);
+        NavController navController = NavHostFragment.findNavController(this);
+
+        Bundle bundle = getArguments();
+        if (Objects.nonNull(bundle)) {
+            List<CameraContentBean> contentBeans = (List<CameraContentBean>) bundle.getSerializable("contents");
+            if (Objects.nonNull(contentBeans)) {
+                Log.i("xiaweihu", "contentBeans: " + contentBeans.get(0).getUri().toString());
+                getFileNameFromUri(contentBeans.get(0).getUri());
+            }
+            breakDownListDialogFragment.show(getParentFragmentManager(), "breakdownReport");
+        }
 
         return binding.getRoot();
+    }
+
+    public static String getFileNameFromUri(Uri fileUri) {
+        // 获取文件的完整路径
+        String filePath = fileUri.getPath();
+        // 获取文件名
+        int lastSlashIndex = filePath.lastIndexOf('/');
+        return lastSlashIndex != -1 ? filePath.substring(lastSlashIndex + 1) : filePath;
     }
 
     public class ViewHolder  implements View.OnClickListener {
@@ -127,12 +154,15 @@ public class InspectionFragment extends Fragment {
 
             }
             if (id == R.id.button3) {
-                //开始
+                //暂停
                 Log.i("tiger", "onClick: button3 -----------> " + v.getTag());
+                breakDownListDialogFragment = BreakDownListDialogFragment.newInstance(2);
+                breakDownListDialogFragment.show(getParentFragmentManager(), "breakdownReport");
+
 
             }
             if (id == R.id.button4) {
-                //开始
+                //结束
                 Log.i("tiger", "onClick: button4 -----------> " + v.getTag());
 
             }

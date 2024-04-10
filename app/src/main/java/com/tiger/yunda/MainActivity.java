@@ -1,12 +1,17 @@
 package com.tiger.yunda;
 
+import static java.security.AccessController.getContext;
+
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -23,6 +28,12 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     private LoggedInUser loggedInUser;
+    private String[] REQUIRED_PERMISSIONS = {
+            android.Manifest.permission.CAMERA,
+            android.Manifest.permission.RECORD_AUDIO,
+            android.Manifest.permission.READ_EXTERNAL_STORAGE
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +44,10 @@ public class MainActivity extends AppCompatActivity {
         }*/
 
         super.onCreate(savedInstanceState);
-
+       /* if (!allPermissionsGranted()) {
+            Log.w("xiaweihu", "application has no permission ");
+            return;
+        }*/
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -51,6 +65,15 @@ public class MainActivity extends AppCompatActivity {
 
         //添加登录校验逻辑
 
+    }
+
+    private boolean allPermissionsGranted() {
+        for (String permission : REQUIRED_PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

@@ -13,7 +13,7 @@
         tools:layout="@layout/fragment_home"
         android:color = "@color/green"
         >
-        <action android:id="@+id/to_accept_mission" app:destination="@id/accept_mission"/>
+        <action android:id="@+id/to_accept_mission" app:destination="@id/deliver_mission"/>
         <action android:id="@+id/to_inspection_mission" app:destination="@id/inspection_mission"/>
     </fragment>
 
@@ -40,15 +40,42 @@
         android:label="@string/title_resource"
         tools:layout="@layout/fragment_resource" />
 
-    <fragment android:id="@+id/accept_mission"
+    <fragment android:id="@+id/deliver_mission"
         android:name="com.tiger.yunda.ui.home.AcceptMissionFragment"
-        android:label="接受任务"
+        android:label="派发任务"
         tools:layout="@layout/fragment_accept_mission"
         />
 
     <fragment android:id="@+id/inspection_mission"
         android:name="com.tiger.yunda.ui.home.inspection.InspectionFragment"
         android:label="巡检"
-        tools:layout="@layout/fragment_inspection"/>
+        tools:layout="@layout/fragment_inspection">
+       <!-- -->
+       <action android:id="@+id/to_inspection_report" app:destination="@id/problem_dialog"/>
+        <action android:id="@+id/dialog_to_camera" app:destination="@id/inspection_camera"/>
+    </fragment>
 
+    <!--<fragment android:id="@+id/inspecton_report"
+        android:name="com.tiger.yunda.ui.common.BreakDownListDialogFragment"
+        android:label="问题"
+        tools:layout="@layout/fragment_breakdown_list_dialog_item"
+        >
+        <action android:id="@+id/dialog_to_camera" app:destination="@id/inspection_camera"/>
+
+
+    </fragment>-->
+
+    <fragment android:id="@+id/inspection_camera"
+        android:name="com.tiger.yunda.ui.common.CameraFragment"
+        android:label="巡检"
+        tools:layout="@layout/fragment_camera">
+         <action android:id="@+id/to_inspection_mission" app:destination="@id/inspection_mission" />
+    </fragment>
+
+    <dialog android:id="@+id/problem_dialog"
+        android:name="com.tiger.yunda.ui.common.BreakDownListDialogFragment"
+        android:label="问题上报"
+        tools:layout="@layout/fragment_breakdown_list_dialog_item">
+      <!--  <action android:id="@+id/dialog_to_camera" app:destination="@id/inspection_camera"/>-->
+    </dialog>
 </navigation>

@@ -1,6 +1,8 @@
 package com.tiger.yunda.ui.home;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,10 +19,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.recyclerview.widget.DiffUtil;
 
-import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
-import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.tiger.yunda.R;
-
 
 import java.util.List;
 
@@ -55,28 +54,46 @@ public class ListViewAdapter extends ArrayAdapter<Mission> {
                 public void onClick(View v) {
                     // 在这里处理按钮点击事件
                     Log.d("tiger", "onClick: ======================= ");
-                    // 例如：Toast.makeText(context, "Button clicked for " + item, Toast.LENGTH_SHORT).show();
-                    new QMUIDialog.MessageDialogBuilder(context)
-                            .setTitle("系统提示")
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("系统提示")
                             .setMessage("确认要领取该任务吗？")
-
-                            .addAction("取消", new QMUIDialogAction.ActionListener() {
-                                @Override
-                                public void onClick(QMUIDialog dialog, int index) {
-                                    dialog.dismiss();
-                                }
-                            })
-                            .addAction("确定", new QMUIDialogAction.ActionListener() {
-                                @Override
-                                public void onClick(QMUIDialog dialog, int index) {
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // 点击“OK”按钮后的操作
                                     Toast.makeText(context, "点击确定", Toast.LENGTH_SHORT).show();
-                                    //getNavController().navigate(R.id.to_accept_mission);
-
-
                                     getNavController().navigate(R.id.to_inspection_mission);
                                     dialog.dismiss();
                                 }
-                            }).show();
+                            })
+                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // 点击“Cancel”按钮后的操作
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
+                    // 例如：Toast.makeText(context, "Button clicked for " + item, Toast.LENGTH_SHORT).show();
+//                    new QMUIDialog.MessageDialogBuilder(context)
+//                            .setTitle("系统提示")
+//                            .setMessage("确认要领取该任务吗？")
+//
+//                            .addAction("取消", new QMUIDialogAction.ActionListener() {
+//                                @Override
+//                                public void onClick(QMUIDialog dialog, int index) {
+//                                    dialog.dismiss();
+//                                }
+//                            })
+//                            .addAction("确定", new QMUIDialogAction.ActionListener() {
+//                                @Override
+//                                public void onClick(QMUIDialog dialog, int index) {
+//                                    Toast.makeText(context, "点击确定", Toast.LENGTH_SHORT).show();
+//                                    //getNavController().navigate(R.id.to_accept_mission);
+//
+//
+//                                    getNavController().navigate(R.id.to_inspection_mission);
+//                                    dialog.dismiss();
+//                                }
+//                            }).show();
 
                 }
             });
@@ -87,24 +104,23 @@ public class ListViewAdapter extends ArrayAdapter<Mission> {
                     // 在这里处理按钮点击事件
                     Log.d("tiger", "onClick: ======================= ");
                     // 例如：Toast.makeText(context, "Button clicked for " + item, Toast.LENGTH_SHORT).show();
-                    new QMUIDialog.MessageDialogBuilder(context)
-                            .setTitle("系统提示")
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("系统提示")
                             .setMessage("确认要拒绝该任务吗？")
-
-                            .addAction("取消", new QMUIDialogAction.ActionListener() {
-                                @Override
-                                public void onClick(QMUIDialog dialog, int index) {
-                                    dialog.dismiss();
-                                }
-                            })
-                            .addAction("确定", new QMUIDialogAction.ActionListener() {
-                                @Override
-                                public void onClick(QMUIDialog dialog, int index) {
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // 点击“OK”按钮后的操作
                                     Toast.makeText(context, "点击确定", Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
                                 }
-                            }).show()
-                    ;
+                            })
+                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // 点击“Cancel”按钮后的操作
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
 
                 }
             });

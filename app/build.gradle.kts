@@ -53,5 +53,13 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.retrofit2:adapter-rxjava:2.11.0")
-    implementation("com.qmuiteam:qmui:2.0.1")
+//    implementation("com.qmuiteam:qmui:2.0.1")
+    // CameraX dependencies (first release for video is: "1.1.0-alpha10")
+    var camerax_version = "1.3.2"
+    // The following line is optional, as the core library is included indirectly by camera-camera2
+    implementation("androidx.camera:camera-core:${camerax_version}")
+    implementation("androidx.camera:camera-camera2:${camerax_version}")
+    implementation("androidx.camera:camera-lifecycle:${camerax_version}")
+    implementation("androidx.camera:camera-video:${camerax_version}")
+    implementation("androidx.camera:camera-view:${camerax_version}")
 }
