@@ -73,13 +73,22 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
     private BreakDownListViewModel viewModel;
 
     private BreakDownInfo breakDownInfo = null;
+    private SpinnerAdapter spinnerAdapter;
+
 
     public static   BreakDownListDialogFragment newInstance(int itemCount, BreakDownInfo info) {
-        if (Objects.isNull(breakDownListDialogFragment)) {
-             breakDownListDialogFragment = new BreakDownListDialogFragment();
-             Bundle args = new Bundle();
-            args.putInt(ARG_ITEM_COUNT, itemCount);
-            breakDownListDialogFragment.setArguments(args);
+
+
+        if  (Objects.isNull(breakDownListDialogFragment)) {
+            synchronized (ARG_ITEM_COUNT) {
+                 breakDownListDialogFragment = new BreakDownListDialogFragment();
+                 Bundle args = new Bundle();
+                args.putInt(ARG_ITEM_COUNT, itemCount);
+                breakDownListDialogFragment.setArguments(args);
+                breakDownListDialogFragment.breakDownInfo = info;
+            }
+        }
+        if (breakDownListDialogFragment.breakDownInfo == null) {
             breakDownListDialogFragment.breakDownInfo = info;
         }
         return breakDownListDialogFragment;
@@ -89,6 +98,18 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(this).get(BreakDownListViewModel.class);
+        List<BreakDownType> breakDownTypes = new ArrayList<>();
+        breakDownTypes.add(BreakDownType.builder()
+                        .type(1)
+                        .name("PIS")
+                .build());
+        breakDownTypes.add(BreakDownType.builder()
+                .type(2)
+                .name("AIS")
+                .build());
+        context = getContext();
+        spinnerAdapter = new SpinnerAdapter(breakDownTypes, context);
+
     }
 
     @Nullable
@@ -98,18 +119,18 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
         //return inflater.inflate(R.layout.fragment_breakdown_list_dialog_item, container);
         binding = FragmentBreakdownListDialogItemBinding.inflate(inflater, container, false);
         listDialogBinding = FragmentBreakdowntDialogListDialogBinding.inflate(inflater, container, false);
-        context = getContext();
-        ViewHolder viewHolder = new ViewHolder(this);
+        binding.problemCatalogSelect.setAdapter(spinnerAdapter);
         if (Objects.nonNull(viewModel)) {
             viewModel.getTypes().observe(this, new Observer<List<BreakDownType>>() {
                 @Override
                 public void onChanged(List<BreakDownType> breakDownTypes) {
-                    SpinnerAdapter sa = new SpinnerAdapter(breakDownTypes, context);
-                    binding.problemCatalogSelect.setAdapter(sa);
+                    spinnerAdapter.setData(breakDownTypes);
+                    spinnerAdapter.notifyDataSetChanged();
                 }
             });
 
         }
+        ViewHolder viewHolder = new ViewHolder(this);
 
         return binding.getRoot();
 
@@ -188,8 +209,9 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
                 breakDownInfo = new BreakDownInfo();
             } else {
                 //回显样式
-                if (Objects.nonNull(breakDownInfo.getType()) ) {
-                    type.setSelection(breakDownInfo.getTypePosition());
+                if (Objects.nonNull(breakDownInfo.getTypePosition()) ) {
+                    spinnerAdapter.notifyDataSetChanged();
+                    type.setSelection(breakDownInfo.getTypePosition(), true);
                 }
                 if (Objects.nonNull(breakDownInfo.getDesc()) && breakDownInfo.getDesc() != "") {
                     problemDesc.setText(breakDownInfo.getDesc());
@@ -242,6 +264,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
         public void onClick(View v) {
 
             String tag = (String) v.getTag();
+            saveInfo();
             switch (tag) {
                 case "problem_video":
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -278,6 +301,39 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
                             .show();
                     break;
                 case "recover_problem":
+                    AlertDialog.Builder builderRecover = new AlertDialog.Builder(context);
+                    builderRecover.setTitle("故障资料")
+                            .setMessage("请选择文件或者拍照")
+                            .setPositiveButton("已有图像", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // 点击“OK”按钮后的操作
+                                    Log.i("xiaweihu", "图像:  =========================>");
+                                    Intent albumIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                                    albumIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);   // 是否允许多选
+                                    albumIntent.setType("*/*");
+                                    albumIntent.addCategory(Intent.CATEGORY_OPENABLE);
+                                    startActivityForResult(albumIntent, CHOOSE_CODE); // 打开系统相册
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setNegativeButton("拍摄", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // 点击“Cancel”按钮后的操作
+                                    Toast.makeText(context, "拍摄", Toast.LENGTH_SHORT).show();
+                                    //getNavController().navigate(R.id.to_accept_mission);
+                                    Log.i("xiaweihu", "拍摄:  =========================>");
+                                    if (breakDownListDialogFragment != null && breakDownListDialogFragment.getDialog() != null) {
+                                        // View view = breakDownListDialogFragment.getDialog().getWindow().getDecorView();
+                                        //view.setVisibility(View.GONE); // 设置对话框的视图不可见
+                                        breakDownListDialogFragment.dismiss();
+                                    }
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("type", "0");
+                                    NavHostFragment.findNavController(breakDownListDialogFragment).navigate(R.id.dialog_to_camera, bundle);
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
                     break;
                 case "finished":
                     break;
@@ -290,8 +346,12 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             if (Objects.nonNull(view)) {
-                breakDownInfo.setType((Integer) view.getTag());
+                Log.i("xiaweihu", "onItemSelected:  ==========>" + (Integer) view.getTag() + "=====" +position);
+                LinearLayout linearLayout = (LinearLayout) view;
+                Integer type = (Integer) linearLayout.getChildAt(0).getTag();
+                breakDownInfo.setType(type);
                 breakDownInfo.setTypePosition(position);
+
             }
         }
 
@@ -302,6 +362,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
 
         private void saveInfo() {
             breakDownInfo.setDesc(this.problemDesc.getText().toString());
+            breakDownInfo.setType((Integer) this.type.getTag());
         }
     }
 

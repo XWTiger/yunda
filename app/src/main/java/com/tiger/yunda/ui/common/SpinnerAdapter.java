@@ -27,6 +27,10 @@ public class SpinnerAdapter extends BaseAdapter {
         this.context = context;
     }
 
+    public void setData(List<BreakDownType> types) {
+        this.types = types;
+    }
+
 
     @NonNull
     @Override
