@@ -33,16 +33,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.tiger.yunda.R;
 import com.tiger.yunda.data.BreakDownInfo;
 import com.tiger.yunda.data.BreakDownType;
 import com.tiger.yunda.databinding.FragmentBreakdownListDialogItemBinding;
 import com.tiger.yunda.databinding.FragmentBreakdowntDialogListDialogBinding;
+import com.tiger.yunda.enums.CameraFileType;
 import com.tiger.yunda.ui.login.LoginViewModel;
 import com.tiger.yunda.ui.login.LoginViewModelFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,18 +67,22 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
 
     private int CHOOSE_CODE = 3;
     private Context context;
+    private static volatile BreakDownListDialogFragment breakDownListDialogFragment ;
 
 
     private BreakDownListViewModel viewModel;
 
     private BreakDownInfo breakDownInfo = null;
 
-    public static BreakDownListDialogFragment newInstance(int itemCount) {
-        final BreakDownListDialogFragment fragment = new BreakDownListDialogFragment();
-        final Bundle args = new Bundle();
-        args.putInt(ARG_ITEM_COUNT, itemCount);
-        fragment.setArguments(args);
-        return fragment;
+    public static   BreakDownListDialogFragment newInstance(int itemCount, BreakDownInfo info) {
+        if (Objects.isNull(breakDownListDialogFragment)) {
+             breakDownListDialogFragment = new BreakDownListDialogFragment();
+             Bundle args = new Bundle();
+            args.putInt(ARG_ITEM_COUNT, itemCount);
+            breakDownListDialogFragment.setArguments(args);
+            breakDownListDialogFragment.breakDownInfo = info;
+        }
+        return breakDownListDialogFragment;
     }
 
     @Override
@@ -95,7 +104,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
             viewModel.getTypes().observe(this, new Observer<List<BreakDownType>>() {
                 @Override
                 public void onChanged(List<BreakDownType> breakDownTypes) {
-                    SpinnerAdapter sa = new SpinnerAdapter(context, listDialogBinding.list.getId(),  breakDownTypes);
+                    SpinnerAdapter sa = new SpinnerAdapter(breakDownTypes, context);
                     binding.problemCatalogSelect.setAdapter(sa);
                 }
             });
@@ -133,6 +142,8 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
 
         private ChipGroup chipGroup;
 
+        private Chip chip;
+
         private Switch aSwitch;
 
         private ImageButton addRecoverButton;
@@ -166,13 +177,51 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
             addRecoverButton = binding.imageButton2; //添加恢复视频或照片
             addRecoverButton.setTag("recover_problem");
             addRecoverButton.setOnClickListener(this);
+            chip = binding.chip2;
             this.breakDownListDialogFragment = breakDownListDialogFragment;
             recoverLayout = binding.recoverLayout;
             problemRecoverLayout = binding.problemRecoverVedio;
             type = binding.problemCatalogSelect;
             type.setOnItemSelectedListener(this);
             if (Objects.isNull(breakDownInfo)) {
+                Log.w("xiaweihu", "breakDownInfo:================");
                 breakDownInfo = new BreakDownInfo();
+            } else {
+                //回显样式
+                if (Objects.nonNull(breakDownInfo.getType()) ) {
+                    type.setSelection(breakDownInfo.getTypePosition());
+                }
+                if (Objects.nonNull(breakDownInfo.getDesc()) && breakDownInfo.getDesc() != "") {
+                    problemDesc.setText(breakDownInfo.getDesc());
+                }
+
+                if (Objects.nonNull(breakDownInfo.getFiles()) && !breakDownInfo.getFiles().isEmpty()) {
+                    chipGroup.removeAllViews();
+
+                    int position = 0;
+                    breakDownInfo.getFiles().forEach(s -> {
+                        chip.setText("故障." + (s.getType().equals(CameraFileType.IMAGE)?"jpg":"mp4"));
+                        chip.setTag(position);
+                        chipGroup.addView(chip);
+                    });
+
+                }
+                if (Objects.nonNull(breakDownInfo.getDiscretion()) && breakDownInfo.getDiscretion()) {
+                    aSwitch.setChecked(breakDownInfo.getDiscretion());
+                    if (Objects.nonNull(breakDownInfo.getHandleFiles()) && !breakDownInfo.getHandleFiles().isEmpty()) {
+                        recoverChipGroup.removeAllViews();
+
+                        int position = 0;
+                        breakDownInfo.getFiles().forEach(s -> {
+                            chip.setText("恢复." + (s.getType().equals(CameraFileType.IMAGE)?"jpg":"mp4"));
+                            chip.setTag(position);
+                            recoverChipGroup.addView(chip);
+                        });
+                    }
+
+                }
+
+
             }
         }
 
@@ -240,7 +289,10 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
 
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-           breakDownInfo.setType((Integer) view.getTag());
+            if (Objects.nonNull(view)) {
+                breakDownInfo.setType((Integer) view.getTag());
+                breakDownInfo.setTypePosition(position);
+            }
         }
 
         @Override

@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.tiger.yunda.R;
+import com.tiger.yunda.data.BreakDownInfo;
 import com.tiger.yunda.databinding.FragmentHomeBinding;
 import com.tiger.yunda.databinding.FragmentInspectionListBinding;
 import com.tiger.yunda.ui.common.BreakDownListDialogFragment;
@@ -109,8 +110,13 @@ public class InspectionFragment extends Fragment {
 
         public List<PlaceholderContent.PlaceholderItem> mItems;
 
+        private BreakDownInfo breakDownInfo;
+
         public ViewHolder(com.tiger.yunda.databinding.FragmentInspectionBinding binding, List<PlaceholderContent.PlaceholderItem> mItems) {
             this.mItems = mItems;
+            if (Objects.isNull(breakDownInfo)) {
+                breakDownInfo = new BreakDownInfo();
+            }
             if (Objects.isNull(this.linearLayout)) {
 
                 LinearLayout linearLayout = binding.inspectionList;
@@ -159,7 +165,7 @@ public class InspectionFragment extends Fragment {
             if (id == R.id.button3) {
                 //暂停
                 Log.i("tiger", "onClick: button3 -----------> " + v.getTag());
-                breakDownListDialogFragment = BreakDownListDialogFragment.newInstance(2);
+                breakDownListDialogFragment = BreakDownListDialogFragment.newInstance(2, breakDownInfo);
                 breakDownListDialogFragment.show(getParentFragmentManager(), "breakdownReport");
 
 

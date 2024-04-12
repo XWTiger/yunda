@@ -21,6 +21,7 @@ public class BreakDownInfo {
     private String TrainLocationId;
 
     private Integer Type;
+    private int typePosition;
 
     private String Desc;
 
