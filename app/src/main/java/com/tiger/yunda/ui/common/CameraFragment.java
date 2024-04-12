@@ -39,6 +39,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.tiger.yunda.R;
+import com.tiger.yunda.data.BreakDownInfo;
 import com.tiger.yunda.databinding.FragmentCameraBinding;
 import com.tiger.yunda.enums.CameraFileType;
 
@@ -80,6 +81,8 @@ public class CameraFragment extends Fragment {
     private Viewholder viewholder;
 
     private Camera camera;
+
+    private String recordType;
 
 
 
@@ -135,6 +138,8 @@ public class CameraFragment extends Fragment {
             //校验权限
             startCamera();
         }
+        Bundle bundle = getArguments();
+        recordType = (String) bundle.get("type");
         cameraExecutor = Executors.newFixedThreadPool(2);
         return fragmentCameraBinding.getRoot();
     }
@@ -347,7 +352,7 @@ public class CameraFragment extends Fragment {
                         String msg = "图片保存成功: " + output.getSavedUri();
                         Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
                         Log.d("tiger", msg);
-                        CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.IMAGE, output.getSavedUri());
+                        CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.IMAGE, output.getSavedUri(), "1".equals(recordType));
                         contentBeans.add(cameraContentBean);
                     }
                 }
@@ -379,7 +384,7 @@ public class CameraFragment extends Fragment {
                         if (!((VideoRecordEvent.Finalize) videoRecordEvent).hasError()) {
                             String msg = "Video capture succeeded: " + ((VideoRecordEvent.Finalize) videoRecordEvent).getOutputResults().getOutputUri();
                             Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
-                            CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, ((VideoRecordEvent.Finalize) videoRecordEvent).getOutputResults().getOutputUri());
+                            CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, ((VideoRecordEvent.Finalize) videoRecordEvent).getOutputResults().getOutputUri(), "1".equals(recordType));
                             this.contentBeans.add(cameraContentBean);
                         } else {
                             recording.close();

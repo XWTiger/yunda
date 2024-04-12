@@ -42,8 +42,8 @@
 
     <Spinner
         android:id="@+id/problem_catalog_select"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="30dp"
         android:layout_marginTop="5dp"
         app:layout_constraintTop_toBottomOf="@+id/text"
         tools:layout_editor_absoluteX="11dp"></Spinner>
@@ -120,10 +120,11 @@
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/pic_add" />
         <com.google.android.material.chip.ChipGroup
+            android:id="@+id/file_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <com.google.android.material.chip.Chip
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                style="@style/Widget.MaterialComponents.Chip.Entry"
                 android:id="@+id/chip2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -164,15 +165,17 @@
 
         <Switch
             android:id="@+id/switch1"
+            android:layout_marginLeft="35dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="是否" />
 
 
     </LinearLayout>
 
     <LinearLayout
+        android:visibility="invisible"
+        android:id="@+id/recover_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <ImageView
@@ -201,6 +204,7 @@
     </LinearLayout>
     <LinearLayout
         android:id="@+id/problem_recover_vedio"
+        android:visibility="invisible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <ImageButton
@@ -208,6 +212,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/pic_add" />
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/recover_file_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.MaterialComponents.Chip.Entry"
+                android:id="@+id/recover_chip2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="test"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                />
+
+        </com.google.android.material.chip.ChipGroup>
     </LinearLayout>
     <Button
         android:id="@+id/inspection_finished"

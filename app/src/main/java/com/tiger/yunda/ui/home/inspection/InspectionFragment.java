@@ -85,7 +85,10 @@ public class InspectionFragment extends Fragment {
                 Log.i("xiaweihu", "contentBeans: " + contentBeans.get(0).getUri().toString());
                 getFileNameFromUri(contentBeans.get(0).getUri());
             }
-            breakDownListDialogFragment.show(getParentFragmentManager(), "breakdownReport");
+            if (Objects.nonNull(breakDownListDialogFragment)) {
+
+                breakDownListDialogFragment.show(getParentFragmentManager(), "breakdownReport");
+            }
         }
 
         return binding.getRoot();
