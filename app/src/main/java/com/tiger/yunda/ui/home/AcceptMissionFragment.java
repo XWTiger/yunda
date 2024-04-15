@@ -32,6 +32,8 @@ public class AcceptMissionFragment extends Fragment {
 
     private DeliverMissionBinding deliverMissionBinding;
 
+    private Mission mission;
+
 
     public AcceptMissionFragment() {
 
@@ -56,6 +58,10 @@ public class AcceptMissionFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            Bundle bundle = getArguments();
+            mission = (Mission) bundle.getSerializable(ListViewAdapter.MISSION_KEY);
+        }
     }
 
     //实际这个类是派发任务的类
@@ -77,7 +83,7 @@ public class AcceptMissionFragment extends Fragment {
                 dusers.addAll(users);
             }
         });
-        acceptMissionViewModel.getDatas().observe(getViewLifecycleOwner(), new Observer<List<DeliverMssion>>() {
+        acceptMissionViewModel.getDatas(mission.getTaskId()).observe(getViewLifecycleOwner(), new Observer<List<DeliverMssion>>() {
             @Override
             public void onChanged(List<DeliverMssion> deliverMssions) {
                 DeliverMissionAdapter deliverMissionAdapter = new DeliverMissionAdapter(getContext(), binding.listItem.getId(),  deliverMssions, dusers);

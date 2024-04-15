@@ -87,6 +87,7 @@ public class InspectionFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         this.inflater = inflater;
         binding = com.tiger.yunda.databinding.FragmentInspectionBinding.inflate(inflater, container, false);
+        PlaceholderContent.addInspectionPositionData(mission);
         ViewHolder viewHolder =  new ViewHolder(binding, PlaceholderContent.ITEMS);
        // NavController navController = NavHostFragment.findNavController(this);
 

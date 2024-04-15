@@ -1,16 +1,43 @@
 package com.tiger.yunda.ui.home;
 
-public class TrainLocations {
-        private String id;
-        private String subtaskId;
-        private String startTime;
-        private String endTime;
-        private int locationType;
-        private String locationTypeName;
-        private String spendTime;
-        private int score;
-        private int state;
-        private String stateText;
+import java.io.Serializable;
+
+//巡检车位置
+public class TrainLocations  implements Serializable {
+    /**
+     *  车巡检位置id
+     */
+    private String id;//车巡检位置id
+    /**
+     * 子任务id
+     */
+    private String subtaskId;
+    /**
+     *
+     * 巡检开始时间
+     */
+    private String startTime;
+    private String endTime;
+    /**
+     *车位置
+     */
+    private int locationType;
+    /**
+     *车位置
+     */
+    private String locationTypeName;
+    private String spendTime;
+    private int score;
+    /**
+     * 状态，1:初始、2:已开始、3:已暂停、4:已恢复、5:已结束
+     */
+    private int state;
+    /**
+     * 状态，1:初始、2:已开始、3:已暂停、4:已恢复、5:已结束
+     */
+    private String stateText;
+
+
 
     public TrainLocations(String id, String subtaskId, String startTime, String endTime, int locationType, String locationTypeName, String spendTime, int score, int state, String stateText) {
         this.id = id;

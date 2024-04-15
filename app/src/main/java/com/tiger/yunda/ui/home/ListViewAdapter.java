@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,9 +28,11 @@ import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
 import com.tiger.yunda.enums.RoleType;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 
-public class ListViewAdapter extends ArrayAdapter<Mission> {
+public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundButton.OnCheckedChangeListener {
 
     public static String MISSION_KEY = "mission";
     private Context context;
@@ -39,6 +42,8 @@ public class ListViewAdapter extends ArrayAdapter<Mission> {
     private Activity activity;
 
     private List<Mission> objects;
+
+    private Button acceptAll;
 
     public ListViewAdapter(@NonNull Context context, int resource,@NonNull List<Mission> objects, Activity activity) {
         super(context, resource,objects);
@@ -63,6 +68,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> {
             Button btnReject = convertView.findViewById(R.id.button_reject);
             btnReject.setTag(position);
             CheckBox checkBox = convertView.findViewById(R.id.checkBox);
+            checkBox.setOnCheckedChangeListener(this);
 
             btnItem.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -86,12 +92,12 @@ public class ListViewAdapter extends ArrayAdapter<Mission> {
 
                                     // 点击“OK”按钮后的操作
                                     Toast.makeText(context, "点击确定", Toast.LENGTH_SHORT).show();
-                                    if (MainActivity.loggedInUser.getRole() == RoleType.WORKER) {
+                                    if (StringUtils.isNotBlank(objects.get(position).getId())) {
                                         //巡检员
                                         getNavController().navigate(R.id.to_inspection_mission, bundle);
                                     }
                                     //to_accept_mission
-                                    if (MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
+                                    if (StringUtils.isNotBlank(objects.get(position).getTaskId())) {
                                         //工班长
                                         getNavController().navigate(R.id.to_accept_mission, bundle);
                                     }
@@ -107,6 +113,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> {
                             .show();
                 }
             });
+
 
             btnReject.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -149,7 +156,18 @@ public class ListViewAdapter extends ArrayAdapter<Mission> {
         return convertView;
     }
 
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        acceptAll.setVisibility(View.VISIBLE);
+    }
 
+    public Button getAcceptAll() {
+        return acceptAll;
+    }
+
+    public void setAcceptAll(Button acceptAll) {
+        this.acceptAll = acceptAll;
+    }
 
     public NavController getNavController() {
         return navController;

@@ -34,6 +34,10 @@ public class MissionFragment extends Fragment {
 
     private TextView textView;
 
+    private Button myButton; //一键接受
+
+    private Button missionyButton;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,8 +52,8 @@ public class MissionFragment extends Fragment {
             // 创建自定义视图
             View customView = LayoutInflater.from(getContext()).inflate(R.layout.header_mission_layout, null);
 
-            Button myButton = customView.findViewById(R.id.accept_all);
-            Button missionyButton = customView.findViewById(R.id.create_mission);
+             myButton = customView.findViewById(R.id.accept_all);
+             missionyButton = customView.findViewById(R.id.create_mission);
            // BlendModeColorFilter filter = new BlendModeColorFilter(Color.parseColor("#ffffff"), BlendMode.SRC_ATOP);
 
 
@@ -103,6 +107,7 @@ public class MissionFragment extends Fragment {
                     ListViewAdapter listViewAdapter = new ListViewAdapter(getActivity(), listView.getId(), missionViewModel.getData().getValue().getData(), getActivity());
                     listViewAdapter.setNavController(navController);
                     listViewAdapter.setFragmentManager(getFragmentManager());
+                    listViewAdapter.setAcceptAll(myButton);
                     listView.setAdapter(listViewAdapter);
                 }
             }

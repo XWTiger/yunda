@@ -20,7 +20,7 @@ public class DeliverMissionViewModel extends ViewModel {
     public DeliverMissionViewModel() {
     }
 
-    public LiveData<List<DeliverMssion>> getDatas() {
+    public LiveData<List<DeliverMssion>> getDatas(String taskId) {
         List<DeliverMssion> list = new ArrayList<>();
         list.add(new DeliverMssion(1, "tiger",1, "二段", "A单元","5h"));
         list.add(new DeliverMssion(1, "tiger",1, "二段", "B单元","5h"));
