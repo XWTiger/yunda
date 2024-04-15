@@ -4,16 +4,23 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -28,6 +35,7 @@ import com.tiger.yunda.ui.common.BreakDownListDialogFragment;
 import com.tiger.yunda.ui.common.CameraContentBean;
 import com.tiger.yunda.ui.home.inspection.placeholder.PlaceholderContent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,6 +48,8 @@ public class InspectionFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
+
+    private BreakDownInfo breakDownInfo;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -64,10 +74,22 @@ public class InspectionFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (Objects.isNull(breakDownInfo)) {
+            breakDownInfo = new BreakDownInfo();
+        }
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+        setHasOptionsMenu(true);
+
+
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        NavController navController = NavHostFragment.findNavController(this);
+        navController.popBackStack();
+        Log.i("xiaweihu", "onOptionsItemSelected: ========================" + item.getItemId());
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -77,23 +99,36 @@ public class InspectionFragment extends Fragment {
         this.inflater = inflater;
         binding = com.tiger.yunda.databinding.FragmentInspectionBinding.inflate(inflater, container, false);
         ViewHolder viewHolder =  new ViewHolder(binding, PlaceholderContent.ITEMS);
-        NavController navController = NavHostFragment.findNavController(this);
+       // NavController navController = NavHostFragment.findNavController(this);
+
 
         Bundle bundle = getArguments();
         if (Objects.nonNull(bundle)) {
+            List<CameraContentBean> files = new ArrayList<>();
+            List<CameraContentBean> handleFiles = new ArrayList<>();
             List<CameraContentBean> contentBeans = (List<CameraContentBean>) bundle.getSerializable("contents");
-            if (Objects.nonNull(contentBeans)) {
-                Log.i("xiaweihu", "contentBeans: " + contentBeans.get(0).getUri().toString());
-                getFileNameFromUri(contentBeans.get(0).getUri());
-            }
-            if (Objects.nonNull(breakDownListDialogFragment)) {
+            if (Objects.nonNull(contentBeans) && contentBeans.size() > 0) {
+                contentBeans.forEach(cameraContentBean -> {
+                    if (cameraContentBean.isProblem()) {
+                        files.add(cameraContentBean);
+                    } else {
+                        handleFiles.add(cameraContentBean);
+                    }
+                });
+                breakDownInfo.setFiles(files);
+                breakDownInfo.setHandleFiles(handleFiles);
 
+            }
+            if (Objects.isNull(breakDownListDialogFragment)) {
+                breakDownListDialogFragment = BreakDownListDialogFragment.newInstance(2, breakDownInfo);
                 breakDownListDialogFragment.show(getParentFragmentManager(), "breakdownReport");
             }
         }
 
         return binding.getRoot();
     }
+
+
 
     public static String getFileNameFromUri(Uri fileUri) {
         // 获取文件的完整路径
@@ -110,7 +145,7 @@ public class InspectionFragment extends Fragment {
 
         public List<PlaceholderContent.PlaceholderItem> mItems;
 
-        private BreakDownInfo breakDownInfo;
+
 
         public ViewHolder(com.tiger.yunda.databinding.FragmentInspectionBinding binding, List<PlaceholderContent.PlaceholderItem> mItems) {
             this.mItems = mItems;

@@ -1,5 +1,6 @@
 package com.tiger.yunda.ui.common;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.icu.text.SimpleDateFormat;
@@ -284,7 +285,7 @@ public class CameraFragment extends Fragment {
         contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-            contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Yunda-Image");
+            contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Yunda");
         }
         return contentValues;
     }
@@ -298,7 +299,7 @@ public class CameraFragment extends Fragment {
         contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4");
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-            contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, "Movies/Yunda-Video");
+            contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Yunda");
         }
         return contentValues;
     }
@@ -328,6 +329,7 @@ public class CameraFragment extends Fragment {
                         super.onCaptureSuccess(image);
                         //拍照成功
                         Log.e("tiger", "拍照成功");
+                        Toast.makeText(getContext(), "拍照成功", Toast.LENGTH_SHORT).show();
                         image.close();
                     }
 
@@ -349,11 +351,12 @@ public class CameraFragment extends Fragment {
 
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults output) {
-                        String msg = "图片保存成功: " + output.getSavedUri();
+                        String msg = "图片保存成功: " + output.getSavedUri().toString();
                         Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
                         Log.d("tiger", msg);
-                        CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.IMAGE, output.getSavedUri(), "1".equals(recordType));
+                        CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.IMAGE,  output.getSavedUri().toString(), "1".equals(recordType));
                         contentBeans.add(cameraContentBean);
+                        viewholder.setExitButtonEnable(true);
                     }
                 }
         );
@@ -384,8 +387,9 @@ public class CameraFragment extends Fragment {
                         if (!((VideoRecordEvent.Finalize) videoRecordEvent).hasError()) {
                             String msg = "Video capture succeeded: " + ((VideoRecordEvent.Finalize) videoRecordEvent).getOutputResults().getOutputUri();
                             Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
-                            CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, ((VideoRecordEvent.Finalize) videoRecordEvent).getOutputResults().getOutputUri(), "1".equals(recordType));
+                            CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, ((VideoRecordEvent.Finalize) videoRecordEvent).getOutputResults().getOutputUri().toString(), "1".equals(recordType));
                             this.contentBeans.add(cameraContentBean);
+                            viewholder.setExitButtonEnable(true);
                         } else {
                             recording.close();
                             recording = null;
@@ -471,7 +475,7 @@ public class CameraFragment extends Fragment {
             if (type.equals("capture")) {
                 cameraFragment.takePhoto();
                 stopButton.setVisibility(View.INVISIBLE);
-
+                exitButton.setClickable(false);
             }
             if (type.equals("camera")) {
                 Toast.makeText(getContext(), "开始录制", Toast.LENGTH_SHORT).show();
@@ -479,7 +483,7 @@ public class CameraFragment extends Fragment {
                 stopButton.setVisibility(View.VISIBLE);
                 captureButton.setVisibility(View.INVISIBLE);
                 cameraButton.setVisibility(View.INVISIBLE);
-
+                exitButton.setClickable(false);
                 cameraFragment.captureVideo();
             }
             if (type.equals("stop")) {
@@ -502,6 +506,12 @@ public class CameraFragment extends Fragment {
             Log.i("tiger", "onCheckedChanged:  toggleFlash================");
             toggleFlash();
         }
+        public void setExitButtonEnable(boolean able) {
+            this.exitButton.setClickable(able);
+        }
+
     }
+
+
 
 }

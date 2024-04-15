@@ -1,6 +1,8 @@
 package com.tiger.yunda.enums;
 
-public enum CameraFileType {
+import java.io.Serializable;
+
+public enum CameraFileType implements Serializable {
     VIDEO,
     IMAGE,
     ;

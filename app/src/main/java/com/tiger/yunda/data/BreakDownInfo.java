@@ -4,6 +4,7 @@ import android.net.Uri;
 
 import com.tiger.yunda.ui.common.CameraContentBean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -32,11 +33,11 @@ public class BreakDownInfo {
 
 
     //故障文件
-    private List<CameraContentBean> files;
+    private List<CameraContentBean> files = new ArrayList<>();
 
     private String handleDesc;
 
-    private List<CameraContentBean> handleFiles;
+    private List<CameraContentBean> handleFiles = new ArrayList<>();
 
 
     //false 故障 true 恢复拍照

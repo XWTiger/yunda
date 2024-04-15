@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:theme="@android:style/Theme.NoDisplay"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:theme="@android:style/Theme.NoDisplay"
+        android:background="@drawable/ic_will_do" />
+    <TextView
+        android:text="待办任务"
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/create_mission"
+        android:text="新建任务"
+        android:textColor="@color/green"
+        android:background="@drawable/ic_header_button"
+        android:layout_marginLeft="120dp"
+        android:theme="@android:style/Theme.NoDisplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/accept_all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/ic_header_button"
+        android:text="一键领取"
+        android:textColor="@color/green"
+        android:theme="@android:style/Theme.NoDisplay" />
+</LinearLayout>

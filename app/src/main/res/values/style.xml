@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Widget.Entry" parent="Widget.MaterialComponents.Chip.Entry">
+        <!-- 在这里设置你的样式属性 -->
+    </style>
+
+</resources>

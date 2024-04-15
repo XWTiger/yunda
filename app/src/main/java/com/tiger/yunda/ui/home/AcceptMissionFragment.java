@@ -2,23 +2,36 @@ package com.tiger.yunda.ui.home;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
-import com.tiger.yunda.R;
+import com.tiger.yunda.MainActivity;
+import com.tiger.yunda.data.model.DeliverMssion;
+import com.tiger.yunda.data.model.User;
+import com.tiger.yunda.databinding.DeliverMissionBinding;
 import com.tiger.yunda.databinding.FragmentAcceptMissionBinding;
-import com.tiger.yunda.databinding.FragmentHomeBinding;
-import com.tiger.yunda.ui.breakdown.BreakDownFragment;
+import com.tiger.yunda.ui.home.viewmodel.DeliverMissionAdapter;
+import com.tiger.yunda.ui.home.viewmodel.DeliverMissionViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 //接受任务界面
 public class AcceptMissionFragment extends Fragment {
 
     private FragmentAcceptMissionBinding binding;
+
+    private DeliverMissionBinding deliverMissionBinding;
+
 
     public AcceptMissionFragment() {
 
@@ -39,6 +52,13 @@ public class AcceptMissionFragment extends Fragment {
         return fragment;
     }
 
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    //实际这个类是派发任务的类
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -46,9 +66,34 @@ public class AcceptMissionFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         binding = FragmentAcceptMissionBinding.inflate(inflater, container, false);
-        //View root = binding.getRoot();
-        return inflater.inflate(R.layout.fragment_accept_mission, container, false);
-       // return root;
+
+        DeliverMissionViewModel acceptMissionViewModel = new DeliverMissionViewModel();
+
+        List<User> dusers = new ArrayList<>();
+        acceptMissionViewModel.getUsers(MainActivity.loggedInUser.getDeptId()).observe(getViewLifecycleOwner(), new Observer<List<User>>() {
+            @Override
+            public void onChanged(List<User> users) {
+                dusers.clear();
+                dusers.addAll(users);
+            }
+        });
+        acceptMissionViewModel.getDatas().observe(getViewLifecycleOwner(), new Observer<List<DeliverMssion>>() {
+            @Override
+            public void onChanged(List<DeliverMssion> deliverMssions) {
+                DeliverMissionAdapter deliverMissionAdapter = new DeliverMissionAdapter(getContext(), binding.listItem.getId(),  deliverMssions, dusers);
+                          binding.listItem.setAdapter(deliverMissionAdapter);
+            }
+        });
+
+        View root = binding.getRoot();
+        return root;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        NavController navController = NavHostFragment.findNavController(this);
+        navController.popBackStack();
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

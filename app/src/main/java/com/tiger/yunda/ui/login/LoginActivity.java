@@ -5,6 +5,7 @@ import android.app.Activity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -22,6 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
 import com.tiger.yunda.ui.login.LoginViewModel;
 import com.tiger.yunda.ui.login.LoginViewModelFactory;
@@ -31,6 +33,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private LoginViewModel loginViewModel;
     private ActivityLoginBinding binding;
+
+    public static String LOGIN_RESULT_KEY = "loginResult";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
         final EditText passwordEditText = binding.password;
         final Button loginButton = binding.login;
         final ProgressBar loadingProgressBar = binding.loading;
+        this.getSupportActionBar().hide();
 
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
             @Override
@@ -75,11 +80,15 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 if (loginResult.getSuccess() != null) {
                     updateUiWithUser(loginResult.getSuccess());
-                }
-                setResult(Activity.RESULT_OK);
+                    Intent intent = new Intent();
+                    intent.putExtra(LOGIN_RESULT_KEY,  loginResult.getLoggedInUser());
 
-                //Complete and destroy login activity once successful
-                finish();
+                    setResult(Activity.RESULT_OK, intent);
+                    //Complete and destroy login activity once successful
+                    finish();
+                }
+
+
             }
         });
 

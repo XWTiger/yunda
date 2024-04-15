@@ -1,5 +1,6 @@
 package com.tiger.yunda.ui.home;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,11 +16,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.recyclerview.widget.DiffUtil;
 
+import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
+import com.tiger.yunda.enums.RoleType;
 
 import java.util.List;
 
@@ -29,9 +34,12 @@ public class ListViewAdapter extends ArrayAdapter<Mission> {
     private NavController navController;
     private FragmentManager fragmentManager;
 
-    public ListViewAdapter(@NonNull Context context, int resource,@NonNull List<Mission> objects) {
+    private Activity activity;
+
+    public ListViewAdapter(@NonNull Context context, int resource,@NonNull List<Mission> objects, Activity activity) {
         super(context, resource,objects);
         this.context = context;
+        this.activity = activity;
     }
 
     @NonNull
@@ -52,8 +60,14 @@ public class ListViewAdapter extends ArrayAdapter<Mission> {
             btnItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // 在这里处理按钮点击事件
+                    // 接受事件
                     Log.d("tiger", "onClick: ======================= ");
+                    AppCompatActivity ac = (AppCompatActivity) activity;
+                    ActionBar actionBar = ac.getSupportActionBar();
+                    if (actionBar != null) {
+                        actionBar.setDisplayShowCustomEnabled(false);
+                        actionBar.setDisplayShowTitleEnabled(true);
+                    }
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("系统提示")
                             .setMessage("确认要领取该任务吗？")
@@ -61,7 +75,15 @@ public class ListViewAdapter extends ArrayAdapter<Mission> {
                                 public void onClick(DialogInterface dialog, int which) {
                                     // 点击“OK”按钮后的操作
                                     Toast.makeText(context, "点击确定", Toast.LENGTH_SHORT).show();
-                                    getNavController().navigate(R.id.to_inspection_mission);
+                                    if (MainActivity.loggedInUser.getRole() == RoleType.WORKER) {
+                                        //巡检员
+                                        getNavController().navigate(R.id.to_inspection_mission);
+                                    }
+                                    //to_accept_mission
+                                    if (MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
+                                        //工班长
+                                        getNavController().navigate(R.id.to_accept_mission);
+                                    }
                                     dialog.dismiss();
                                 }
                             })
@@ -72,36 +94,13 @@ public class ListViewAdapter extends ArrayAdapter<Mission> {
                                 }
                             })
                             .show();
-                    // 例如：Toast.makeText(context, "Button clicked for " + item, Toast.LENGTH_SHORT).show();
-//                    new QMUIDialog.MessageDialogBuilder(context)
-//                            .setTitle("系统提示")
-//                            .setMessage("确认要领取该任务吗？")
-//
-//                            .addAction("取消", new QMUIDialogAction.ActionListener() {
-//                                @Override
-//                                public void onClick(QMUIDialog dialog, int index) {
-//                                    dialog.dismiss();
-//                                }
-//                            })
-//                            .addAction("确定", new QMUIDialogAction.ActionListener() {
-//                                @Override
-//                                public void onClick(QMUIDialog dialog, int index) {
-//                                    Toast.makeText(context, "点击确定", Toast.LENGTH_SHORT).show();
-//                                    //getNavController().navigate(R.id.to_accept_mission);
-//
-//
-//                                    getNavController().navigate(R.id.to_inspection_mission);
-//                                    dialog.dismiss();
-//                                }
-//                            }).show();
-
                 }
             });
 
             btnReject.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // 在这里处理按钮点击事件
+                    // 拒绝事件
                     Log.d("tiger", "onClick: ======================= ");
                     // 例如：Toast.makeText(context, "Button clicked for " + item, Toast.LENGTH_SHORT).show();
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);

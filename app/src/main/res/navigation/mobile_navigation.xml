@@ -49,10 +49,12 @@
     <fragment android:id="@+id/inspection_mission"
         android:name="com.tiger.yunda.ui.home.inspection.InspectionFragment"
         android:label="巡检"
+
         tools:layout="@layout/fragment_inspection">
        <!-- -->
        <action android:id="@+id/to_inspection_report" app:destination="@id/problem_dialog"/>
         <action android:id="@+id/dialog_to_camera" app:destination="@id/inspection_camera"/>
+        <action android:id="@+id/to_navigation_mission" app:destination="@id/navigation_mission"/>
     </fragment>
 
     <!--<fragment android:id="@+id/inspecton_report"
@@ -67,7 +69,7 @@
 
     <fragment android:id="@+id/inspection_camera"
         android:name="com.tiger.yunda.ui.common.CameraFragment"
-        android:label="巡检"
+        android:label="拍照"
         tools:layout="@layout/fragment_camera">
          <action android:id="@+id/to_inspection_mission" app:destination="@id/inspection_mission" />
     </fragment>

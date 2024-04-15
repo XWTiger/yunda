@@ -1,27 +1,31 @@
 package com.tiger.yunda.ui.home;
 
+import android.graphics.BlendMode;
+import android.graphics.BlendModeColorFilter;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.tiger.yunda.R;
 import com.tiger.yunda.databinding.FragmentHomeBinding;
-import com.tiger.yunda.ui.login.LoginViewModel;
-import com.tiger.yunda.ui.login.LoginViewModelFactory;
 
 public class MissionFragment extends Fragment {
 
@@ -29,6 +33,48 @@ public class MissionFragment extends Fragment {
     private ProgressBar progressBar;
 
     private TextView textView;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+       // setHasOptionsMenu(true);
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false); // 可选，如果不需要显示默认标题
+
+            // 创建自定义视图
+            View customView = LayoutInflater.from(getContext()).inflate(R.layout.header_mission_layout, null);
+
+            Button myButton = customView.findViewById(R.id.accept_all);
+            Button missionyButton = customView.findViewById(R.id.create_mission);
+           // BlendModeColorFilter filter = new BlendModeColorFilter(Color.parseColor("#ffffff"), BlendMode.SRC_ATOP);
+
+
+            // 按钮的点击事件,一键领取
+            myButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // 按钮点击后的操作
+                    Log.i("xiaweihu", "header on click:  =========================");
+                }
+            });
+
+            //新建任务
+            missionyButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // 按钮点击后的操作
+                    Log.i("xiaweihu", "header on click:  =========================");
+                }
+            });
+
+            // 设置自定义视图
+            actionBar.setCustomView(customView);
+        }
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -42,6 +88,7 @@ public class MissionFragment extends Fragment {
         progressBar = binding.progressBar;
         textView = binding.missionResultTv;
 
+
         NavController navController = NavHostFragment.findNavController(this);
 
         missionViewModel.getData().observe(getViewLifecycleOwner(), new Observer<MissionResult>() {
@@ -53,7 +100,7 @@ public class MissionFragment extends Fragment {
                     textView.setVisibility(View.VISIBLE);
                 } else {
 
-                    ListViewAdapter listViewAdapter = new ListViewAdapter(getActivity(), listView.getId(), missionViewModel.getData().getValue().getData());
+                    ListViewAdapter listViewAdapter = new ListViewAdapter(getActivity(), listView.getId(), missionViewModel.getData().getValue().getData(), getActivity());
                     listViewAdapter.setNavController(navController);
                     listViewAdapter.setFragmentManager(getFragmentManager());
                     listView.setAdapter(listViewAdapter);
@@ -63,6 +110,20 @@ public class MissionFragment extends Fragment {
 
         return root;
     }
+
+  /*  @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.header_bar, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        NavController navController = NavHostFragment.findNavController(this);
+        navController.popBackStack();
+        Log.i("xiaweihu", "onOptionsItemSelected: ========================" + item.getItemId());
+        return super.onOptionsItemSelected(item);
+    }*/
 
     @Override
     public void onDestroyView() {

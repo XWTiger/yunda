@@ -1,6 +1,7 @@
 package com.tiger.yunda.data;
 
 import com.tiger.yunda.data.model.LoggedInUser;
+import com.tiger.yunda.enums.RoleType;
 
 import java.io.IOException;
 
@@ -16,7 +17,9 @@ public class LoginDataSource {
             LoggedInUser fakeUser =
                     new LoggedInUser(
                             java.util.UUID.randomUUID().toString(),
-                            "Jane Doe");
+                            "tiger", RoleType.WORKER_LEADER );
+            fakeUser.setToken("aaasd");
+            fakeUser.setUserId("1");
             return new Result.Success<>(fakeUser);
         } catch (Exception e) {
             return new Result.Error(new IOException("Error logging in", e));

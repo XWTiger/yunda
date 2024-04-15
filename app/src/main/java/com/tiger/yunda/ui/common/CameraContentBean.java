@@ -14,10 +14,10 @@ public class CameraContentBean implements Serializable {
 
     private boolean problem;
 
-    private Uri uri;
+    private String uri;
 
 
-    public CameraContentBean(CameraFileType type, Uri uri, boolean problem) {
+    public CameraContentBean(CameraFileType type, String uri, boolean problem) {
         this.type = type;
         this.uri = uri;
         this.problem = problem;
@@ -31,11 +31,11 @@ public class CameraContentBean implements Serializable {
         this.type = type;
     }
 
-    public Uri getUri() {
+    public String getUri() {
         return uri;
     }
 
-    public void setUri(Uri uri) {
+    public void setUri(String uri) {
         this.uri = uri;
     }
 

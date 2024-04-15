@@ -1,26 +1,20 @@
 package com.tiger.yunda.ui.common;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-import androidx.annotation.NonNull;
-
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -29,27 +23,33 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.tiger.yunda.R;
 import com.tiger.yunda.data.BreakDownInfo;
 import com.tiger.yunda.data.BreakDownType;
+import com.tiger.yunda.databinding.ChipFileBinding;
 import com.tiger.yunda.databinding.FragmentBreakdownListDialogItemBinding;
-import com.tiger.yunda.databinding.FragmentBreakdowntDialogListDialogBinding;
 import com.tiger.yunda.enums.CameraFileType;
-import com.tiger.yunda.ui.login.LoginViewModel;
-import com.tiger.yunda.ui.login.LoginViewModelFactory;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <p>A fragment that shows a list of items as a modal bottom sheet.</p>
@@ -63,7 +63,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
 
     private static final String ARG_ITEM_COUNT = "item_count";
     private FragmentBreakdownListDialogItemBinding binding;
-    private FragmentBreakdowntDialogListDialogBinding listDialogBinding;
+
 
     private int CHOOSE_CODE = 3;
     private Context context;
@@ -74,6 +74,8 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
 
     private BreakDownInfo breakDownInfo = null;
     private SpinnerAdapter spinnerAdapter;
+    ActivityResultLauncher<PickVisualMediaRequest>  pickMultipleMedia;
+
 
 
     public static   BreakDownListDialogFragment newInstance(int itemCount, BreakDownInfo info) {
@@ -82,15 +84,13 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
         if  (Objects.isNull(breakDownListDialogFragment)) {
             synchronized (ARG_ITEM_COUNT) {
                  breakDownListDialogFragment = new BreakDownListDialogFragment();
-                 Bundle args = new Bundle();
+                /* Bundle args = new Bundle();
                 args.putInt(ARG_ITEM_COUNT, itemCount);
-                breakDownListDialogFragment.setArguments(args);
+                breakDownListDialogFragment.setArguments(args);*/
                 breakDownListDialogFragment.breakDownInfo = info;
             }
         }
-        if (breakDownListDialogFragment.breakDownInfo == null) {
-            breakDownListDialogFragment.breakDownInfo = info;
-        }
+        breakDownListDialogFragment.breakDownInfo = info;
         return breakDownListDialogFragment;
     }
 
@@ -110,6 +110,8 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
         context = getContext();
         spinnerAdapter = new SpinnerAdapter(breakDownTypes, context);
 
+
+
     }
 
     @Nullable
@@ -118,7 +120,6 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
                              @Nullable Bundle savedInstanceState) {
         //return inflater.inflate(R.layout.fragment_breakdown_list_dialog_item, container);
         binding = FragmentBreakdownListDialogItemBinding.inflate(inflater, container, false);
-        listDialogBinding = FragmentBreakdowntDialogListDialogBinding.inflate(inflater, container, false);
         binding.problemCatalogSelect.setAdapter(spinnerAdapter);
         if (Objects.nonNull(viewModel)) {
             viewModel.getTypes().observe(this, new Observer<List<BreakDownType>>() {
@@ -131,7 +132,17 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
 
         }
         ViewHolder viewHolder = new ViewHolder(this);
-
+        pickMultipleMedia =
+                registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(4), uris -> {
+                    // Callback is invoked after the user selects media items or closes the
+                    // photo picker.
+                    if (!uris.isEmpty()) {
+                        Log.d("PhotoPicker", "Number of items selected: " + uris.size());
+                        viewHolder.handleFileUri(uris);
+                    } else {
+                        Log.d("PhotoPicker", "No media selected");
+                    }
+                });
         return binding.getRoot();
 
     }
@@ -139,9 +150,6 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-       /* final RecyclerView recyclerView = (RecyclerView) view;
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new BreakDownAdapter(getArguments().getInt(ARG_ITEM_COUNT)));*/
 
     }
 
@@ -163,8 +171,6 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
 
         private ChipGroup chipGroup;
 
-        private Chip chip;
-
         private Switch aSwitch;
 
         private ImageButton addRecoverButton;
@@ -179,6 +185,12 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
 
 
         BreakDownListDialogFragment breakDownListDialogFragment;
+
+        private List<CameraContentBean> removeProblem = new ArrayList<>();
+
+        private List<CameraContentBean> removeRecover = new ArrayList<>();
+
+        private boolean way;
 
 
 
@@ -198,7 +210,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
             addRecoverButton = binding.imageButton2; //添加恢复视频或照片
             addRecoverButton.setTag("recover_problem");
             addRecoverButton.setOnClickListener(this);
-            chip = binding.chip2;
+
             this.breakDownListDialogFragment = breakDownListDialogFragment;
             recoverLayout = binding.recoverLayout;
             problemRecoverLayout = binding.problemRecoverVedio;
@@ -220,11 +232,13 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
                 if (Objects.nonNull(breakDownInfo.getFiles()) && !breakDownInfo.getFiles().isEmpty()) {
                     chipGroup.removeAllViews();
 
-                    int position = 0;
+                    AtomicInteger position = new AtomicInteger();
                     breakDownInfo.getFiles().forEach(s -> {
+                        Chip chip =  (Chip) LayoutInflater.from(context).inflate(R.layout.chip_file, null);;
                         chip.setText("故障." + (s.getType().equals(CameraFileType.IMAGE)?"jpg":"mp4"));
-                        chip.setTag(position);
+                        chip.setTag("problem_" + position.get());
                         chipGroup.addView(chip);
+                        position.getAndIncrement();
                     });
 
                 }
@@ -233,11 +247,13 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
                     if (Objects.nonNull(breakDownInfo.getHandleFiles()) && !breakDownInfo.getHandleFiles().isEmpty()) {
                         recoverChipGroup.removeAllViews();
 
-                        int position = 0;
+                        AtomicInteger position = new AtomicInteger();
                         breakDownInfo.getFiles().forEach(s -> {
+                            Chip chip = (Chip) LayoutInflater.from(context).inflate(R.layout.chip_file, null);;
                             chip.setText("恢复." + (s.getType().equals(CameraFileType.IMAGE)?"jpg":"mp4"));
-                            chip.setTag(position);
+                            chip.setTag("recover_" + position.get());
                             recoverChipGroup.addView(chip);
+                            position.getAndIncrement();
                         });
                     }
 
@@ -255,6 +271,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
             } else {
                 this.recoverLayout.setVisibility(View.INVISIBLE);
                 this.problemRecoverLayout.setVisibility(View.INVISIBLE);
+                this.recoverChipGroup.removeAllViews();
             }
             breakDownInfo.setDiscretion(isChecked);
         }
@@ -265,83 +282,103 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
 
             String tag = (String) v.getTag();
             saveInfo();
-            switch (tag) {
-                case "problem_video":
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setTitle("故障资料")
-                            .setMessage("请选择文件或者拍照")
-                            .setPositiveButton("已有图像", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // 点击“OK”按钮后的操作
-                                    Log.i("xiaweihu", "图像:  =========================>");
-                                    Intent albumIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                                    albumIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);   // 是否允许多选
-                                    albumIntent.setType("*/*");
-                                    startActivityForResult(albumIntent, CHOOSE_CODE); // 打开系统相册
-                                    dialog.dismiss();
-                                }
-                            })
-                            .setNegativeButton("拍摄", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // 点击“Cancel”按钮后的操作
-                                    Toast.makeText(context, "拍摄", Toast.LENGTH_SHORT).show();
-                                    //getNavController().navigate(R.id.to_accept_mission);
-                                    Log.i("xiaweihu", "拍摄:  =========================>");
-                                    if (breakDownListDialogFragment != null && breakDownListDialogFragment.getDialog() != null) {
-                                        // View view = breakDownListDialogFragment.getDialog().getWindow().getDecorView();
-                                        //view.setVisibility(View.GONE); // 设置对话框的视图不可见
-                                        breakDownListDialogFragment.dismiss();
+            if (StringUtils.isNotBlank(tag)) {
+                switch (tag) {
+                    case "problem_video":
+                        removeProblem.clear();
+                        if (Objects.nonNull(breakDownInfo.getFiles())) {
+                            breakDownInfo.getFiles().clear();
+                        }
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setTitle("故障资料")
+                                .setMessage("请选择文件或者拍照")
+                                .setPositiveButton("已有图像", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // 点击“OK”按钮后的操作
+                                        Log.i("xiaweihu", "图像:  =========================>");
+                                        way = true;
+                                        openFilePicker();
+                                        //dialog.dismiss();
                                     }
-                                    Bundle bundle = new Bundle();
-                                    bundle.putString("type", "1");
-                                    NavHostFragment.findNavController(breakDownListDialogFragment).navigate(R.id.dialog_to_camera, bundle);
-                                    dialog.dismiss();
-                                }
-                            })
-                            .show();
-                    break;
-                case "recover_problem":
-                    AlertDialog.Builder builderRecover = new AlertDialog.Builder(context);
-                    builderRecover.setTitle("故障资料")
-                            .setMessage("请选择文件或者拍照")
-                            .setPositiveButton("已有图像", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // 点击“OK”按钮后的操作
-                                    Log.i("xiaweihu", "图像:  =========================>");
-                                    Intent albumIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                                    albumIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);   // 是否允许多选
-                                    albumIntent.setType("*/*");
-                                    albumIntent.addCategory(Intent.CATEGORY_OPENABLE);
-                                    startActivityForResult(albumIntent, CHOOSE_CODE); // 打开系统相册
-                                    dialog.dismiss();
-                                }
-                            })
-                            .setNegativeButton("拍摄", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // 点击“Cancel”按钮后的操作
-                                    Toast.makeText(context, "拍摄", Toast.LENGTH_SHORT).show();
-                                    //getNavController().navigate(R.id.to_accept_mission);
-                                    Log.i("xiaweihu", "拍摄:  =========================>");
-                                    if (breakDownListDialogFragment != null && breakDownListDialogFragment.getDialog() != null) {
-                                        // View view = breakDownListDialogFragment.getDialog().getWindow().getDecorView();
-                                        //view.setVisibility(View.GONE); // 设置对话框的视图不可见
-                                        breakDownListDialogFragment.dismiss();
+                                })
+                                .setNegativeButton("拍摄", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // 点击“Cancel”按钮后的操作
+                                        Toast.makeText(context, "拍摄", Toast.LENGTH_SHORT).show();
+                                        //getNavController().navigate(R.id.to_accept_mission);
+                                        Log.i("xiaweihu", "拍摄:  =========================>");
+                                        if (breakDownListDialogFragment != null && breakDownListDialogFragment.getDialog() != null) {
+                                            // View view = breakDownListDialogFragment.getDialog().getWindow().getDecorView();
+                                            //view.setVisibility(View.GONE); // 设置对话框的视图不可见
+                                            breakDownListDialogFragment.dismiss();
+                                        }
+                                        Bundle bundle = new Bundle();
+                                        bundle.putString("type", "1");
+                                        NavHostFragment.findNavController(breakDownListDialogFragment).navigate(R.id.dialog_to_camera, bundle);
+                                        dialog.dismiss();
                                     }
-                                    Bundle bundle = new Bundle();
-                                    bundle.putString("type", "0");
-                                    NavHostFragment.findNavController(breakDownListDialogFragment).navigate(R.id.dialog_to_camera, bundle);
-                                    dialog.dismiss();
-                                }
-                            })
-                            .show();
-                    break;
-                case "finished":
-                    break;
+                                })
+                                .show();
+                        break;
+                    case "recover_problem":
+                        removeRecover.clear();
+                        if (Objects.nonNull(breakDownInfo.getHandleFiles())) {
+                            breakDownInfo.getHandleFiles().clear();
+                        }
+                        AlertDialog.Builder builderRecover = new AlertDialog.Builder(context);
+                        builderRecover.setTitle("故障资料")
+                                .setMessage("请选择文件或者拍照")
+                                .setPositiveButton("已有图像", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // 点击“OK”按钮后的操作
+                                        Log.i("xiaweihu", "图像:  =========================>");
+                                        way = false;
+                                        openFilePicker();
+                                        //dialog.dismiss();
+                                    }
+                                })
+                                .setNegativeButton("拍摄", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // 点击“Cancel”按钮后的操作
+                                        Toast.makeText(context, "拍摄", Toast.LENGTH_SHORT).show();
+                                        //getNavController().navigate(R.id.to_accept_mission);
+                                        Log.i("xiaweihu", "拍摄:  =========================>");
+                                        if (breakDownListDialogFragment != null && breakDownListDialogFragment.getDialog() != null) {
+                                            // View view = breakDownListDialogFragment.getDialog().getWindow().getDecorView();
+                                            //view.setVisibility(View.GONE); // 设置对话框的视图不可见
+                                            breakDownListDialogFragment.dismiss();
+                                        }
+                                        Bundle bundle = new Bundle();
+                                        bundle.putString("type", "0");
+                                        NavHostFragment.findNavController(breakDownListDialogFragment).navigate(R.id.dialog_to_camera, bundle);
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .show();
+                        break;
+                    case "finished":
+                        break;
+                    default: //文件chip 选择
+                        if (tag.startsWith("problem_")) { //删除故障图片或视频
+                            String position = tag.split("_")[1];
+                            chipGroup.removeView(v);
+                            removeProblem.add(breakDownInfo.getFiles().get(Integer.parseInt(position)));
+
+                        }
+                        if (tag.startsWith("recover_")) { //删除恢复图片或视频
+                            String position = tag.split("_")[1];
+                            recoverChipGroup.removeView(v);
+                            removeRecover.add(breakDownInfo.getHandleFiles().get(Integer.parseInt(position)));
+                        }
+
+                }
 
             }
 
 
         }
+
+
 
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -364,18 +401,86 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
             breakDownInfo.setDesc(this.problemDesc.getText().toString());
             breakDownInfo.setType((Integer) this.type.getTag());
         }
-    }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i("xiaweihu", "onActivityResult:  ==========>" + data.getData().toString() + "==========>" +  data.getClipData().getItemCount());
-        data.getClipData().getItemAt(1).getUri();
-        if ( this.getDialog() != null) {
-            View view = this.getDialog().getWindow().getDecorView();
-            view.setVisibility(View.VISIBLE); // 设置对话框的视图不可见
+        public String getMimeType(ContentResolver contentResolver, Uri fileUri) {
+            MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+            String extension = mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(fileUri));
+            return extension;
+        }
+
+        public void handleFileUri(List<Uri> uris) {
+
+                if (way) {
+                    if (Objects.isNull(breakDownInfo.getFiles())) {
+                        breakDownInfo.setFiles(new ArrayList<>());
+                    }
+                    List<CameraContentBean> ccbs = new ArrayList<>();
+
+                    uris.forEach(uri -> {
+                        String type = getMimeType(context.getContentResolver(), uri);
+                        CameraContentBean cameraContentBean = null;
+                        if (type.equals("jpg")) {
+                          cameraContentBean = new CameraContentBean(CameraFileType.IMAGE, uri.toString(), way);
+                        } else {
+                            cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, uri.toString(), way);
+                        }
+                        ccbs.add(cameraContentBean);
+                    });
+                    breakDownInfo.setFiles(ccbs);
+                    chipGroup.removeAllViews();
+                    AtomicInteger position = new AtomicInteger();
+                    breakDownInfo.getFiles().forEach(s -> {
+
+                        Chip chip = (Chip) LayoutInflater.from(context).inflate(R.layout.chip_file, null);
+                        chip.setText("故障_" + position.get() + "." + (s.getType().equals(CameraFileType.IMAGE)?"jpg":"mp4"));
+                        chip.setTag("problem_" + position.get());
+                        chip.setOnClickListener(this);
+                        chipGroup.addView(chip);
+                        position.getAndIncrement();
+                    });
+                } else {
+                    if (Objects.isNull(breakDownInfo.getHandleFiles())) {
+                        breakDownInfo.setHandleFiles(new ArrayList<>());
+                    }
+                    recoverChipGroup.removeAllViews();
+                    List<CameraContentBean> ccbs = new ArrayList<>();
+
+                    uris.forEach(uri -> {
+                        String type = getMimeType(context.getContentResolver(), uri);
+                        CameraContentBean cameraContentBean = null;
+                        if (type.equals("jpg")) {
+                            cameraContentBean = new CameraContentBean(CameraFileType.IMAGE, uri.toString(), way);
+                        } else {
+                            cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, uri.toString(), way);
+                        }
+                        ccbs.add(cameraContentBean);
+                    });
+                    breakDownInfo.setHandleFiles(ccbs);
+                    AtomicInteger position = new AtomicInteger();
+                    breakDownInfo.getFiles().forEach(s -> {
+                        Chip chip = (Chip) LayoutInflater.from(context).inflate(R.layout.chip_file, null);
+                        chip.setText("恢复_" + position.get() + "." + (s.getType().equals(CameraFileType.IMAGE)?"jpg":"mp4"));
+                        chip.setTag("recover_" + position.get());
+                        chip.setOnClickListener(this);
+                        recoverChipGroup.addView(chip);
+                        position.getAndIncrement();
+                    });
+                }
+
+
+
         }
     }
 
+    public void openFilePicker() {
+        // For this example, launch the photo picker and let the user choose images
+        // and videos. If you want the user to select a specific type of media file,
+        // use the overloaded versions of launch(), as shown in the section about how
+        // to select a single media item.
+        pickMultipleMedia.launch(new PickVisualMediaRequest.Builder()
+                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageAndVideo.INSTANCE)
+                .build());
+    }
 
 
 
