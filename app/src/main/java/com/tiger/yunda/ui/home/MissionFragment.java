@@ -41,7 +41,7 @@ public class MissionFragment extends Fragment {
        // setHasOptionsMenu(true);
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         ActionBar actionBar = activity.getSupportActionBar();
-        if (actionBar != null) {
+        if (actionBar != null) { //自定义应用栏
             actionBar.setDisplayShowCustomEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false); // 可选，如果不需要显示默认标题
 

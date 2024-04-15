@@ -1,25 +1,9 @@
 package com.tiger.yunda.ui.home.inspection;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.NavigationUI;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,12 +11,17 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+
 import com.tiger.yunda.R;
 import com.tiger.yunda.data.BreakDownInfo;
-import com.tiger.yunda.databinding.FragmentHomeBinding;
-import com.tiger.yunda.databinding.FragmentInspectionListBinding;
 import com.tiger.yunda.ui.common.BreakDownListDialogFragment;
 import com.tiger.yunda.ui.common.CameraContentBean;
+import com.tiger.yunda.ui.home.ListViewAdapter;
+import com.tiger.yunda.ui.home.Mission;
 import com.tiger.yunda.ui.home.inspection.placeholder.PlaceholderContent;
 
 import java.util.ArrayList;
@@ -47,7 +36,7 @@ public class InspectionFragment extends Fragment {
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
-    private int mColumnCount = 1;
+    private Mission mission;
 
     private BreakDownInfo breakDownInfo;
 
@@ -78,7 +67,7 @@ public class InspectionFragment extends Fragment {
             breakDownInfo = new BreakDownInfo();
         }
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            mission = (Mission) getArguments().getSerializable(ListViewAdapter.MISSION_KEY);
         }
         setHasOptionsMenu(true);
 

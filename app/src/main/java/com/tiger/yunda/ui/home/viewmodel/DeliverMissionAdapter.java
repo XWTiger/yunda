@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -48,6 +49,7 @@ public class DeliverMissionAdapter extends ArrayAdapter<DeliverMssion> {
         deliverMissionBinding.setDeliver(deliverMissions.get(position));
         SpinnerAdapter spinnerAdapter = new SpinnerAdapter(covertUserToSpinnerObj(users), getContext());
         deliverMissionBinding.spinnerPerson.setAdapter(spinnerAdapter);
+        setCheck(deliverMissionBinding.spinnerPerson, deliverMissions.get(position));
 
         return deliverMissionBinding.getRoot();
 
@@ -66,5 +68,21 @@ public class DeliverMissionAdapter extends ArrayAdapter<DeliverMssion> {
             types.add(breakDownType);
         });
         return types;
+    }
+
+    private void setCheck(Spinner spinner, DeliverMssion deliverMssion) {
+        if (Objects.isNull(spinner) || users.isEmpty()) {
+            return;
+        }
+        if (deliverMssion.getInspectorId().get() <= 0) {
+            return;
+        }
+        for (int i = 0; i < users.size(); i++) {
+            if (deliverMssion.getInspectorId().get() == users.get(i).getValue()) {
+                spinner.setSelection(i);
+                return;
+            }
+        }
+        ;
     }
 }

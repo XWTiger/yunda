@@ -1,9 +1,10 @@
 package com.tiger.yunda.ui.home;
 
+import java.io.Serializable;
 import java.util.List;
 
 //任务
-public class Mission {
+public class Mission implements Serializable {
 
     private String id;
     private String taskId;

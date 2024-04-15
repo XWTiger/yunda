@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,16 +31,20 @@ import java.util.List;
 
 public class ListViewAdapter extends ArrayAdapter<Mission> {
 
+    public static String MISSION_KEY = "mission";
     private Context context;
     private NavController navController;
     private FragmentManager fragmentManager;
 
     private Activity activity;
 
+    private List<Mission> objects;
+
     public ListViewAdapter(@NonNull Context context, int resource,@NonNull List<Mission> objects, Activity activity) {
         super(context, resource,objects);
         this.context = context;
         this.activity = activity;
+        this.objects = objects;
     }
 
     @NonNull
@@ -54,7 +59,9 @@ public class ListViewAdapter extends ArrayAdapter<Mission> {
 
             TextView tvItem = convertView.findViewById(R.id.editTextTextMultiLine);
             Button btnItem = convertView.findViewById(R.id.button_accept);
+            btnItem.setTag(position);
             Button btnReject = convertView.findViewById(R.id.button_reject);
+            btnReject.setTag(position);
             CheckBox checkBox = convertView.findViewById(R.id.checkBox);
 
             btnItem.setOnClickListener(new View.OnClickListener() {
@@ -68,21 +75,25 @@ public class ListViewAdapter extends ArrayAdapter<Mission> {
                         actionBar.setDisplayShowCustomEnabled(false);
                         actionBar.setDisplayShowTitleEnabled(true);
                     }
+                    int position = (int) v.getTag();
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(MISSION_KEY, objects.get(position));
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("系统提示")
                             .setMessage("确认要领取该任务吗？")
                             .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
+
                                     // 点击“OK”按钮后的操作
                                     Toast.makeText(context, "点击确定", Toast.LENGTH_SHORT).show();
                                     if (MainActivity.loggedInUser.getRole() == RoleType.WORKER) {
                                         //巡检员
-                                        getNavController().navigate(R.id.to_inspection_mission);
+                                        getNavController().navigate(R.id.to_inspection_mission, bundle);
                                     }
                                     //to_accept_mission
                                     if (MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
                                         //工班长
-                                        getNavController().navigate(R.id.to_accept_mission);
+                                        getNavController().navigate(R.id.to_accept_mission, bundle);
                                     }
                                     dialog.dismiss();
                                 }
@@ -101,6 +112,9 @@ public class ListViewAdapter extends ArrayAdapter<Mission> {
                 @Override
                 public void onClick(View v) {
                     // 拒绝事件
+                    int position = (int) v.getTag();
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(MISSION_KEY, objects.get(position));
                     Log.d("tiger", "onClick: ======================= ");
                     // 例如：Toast.makeText(context, "Button clicked for " + item, Toast.LENGTH_SHORT).show();
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -135,22 +149,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> {
         return convertView;
     }
 
-    private static final DiffUtil.ItemCallback<Mission> diffCallback = new DiffUtil.ItemCallback<Mission>() {
-        @Override
-        public boolean areItemsTheSame(@NonNull Mission oldItem, @NonNull Mission newItem) {
-            //判断数据是否为同一项，一般用名称判断
-            //当return值为true时执行下面areContentsTheSame方法
-            return oldItem.getTaskId().equals(newItem.getTaskId());
-        }
 
-        @Override
-        public boolean areContentsTheSame(@NonNull Mission oldItem, @NonNull Mission newItem) {
-            //判断数据内容是否相同，根据需求更改
-            if (oldItem.getTaskId() != newItem.getTaskId()) return false;
-            if (!oldItem.getInspectionUnit().equals(newItem.getInspectionUnit())) return false;
-            return true;
-        }
-    };
 
     public NavController getNavController() {
         return navController;
