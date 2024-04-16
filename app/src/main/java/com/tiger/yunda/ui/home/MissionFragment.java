@@ -24,8 +24,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
 import com.tiger.yunda.databinding.FragmentHomeBinding;
+import com.tiger.yunda.enums.RoleType;
+import com.tiger.yunda.ui.login.LoginActivity;
 
 public class MissionFragment extends Fragment {
 
@@ -54,6 +57,9 @@ public class MissionFragment extends Fragment {
 
              myButton = customView.findViewById(R.id.accept_all);
              missionyButton = customView.findViewById(R.id.create_mission);
+            if (MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
+                missionyButton.setVisibility(View.VISIBLE);
+            }
            // BlendModeColorFilter filter = new BlendModeColorFilter(Color.parseColor("#ffffff"), BlendMode.SRC_ATOP);
 
 

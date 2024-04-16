@@ -18,6 +18,7 @@
     <Button
         android:id="@+id/create_mission"
         android:text="新建任务"
+        android:visibility="gone"
         android:textColor="@color/green"
         android:background="@drawable/ic_header_button"
         android:layout_marginLeft="120dp"
@@ -27,7 +28,7 @@
 
     <Button
         android:id="@+id/accept_all"
-        android:visibility="invisible"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"

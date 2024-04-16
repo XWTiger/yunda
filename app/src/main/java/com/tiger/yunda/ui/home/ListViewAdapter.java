@@ -45,11 +45,14 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
 
     private Button acceptAll;
 
+    private int checkedNum = 0;
+
     public ListViewAdapter(@NonNull Context context, int resource,@NonNull List<Mission> objects, Activity activity) {
         super(context, resource,objects);
         this.context = context;
         this.activity = activity;
         this.objects = objects;
+        checkedNum = 0;
     }
 
     @NonNull
@@ -158,7 +161,17 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        acceptAll.setVisibility(View.VISIBLE);
+        if (isChecked) {
+            checkedNum += 1;
+        } else {
+            checkedNum -= 1;
+        }
+        if (checkedNum > 0 && acceptAll.getVisibility() == View.INVISIBLE) {
+            acceptAll.setVisibility(View.VISIBLE);
+        }
+        if (checkedNum == 0) {
+            acceptAll.setVisibility(View.INVISIBLE);
+        }
     }
 
     public Button getAcceptAll() {
