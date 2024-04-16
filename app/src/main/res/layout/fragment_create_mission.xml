@@ -1,53 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-   <LinearLayout
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content">
-       <TextView
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:textColor="@color/black"
-           android:text="任务名称:"/>
-       <EditText
-           android:text="请输入任务名称"
-           android:layout_marginLeft="20dp"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"/>
+    <data >
+        <variable
+            name="creation"
+            type="com.tiger.yunda.data.model.CreateMission" />
+    </data>
 
-   </LinearLayout>
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="35dp"
+                android:text="任务名称:"
+                android:textColor="@color/black" />
+
+            <EditText
+                android:id="@+id/mission_name"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="@{creation.name}"
+                android:hint="请输入任务名称" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="部门/班组编号:"
+                android:textColor="@color/black" />
+
+            <EditText
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="@{creation.deptId}"
+                android:hint="请输入编号" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="19dp"
+                android:text="工班长编号:"
+                android:textColor="@color/black" />
+
+            <EditText
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="@{creation.leaderId}"
+                android:hint="请输入编号" />
+
+        </LinearLayout>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="部门/班组编号:"/>
-        <EditText
-            android:text="请输入任务名称"
-            android:layout_marginLeft="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_marginLeft="5dp"
+            android:text="计划开始时间:"
+            android:textColor="@color/black" />
 
-    </LinearLayout>
+        <com.loper7.date_time_picker.DateTimePicker
+            android:id="@+id/picker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:dt_dividerColor="#E5E5E5"
+            app:dt_normalTextSize="14sp"
+            app:dt_selectTextSize="16sp"
+            app:dt_selectedTextBold="true"
+            app:dt_showLabel="true"
+            app:dt_textBold="true"
+            app:dt_textColor="#666666"
+            app:dt_themeColor="@color/colorPrimary" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="工班长编号:"/>
-        <EditText
-            android:text="请输入任务名称"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="5dp"
+            android:text="计划结束时间:"
+            android:textColor="@color/black" />
+
+        <com.loper7.date_time_picker.DateTimePicker
+            android:id="@+id/picker_en"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:dt_dividerColor="#E5E5E5"
+            app:dt_normalTextSize="14sp"
+            app:dt_selectTextSize="16sp"
+            app:dt_selectedTextBold="true"
+            app:dt_showLabel="true"
+            app:dt_textBold="true"
+            app:dt_textColor="#666666"
+            app:dt_themeColor="@color/colorPrimary" />
+
+        <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="添加车号:"
+            android:textColor="@color/black" />
+
+        <LinearLayout
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/train_no_text"
+                android:layout_width="wrap_content"
+                android:text="@{creation.trainNoStr}"
+                android:layout_height="wrap_content" />
+
+            <ImageButton
+                android:id="@+id/train_no_add"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/ic_add" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/finished_creation"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="165dp"
+            android:backgroundTint="@color/green"
+            android:text="完成"
+            android:textColor="@color/white" />
 
     </LinearLayout>
-
-</LinearLayout>
+</layout>

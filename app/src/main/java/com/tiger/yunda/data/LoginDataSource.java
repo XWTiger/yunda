@@ -19,6 +19,7 @@ public class LoginDataSource {
                             java.util.UUID.randomUUID().toString(),
                             "tiger", RoleType.WORKER_LEADER );
             fakeUser.setToken("aaasd");
+            fakeUser.setDeptId("123");
             fakeUser.setUserId("1");
             return new Result.Success<>(fakeUser);
         } catch (Exception e) {

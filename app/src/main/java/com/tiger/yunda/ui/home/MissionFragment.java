@@ -30,6 +30,8 @@ import com.tiger.yunda.databinding.FragmentHomeBinding;
 import com.tiger.yunda.enums.RoleType;
 import com.tiger.yunda.ui.login.LoginActivity;
 
+import java.util.Objects;
+
 public class MissionFragment extends Fragment {
 
     private FragmentHomeBinding binding;
@@ -57,12 +59,10 @@ public class MissionFragment extends Fragment {
 
              myButton = customView.findViewById(R.id.accept_all);
              missionyButton = customView.findViewById(R.id.create_mission);
-            if (MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
-                missionyButton.setVisibility(View.VISIBLE);
-            }
+
            // BlendModeColorFilter filter = new BlendModeColorFilter(Color.parseColor("#ffffff"), BlendMode.SRC_ATOP);
 
-
+            NavController navController = NavHostFragment.findNavController(this);
             // 按钮的点击事件,一键领取
             myButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -78,6 +78,10 @@ public class MissionFragment extends Fragment {
                 public void onClick(View v) {
                     // 按钮点击后的操作
                     Log.i("xiaweihu", "header on click:  =========================");
+                    navController.navigate(R.id.to_create_mission);
+                    actionBar.setDisplayShowCustomEnabled(false);
+                    actionBar.setDisplayShowTitleEnabled(true);
+                    //actionBar
                 }
             });
 
@@ -97,6 +101,7 @@ public class MissionFragment extends Fragment {
         final ListView listView = binding.listItem;
         progressBar = binding.progressBar;
         textView = binding.missionResultTv;
+
 
 
         NavController navController = NavHostFragment.findNavController(this);
@@ -135,6 +140,15 @@ public class MissionFragment extends Fragment {
         Log.i("xiaweihu", "onOptionsItemSelected: ========================" + item.getItemId());
         return super.onOptionsItemSelected(item);
     }*/
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (Objects.nonNull(MainActivity.loggedInUser) &&  MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
+            missionyButton.setVisibility(View.VISIBLE);
+        }
+    }
 
     @Override
     public void onDestroyView() {

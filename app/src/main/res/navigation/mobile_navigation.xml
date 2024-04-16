@@ -15,6 +15,7 @@
         >
         <action android:id="@+id/to_accept_mission" app:destination="@id/deliver_mission"/>
         <action android:id="@+id/to_inspection_mission" app:destination="@id/inspection_mission"/>
+        <action android:id="@+id/to_create_mission" app:destination="@id/create_mission"/>
     </fragment>
 
     <fragment
@@ -66,6 +67,10 @@
 
 
     </fragment>-->
+    <fragment android:id="@+id/create_mission"
+        android:name="com.tiger.yunda.ui.home.CreateMissionFragment"
+        tools:layout="@layout/fragment_create_mission"
+        />
 
     <fragment android:id="@+id/inspection_camera"
         android:name="com.tiger.yunda.ui.common.CameraFragment"
