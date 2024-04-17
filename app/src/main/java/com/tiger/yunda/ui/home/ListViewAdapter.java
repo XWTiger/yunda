@@ -26,7 +26,9 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
+import com.tiger.yunda.databinding.FragmentHomeBinding;
 import com.tiger.yunda.enums.RoleType;
+import com.tiger.yunda.utils.TimeUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -45,14 +47,17 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
 
     private Button acceptAll;
 
-    private int checkedNum = 0;
+
+
+    private int[]  checkedArr;
 
     public ListViewAdapter(@NonNull Context context, int resource,@NonNull List<Mission> objects, Activity activity) {
-        super(context, resource,objects);
+        super(context, resource, objects);
         this.context = context;
         this.activity = activity;
         this.objects = objects;
-        checkedNum = 0;
+        checkedArr = new int[objects.size()];
+
     }
 
     @NonNull
@@ -71,6 +76,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
             Button btnReject = convertView.findViewById(R.id.button_reject);
             btnReject.setTag(position);
             CheckBox checkBox = convertView.findViewById(R.id.checkBox);
+            checkBox.setTag(position);
             checkBox.setOnCheckedChangeListener(this);
 
             btnItem.setOnClickListener(new View.OnClickListener() {
@@ -161,18 +167,21 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        int position = (int) buttonView.getTag();
         if (isChecked) {
-            checkedNum += 1;
+            checkedArr[position] = 1;
         } else {
-            checkedNum -= 1;
+            checkedArr[position] = 0;
         }
-        if (checkedNum > 0 && acceptAll.getVisibility() == View.INVISIBLE) {
+        boolean allZero = TimeUtil.checkAllZero(checkedArr);
+        if (!allZero && (acceptAll.getVisibility() == View.INVISIBLE || acceptAll.getVisibility() == View.GONE)) {
             acceptAll.setVisibility(View.VISIBLE);
         }
-        if (checkedNum == 0) {
+        if (allZero) {
             acceptAll.setVisibility(View.INVISIBLE);
         }
     }
+
 
     public Button getAcceptAll() {
         return acceptAll;

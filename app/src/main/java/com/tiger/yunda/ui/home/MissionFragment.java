@@ -60,6 +60,7 @@ public class MissionFragment extends Fragment {
              myButton = customView.findViewById(R.id.accept_all);
              missionyButton = customView.findViewById(R.id.create_mission);
 
+
            // BlendModeColorFilter filter = new BlendModeColorFilter(Color.parseColor("#ffffff"), BlendMode.SRC_ATOP);
 
             NavController navController = NavHostFragment.findNavController(this);
@@ -145,8 +146,15 @@ public class MissionFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (Objects.nonNull(MainActivity.loggedInUser) &&  MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
+        if (Objects.nonNull(MainActivity.loggedInUser) && MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
             missionyButton.setVisibility(View.VISIBLE);
+        }
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) { //自定义应用栏
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
+
         }
     }
 

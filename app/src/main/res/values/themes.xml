@@ -13,13 +13,13 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimarySurface</item>
-        <item name="background">@drawable/login_ico </item>
+        <item name="background">@drawable/ic_yunda </item>
         <!-- Customize your theme here. -->
     </style>
 
 
     <style name="Theme.Yunda.Pendding">
 
-        <item name="background">@drawable/login_ico </item>
+        <item name="background">@drawable/ic_yunda </item>
     </style>
 </resources>
