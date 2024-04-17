@@ -19,10 +19,13 @@ import android.view.ViewGroup;
 import com.loper7.date_time_picker.DateTimePicker;
 import com.tiger.yunda.R;
 import com.tiger.yunda.data.model.CreateMission;
+import com.tiger.yunda.data.model.Train;
 import com.tiger.yunda.databinding.FragmentCreateMissionBinding;
 import com.tiger.yunda.ui.common.TrainListDialogFragment;
 import com.tiger.yunda.ui.home.viewmodel.CreateMissionViewModel;
 import com.tiger.yunda.utils.TimeUtil;
+
+import java.util.List;
 
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
@@ -53,6 +56,8 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
     private DateTimePicker dateTimePicker;
 
     private DateTimePicker dateTimePickerEnd;
+
+    private List<Train> trainList;
 
     public CreateMissionFragment() {
         // Required empty public constructor
@@ -106,21 +111,21 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
                 binding.setCreation(createMission);
             }
         });
-        dateTimePickerEnd.setOnDateTimeChangedListener(new Function1<Long, Unit>() {
+        createMissionViewModel.getTrains().observe(getViewLifecycleOwner(), new Observer<List<Train>>() {
             @Override
-            public Unit invoke(Long aLong) {
-                String time = TimeUtil.getDateStringFromMs(aLong);
-                Log.i("xiaweihu", "invoke: =========>" + time);
-                return null;
+            public void onChanged(List<Train> trains) {
+                trainList = trains;
             }
         });
-        dateTimePicker.setOnDateTimeChangedListener(new Function1<Long, Unit>() {
-            @Override
-            public Unit invoke(Long aLong) {
-                String time = TimeUtil.getDateStringFromMs(aLong);
-                Log.i("xiaweihu", "invoke: =========>" + time);
-                return null;
-            }
+        dateTimePickerEnd.setOnDateTimeChangedListener(aLong -> {
+            String time = TimeUtil.getDateStringFromMs(aLong);
+            Log.i("xiaweihu", "invoke: =========>" + time);
+            return null;
+        });
+        dateTimePicker.setOnDateTimeChangedListener(aLong -> {
+            String time = TimeUtil.getDateStringFromMs(aLong);
+            Log.i("xiaweihu", "invoke: =========>" + time);
+            return null;
         });
 
         /* return inflater.inflate(R.layout.fragment_create_mission, container, false);*/
@@ -141,7 +146,7 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
     public void onClick(View v) {
         String tag = (String) v.getTag();
         if (ACTION_TRAIN_ADD.equals(tag)) {
-            TrainListDialogFragment.newInstance(10).show(getFragmentManager(), "select_train");
+            TrainListDialogFragment.newInstance(trainList).show(getFragmentManager(), "select_train");
         }
 
         if (ACTION_FINISHED.equals(tag)) {

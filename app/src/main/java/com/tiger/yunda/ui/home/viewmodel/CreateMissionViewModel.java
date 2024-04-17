@@ -8,6 +8,7 @@ import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.data.model.CreateMission;
 import com.tiger.yunda.data.model.Train;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CreateMissionViewModel extends ViewModel {
@@ -17,6 +18,7 @@ public class CreateMissionViewModel extends ViewModel {
 
 
     public LiveData<List<Train>> getTrains() {
+        trains.setValue(new ArrayList<>());
         trains.getValue().add(Train.builder()
                         .text("0832")
                         .value(1)

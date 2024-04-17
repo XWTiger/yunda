@@ -1,6 +1,7 @@
 package com.tiger.yunda.ui.common;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +14,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.tiger.yunda.data.model.Train;
 import com.tiger.yunda.databinding.FragmentTrainDialogItemBinding;
 import com.tiger.yunda.databinding.FragmentTrainDialogListDialogBinding;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>A fragment that shows a list of items as a modal bottom sheet.</p>
@@ -30,10 +37,10 @@ public class TrainListDialogFragment extends BottomSheetDialogFragment {
     private FragmentTrainDialogListDialogBinding binding;
 
     // TODO: Customize parameters
-    public static TrainListDialogFragment newInstance(int itemCount) {
+    public static TrainListDialogFragment newInstance(List<Train> itemCount) {
         final TrainListDialogFragment fragment = new TrainListDialogFragment();
         final Bundle args = new Bundle();
-        args.putInt(ARG_ITEM_COUNT, itemCount);
+        args.putSerializable(ARG_ITEM_COUNT, (Serializable) itemCount);
         fragment.setArguments(args);
         return fragment;
     }
@@ -53,7 +60,11 @@ public class TrainListDialogFragment extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         final RecyclerView recyclerView = (RecyclerView) view;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TrainAdapter(getArguments().getInt(ARG_ITEM_COUNT)));
+        List<Train> trains = new ArrayList<>();
+        if (getArguments() != null) {
+            trains = (List<Train>) getArguments().getSerializable(ARG_ITEM_COUNT);
+        }
+        recyclerView.setAdapter(new TrainAdapter(trains));
 
     }
 
@@ -76,9 +87,9 @@ public class TrainListDialogFragment extends BottomSheetDialogFragment {
 
     private class TrainAdapter extends RecyclerView.Adapter<ViewHolder> implements View.OnClickListener {
 
-        private final int mItemCount;
+        private  List<Train> mItemCount;
 
-        TrainAdapter(int itemCount) {
+        TrainAdapter(List<Train> itemCount) {
             mItemCount = itemCount;
         }
 
@@ -92,17 +103,20 @@ public class TrainListDialogFragment extends BottomSheetDialogFragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.text.setText(String.valueOf(position));
+            holder.text.setText(mItemCount.get(position).getText());
         }
 
         @Override
         public int getItemCount() {
-            return mItemCount;
+            if (Objects.isNull(mItemCount)) {
+                return 0;
+            }
+            return mItemCount.size();
         }
 
         @Override
         public void onClick(View v) {
-
+            Log.i("xiaweihu", "选择item ================ ");
         }
     }
 }
