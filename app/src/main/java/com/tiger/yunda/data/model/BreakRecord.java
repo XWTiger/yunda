@@ -31,7 +31,7 @@ public class BreakRecord implements Serializable {
     private String reportUserName;//提报人
     private String handleDesc;//故障处理描述
     private String handleTime;//处理时间
-    private int handleUserId;//处理人id
+    private Integer handleUserId;//处理人id
     private String handleUserName;//处理人
     private int state; //状态, 1:未处理,2:已处理
     private String stateText;//状态名称

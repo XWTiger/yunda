@@ -19,10 +19,10 @@ public class CreateMission {
     private String name ;
     private String deptId;
     private String leaderId;
-    private String planStartTime = "";
-    private String planEndTime = "";
+    private String planStartTime;
+    private String planEndTime;
     private List<String> trainNo;
-    private String trainNoStr = "";
+    private String trainNoStr;
 
 
     public void covertTrainNoStr() {
