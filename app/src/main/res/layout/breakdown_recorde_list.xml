@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="故障车辆: "
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/train_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0808A" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:text="故障分类: "
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/problem_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PIS" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:text="故障状态: "
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/problem_deal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="已处理"
+            android:textColor="@color/green" />
+
+    </LinearLayout>
+    <Button
+        android:id="@+id/problem_detail_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="300dp"
+        android:background="@drawable/button_problem_detail"
+        android:textColor="@color/selector_text_color"
+        android:text="详情" />
+</LinearLayout>

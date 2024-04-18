@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="27dp"
         android:layout_marginBottom="10dp"
-        android:text="2024年02月1日"
+        android:text="请选择时间"
         android:textColor="@color/black"
         android:textSize="10sp"
         app:layout_constraintBottom_toBottomOf="@+id/imageButton3"
