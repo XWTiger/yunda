@@ -29,6 +29,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
     public static int LOGIN_INTENT_RESULT_CODE = 9;
+    public static String SYSTEM_VERSION = "V0.0.1";
 
     private ActivityMainBinding binding;
 

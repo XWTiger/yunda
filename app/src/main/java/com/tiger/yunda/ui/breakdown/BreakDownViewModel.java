@@ -13,7 +13,7 @@ public class BreakDownViewModel extends ViewModel {
 
     private MutableLiveData<List<BreakRecord>> breakrecords = new MutableLiveData<>();
 
-    public LiveData<List<BreakRecord>> getBreakRecords(Integer pageSize, String startTime, String endTime, Integer deptId) {
+    public LiveData<List<BreakRecord>> getBreakRecords(Integer pageNo, Integer pageSize, String startTime, String endTime, Integer deptId) {
 
         List<BreakRecord> breakRecordList = new ArrayList<>();
         BreakRecord record = BreakRecord.builder()

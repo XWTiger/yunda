@@ -7,10 +7,12 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -24,6 +26,7 @@ import com.tiger.yunda.utils.TimeUtil;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,6 +49,9 @@ public class BreakDownFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private BreakDownListAdapter breakDownListAdapter;
+    private ViewHolder viewHolder;
 
     public BreakDownFragment() {
         // Required empty public constructor
@@ -93,24 +99,35 @@ public class BreakDownFragment extends Fragment {
         breakdownRecordeListBinding = BreakdownRecordeListBinding.inflate(inflater, container, false);
         // Inflate the layout for this fragment
         fragmentBreakDownBinding = FragmentBreakDownBinding.inflate(inflater, container, false);
-        BreakDownViewModel breakDownViewModel = new BreakDownViewModel();
-        ViewHolder viewHolder = new ViewHolder(fragmentBreakDownBinding.selectStartTime, fragmentBreakDownBinding.selectEndTime, getContext());
-        breakDownViewModel.getBreakRecords(1000, "2024-01-01 00:00:00", "2024-04-01 00:00:00", Integer.valueOf(MainActivity.loggedInUser.getDeptId()))
+
+
+        if (Objects.isNull(viewHolder)) {
+            viewHolder = new ViewHolder(fragmentBreakDownBinding.selectStartTime, fragmentBreakDownBinding.selectEndTime, getContext(), new BreakDownViewModel());
+            viewHolder.setSwipeRefreshLayout(fragmentBreakDownBinding.freshList);
+        }
+        viewHolder.getBreakDownViewModel().getBreakRecords(1, 100, "2024-01-01 00:00:00", "2024-04-01 00:00:00", Integer.valueOf(MainActivity.loggedInUser.getDeptId()))
                 .observe(getViewLifecycleOwner(), new Observer<List<BreakRecord>>() {
                     @Override
                     public void onChanged(List<BreakRecord> breakRecords) {
-                        BreakDownListAdapter breakDownListAdapter = new BreakDownListAdapter(getContext(), fragmentBreakDownBinding.list.getId(), breakRecords, breakdownRecordeListBinding);
-                        fragmentBreakDownBinding.list.setAdapter(breakDownListAdapter);
+                        if (Objects.isNull(breakDownListAdapter)) {
+                            breakDownListAdapter = new BreakDownListAdapter(getContext(), fragmentBreakDownBinding.list.getId(), breakRecords, breakdownRecordeListBinding);
+                            fragmentBreakDownBinding.list.setAdapter(breakDownListAdapter);
+                            fragmentBreakDownBinding.list.setOnScrollListener(viewHolder);
+                        } else {
+                            breakDownListAdapter.setBreakRecords(breakRecords);
+                            breakDownListAdapter.notifyDataSetChanged();
+                        }
                     }
                 });
         fragmentBreakDownBinding.imageButton3.setOnClickListener(viewHolder);
         fragmentBreakDownBinding.imageButton3.setTag(TIME_ACTION_START);
         fragmentBreakDownBinding.imageButton.setTag(TIME_ACTION_END);
         fragmentBreakDownBinding.imageButton.setOnClickListener(viewHolder);
+        fragmentBreakDownBinding.freshList.setOnRefreshListener(viewHolder);
         return fragmentBreakDownBinding.getRoot();
     }
 
-    public static class ViewHolder implements View.OnClickListener {
+    public static class ViewHolder implements View.OnClickListener, AbsListView.OnScrollListener, SwipeRefreshLayout.OnRefreshListener {
 
         private TextView startTime;
 
@@ -118,16 +135,18 @@ public class BreakDownFragment extends Fragment {
 
         private Context context;
 
+        private SwipeRefreshLayout swipeRefreshLayout;
 
+        private BreakDownViewModel breakDownViewModel;
 
         private Date startDateTime;
         private Date endDateTime;
 
-        public ViewHolder(TextView startTime, TextView endTime, Context context) {
+        public ViewHolder(TextView startTime, TextView endTime, Context context, BreakDownViewModel breakDownViewModel) {
             this.startTime = startTime;
             this.endTime = endTime;
             this.context = context;
-
+            this.breakDownViewModel = breakDownViewModel;
         }
 
         @Override
@@ -166,6 +185,45 @@ public class BreakDownFragment extends Fragment {
                         })
                         .build().show();
             }
+        }
+
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+            if (scrollState == SCROLL_STATE_IDLE) {
+                // 判断是否滚动到底部
+                if (view.getLastVisiblePosition() >= view.getCount() - 1) {
+                    // 加载更多数据
+
+                    breakDownViewModel.getBreakRecords(1, 100, TimeUtil.getSTrFromMs(startDateTime), TimeUtil.getSTrFromMs(endDateTime), Integer.valueOf(MainActivity.loggedInUser.getDeptId()));
+                }
+            }
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+        }
+
+        public BreakDownViewModel getBreakDownViewModel() {
+            return breakDownViewModel;
+        }
+
+        public void setBreakDownViewModel(BreakDownViewModel breakDownViewModel) {
+            this.breakDownViewModel = breakDownViewModel;
+        }
+
+        @Override
+        public void onRefresh() {
+            breakDownViewModel.getBreakRecords(1, 100, TimeUtil.getSTrFromMs(startDateTime), TimeUtil.getSTrFromMs(endDateTime), Integer.valueOf(MainActivity.loggedInUser.getDeptId()));
+            swipeRefreshLayout.setRefreshing(false);
+        }
+
+        public SwipeRefreshLayout getSwipeRefreshLayout() {
+            return swipeRefreshLayout;
+        }
+
+        public void setSwipeRefreshLayout(SwipeRefreshLayout swipeRefreshLayout) {
+            this.swipeRefreshLayout = swipeRefreshLayout;
         }
     }
 

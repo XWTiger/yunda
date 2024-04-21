@@ -23,6 +23,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
@@ -32,16 +33,24 @@ import com.tiger.yunda.ui.login.LoginActivity;
 
 import java.util.Objects;
 
-public class MissionFragment extends Fragment {
+public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private FragmentHomeBinding binding;
-    private ProgressBar progressBar;
+
 
     private TextView textView;
 
     private Button myButton; //一键接受
 
     private Button missionyButton;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private  ListViewAdapter listViewAdapter;
+    private MissionViewModel missionViewModel;
+
+    private ListView listView;
+
+    private NavController navController;
+    private View customView;
 
 
     @Override
@@ -55,13 +64,13 @@ public class MissionFragment extends Fragment {
             actionBar.setDisplayShowTitleEnabled(false); // 可选，如果不需要显示默认标题
 
             // 创建自定义视图
-            View customView = LayoutInflater.from(getContext()).inflate(R.layout.header_mission_layout, null);
+            customView = LayoutInflater.from(getContext()).inflate(R.layout.header_mission_layout, null);
 
-             myButton = customView.findViewById(R.id.accept_all);
-             missionyButton = customView.findViewById(R.id.create_mission);
+            myButton = customView.findViewById(R.id.accept_all);
+            missionyButton = customView.findViewById(R.id.create_mission);
 
 
-           // BlendModeColorFilter filter = new BlendModeColorFilter(Color.parseColor("#ffffff"), BlendMode.SRC_ATOP);
+            // BlendModeColorFilter filter = new BlendModeColorFilter(Color.parseColor("#ffffff"), BlendMode.SRC_ATOP);
 
             NavController navController = NavHostFragment.findNavController(this);
             // 按钮的点击事件,一键领取
@@ -93,34 +102,57 @@ public class MissionFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        MissionViewModel missionViewModel =
+        if (Objects.isNull(missionViewModel)) {
+            missionViewModel =
                 new ViewModelProvider(this).get(MissionViewModel.class);
+        }
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final ListView listView = binding.listItem;
-        progressBar = binding.progressBar;
+
+        listView = binding.listItem;
+
         textView = binding.missionResultTv;
+        swipeRefreshLayout = binding.freshList;
+        swipeRefreshLayout.setOnRefreshListener(this);
+        //自定义header
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) { //自定义应用栏
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false); // 可选，如果不需要显示默认标题
+            if (Objects.nonNull(customView)) {
+                // 设置自定义视图
+                actionBar.setCustomView(customView);
+            }
+        }
 
 
 
-        NavController navController = NavHostFragment.findNavController(this);
+
+
+        navController = NavHostFragment.findNavController(this);
 
         missionViewModel.getData().observe(getViewLifecycleOwner(), new Observer<MissionResult>() {
             @Override
             public void onChanged(MissionResult missionResult) {
-                progressBar.setVisibility(View.GONE);
                 if (missionResult.getData().size() == 0) {
                     //设置暂无任务
                     textView.setVisibility(View.VISIBLE);
                 } else {
 
-                    ListViewAdapter listViewAdapter = new ListViewAdapter(getActivity(), listView.getId(), missionViewModel.getData().getValue().getData(), getActivity());
-                    listViewAdapter.setNavController(navController);
-                    listViewAdapter.setFragmentManager(getFragmentManager());
-                    listViewAdapter.setAcceptAll(myButton);
-                    listView.setAdapter(listViewAdapter);
+                    if (Objects.isNull(listViewAdapter)) {
+                        listViewAdapter = new ListViewAdapter(getActivity(), listView.getId(), missionResult.getData(), getActivity());
+                        listViewAdapter.setNavController(navController);
+                        listViewAdapter.setFragmentManager(getFragmentManager());
+                        listViewAdapter.setAcceptAll(myButton);
+                        listView.setAdapter(listViewAdapter);
+                    } else {
+                        listViewAdapter.setObjects(missionResult.getData());
+                       // listView.setAdapter(listViewAdapter);
+                        listViewAdapter.notifyDataSetChanged();
+                    }
                 }
             }
         });
@@ -156,11 +188,20 @@ public class MissionFragment extends Fragment {
             actionBar.setDisplayShowTitleEnabled(false);
 
         }
+        if (Objects.nonNull(listView)) {
+            listView.setAdapter(listViewAdapter);
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onRefresh() {
+        missionViewModel.addOne();
+        swipeRefreshLayout.setRefreshing(false);
     }
 }

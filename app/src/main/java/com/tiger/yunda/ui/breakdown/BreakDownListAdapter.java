@@ -35,20 +35,22 @@ public class BreakDownListAdapter extends ArrayAdapter<BreakRecord> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
         if (Objects.isNull(convertView)) {
-            ViewHolder viewHolder = new ViewHolder(convertView);
             breakdownRecordeListBinding = BreakdownRecordeListBinding.inflate(LayoutInflater.from(getContext()), parent, false);
             breakdownRecordeListBinding.setRecord(breakRecords.get(position));
+            convertView = breakdownRecordeListBinding.getRoot();
+            ViewHolder viewHolder = new ViewHolder(convertView);
             viewHolder.setDetailBtn(breakdownRecordeListBinding.problemDetailButton);
             breakdownRecordeListBinding.problemDetailButton.setTag(breakRecords.get(position).getId());
 
             //breakdownRecordeListBinding.problemDetailButton.setBackground(new GreenBorderDrawable());
-            convertView = breakdownRecordeListBinding.getRoot();
 
         }
 
         return convertView;
 
     }
+
+
 
     @Override
     public int getCount() {
@@ -76,4 +78,11 @@ public class BreakDownListAdapter extends ArrayAdapter<BreakRecord> {
         }
     }
 
+    public List<BreakRecord> getBreakRecords() {
+        return breakRecords;
+    }
+
+    public void setBreakRecords(List<BreakRecord> breakRecords) {
+        this.breakRecords = breakRecords;
+    }
 }

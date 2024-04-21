@@ -29,4 +29,11 @@ public class MissionViewModel extends ViewModel {
     public LiveData<MissionResult> getData() {
         return resultMutableLiveData;
     }
+
+    public void addOne() {
+        List<Mission> data = resultMutableLiveData.getValue().getData();
+                data.add(new Mission("", "123", 1, "tiger", 1, "车头", "AC12344", "AC33333-A、AC444444-B", "1200", 2, "已下发", "", "", "", "", "", "", "", null));
+        MissionResult missionResult = new MissionResult(data.size(), data);
+        resultMutableLiveData.setValue(missionResult);
+    }
 }

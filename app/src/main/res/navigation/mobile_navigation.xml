@@ -38,7 +38,7 @@
     <fragment
         android:id="@+id/navigation_person"
         android:name="com.tiger.yunda.ui.person.PersonFragment"
-        android:label="@string/title_resource"
+        android:label="@string/title_person"
         tools:layout="@layout/fragment_resource" />
 
     <fragment android:id="@+id/deliver_mission"

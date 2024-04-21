@@ -3,6 +3,12 @@ package com.tiger.yunda.utils;
 
 
 
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.databinding.BindingAdapter;
+
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
@@ -38,6 +44,23 @@ public class TimeUtil {
         return year + "年" + month + "月" + day + "日";
     }
 
+    /**
+     * 返回 yyyy-MM-dd HH:mm:ss
+     * @param date
+     * @return
+     */
+    public static String getSTrFromMs(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = "";
+        if (Objects.isNull(date)) {
+            Date now = new Date();
+            formattedDate = sdf.format(now);
+            return formattedDate;
+        }
+        formattedDate = sdf.format(date);
+        return formattedDate;
+    }
+
     public static boolean checkAllZero(int[] arr) {
         if (Objects.isNull(arr)) {
             return true;
@@ -49,4 +72,13 @@ public class TimeUtil {
         }
         return true;
     }
+
+    public static String getDpStr(String value) {
+        if (value.length() >= 3) {
+            return "-24dp";
+        }
+        return "-20dp";
+    }
+
+
 }

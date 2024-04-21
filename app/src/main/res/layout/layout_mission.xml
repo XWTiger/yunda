@@ -11,7 +11,7 @@
 
     <TextView
         android:id="@+id/editTextTextMultiLine"
-        android:layout_width="300dp"
+        android:layout_width="340dp"
         android:layout_height="50dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="1dp"

@@ -229,5 +229,14 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
     public void setFragmentManager(FragmentManager fragmentManager) {
         this.fragmentManager = fragmentManager;
     }
+
+    public List<Mission> getObjects() {
+        return objects;
+    }
+
+    public void setObjects(List<Mission> objects) {
+        this.objects = objects;
+        checkedArr = new int[objects.size()];
+    }
 }
 

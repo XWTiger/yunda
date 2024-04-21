@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="log"
+            type="com.tiger.yunda.data.model.WorkLog" />
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:background="@drawable/common_boder"
+            android:gravity="center"
+            android:layout_height="40dp">
+
+            <TextView
+                android:id="@+id/insp_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text='@{log.task.name + ":  "}'
+                android:textSize="18sp"
+                tools:text="夜班巡检:  "
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/train_no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="@{log.inspectionUnit}"
+                tools:text="A374CP-A"
+                />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="170dp"
+                android:background="@drawable/start" />
+            <TextView
+                android:id="@+id/text_score"
+                android:layout_marginStart="-20dp"
+                android:textSize="10sp"
+                android:textColor="@color/green"
+                android:layout_marginTop="1dp"
+                android:text="@{log.score}"
+                tools:layout_marginStart="-20dp"
+                tools:text="9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/worker_detail_button"
+            android:layout_marginTop="3dp"
+            android:layout_width="70dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="300dp"
+            android:background='@drawable/bg_detail_btn'
+            tools:background="@color/selector_detail_button"
+            android:textColor="@color/selector_text_color" />
+    </LinearLayout>
+
+</layout>
