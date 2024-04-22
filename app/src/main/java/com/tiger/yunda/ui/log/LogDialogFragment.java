@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tiger.yunda.R;
+import com.tiger.yunda.data.model.BreakRecord;
+import com.tiger.yunda.data.model.WorkLog;
 import com.tiger.yunda.databinding.FragmentDetailLogDialogItemBinding;
 import com.tiger.yunda.databinding.FragmentDetailLogDialogBinding;
 
@@ -29,14 +31,14 @@ import com.tiger.yunda.databinding.FragmentDetailLogDialogBinding;
 public class LogDialogFragment extends BottomSheetDialogFragment {
 
     // TODO: Customize parameter argument names
-    private static final String ARG_ITEM_COUNT = "item_count";
+    private static final String ARG_ITEM_DETAIL = "wroker_detail";
     private FragmentDetailLogDialogBinding binding;
 
     // TODO: Customize parameters
-    public static LogDialogFragment newInstance(int itemCount) {
+    public static LogDialogFragment newInstance(WorkLog workLog) {
         final LogDialogFragment fragment = new LogDialogFragment();
         final Bundle args = new Bundle();
-        args.putInt(ARG_ITEM_COUNT, itemCount);
+        args.putSerializable(ARG_ITEM_DETAIL, workLog);
         fragment.setArguments(args);
         return fragment;
     }
@@ -53,9 +55,9 @@ public class LogDialogFragment extends BottomSheetDialogFragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        final RecyclerView recyclerView = (RecyclerView) view;
+      /*  final RecyclerView recyclerView = (RecyclerView) view;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new detailAdapter(getArguments().getInt(ARG_ITEM_COUNT)));
+        recyclerView.setAdapter(new detailAdapter((BreakRecord) getArguments().getSerializable(ARG_ITEM_DETAIL)));*/
     }
 
     @Override
@@ -75,31 +77,5 @@ public class LogDialogFragment extends BottomSheetDialogFragment {
 
     }
 
-    private class detailAdapter extends RecyclerView.Adapter<ViewHolder> {
 
-        private final int mItemCount;
-
-        detailAdapter(int itemCount) {
-            mItemCount = itemCount;
-        }
-
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-            return new ViewHolder(FragmentDetailLogDialogItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.text.setText(String.valueOf(position));
-        }
-
-        @Override
-        public int getItemCount() {
-            return mItemCount;
-        }
-
-    }
 }

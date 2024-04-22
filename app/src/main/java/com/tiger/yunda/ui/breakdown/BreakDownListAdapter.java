@@ -9,6 +9,7 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tiger.yunda.data.model.BreakRecord;
@@ -24,9 +25,12 @@ public class BreakDownListAdapter extends ArrayAdapter<BreakRecord> {
 
     private List<BreakRecord> breakRecords;
 
-    public BreakDownListAdapter(@NonNull Context context, int resource, @NonNull List<BreakRecord> objects, BreakdownRecordeListBinding breakdownRecordeListBinding) {
+    private FragmentManager manager;
+
+    public BreakDownListAdapter(@NonNull Context context, int resource, @NonNull List<BreakRecord> objects, FragmentManager fragmentManager) {
         super(context, resource, objects);
         this.breakRecords = objects;
+        manager = fragmentManager;
 
     }
 
@@ -38,7 +42,7 @@ public class BreakDownListAdapter extends ArrayAdapter<BreakRecord> {
             breakdownRecordeListBinding = BreakdownRecordeListBinding.inflate(LayoutInflater.from(getContext()), parent, false);
             breakdownRecordeListBinding.setRecord(breakRecords.get(position));
             convertView = breakdownRecordeListBinding.getRoot();
-            ViewHolder viewHolder = new ViewHolder(convertView);
+            ViewHolder viewHolder = new ViewHolder(convertView, breakRecords.get(position), manager);
             viewHolder.setDetailBtn(breakdownRecordeListBinding.problemDetailButton);
             breakdownRecordeListBinding.problemDetailButton.setTag(breakRecords.get(position).getId());
 
@@ -59,8 +63,12 @@ public class BreakDownListAdapter extends ArrayAdapter<BreakRecord> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private Button detailBtn;
-        public ViewHolder(@NonNull View itemView) {
+        private BreakRecord breakRecord;
+        private FragmentManager manager;
+        public ViewHolder(@NonNull View itemView, BreakRecord breakRecord, FragmentManager manager) {
             super(itemView);
+            this.breakRecord = breakRecord;
+            this.manager = manager;
         }
 
         public Button getDetailBtn() {
@@ -74,7 +82,7 @@ public class BreakDownListAdapter extends ArrayAdapter<BreakRecord> {
 
         @Override
         public void onClick(View view) {
-
+            BreakDownDetailDialogFragment.newInstance(breakRecord).show(manager, "breakdown");
         }
     }
 

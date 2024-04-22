@@ -197,5 +197,10 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
         }
 
     }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        fragmentLogBinding = null;
+    }
 
 }

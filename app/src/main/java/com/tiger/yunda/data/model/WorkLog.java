@@ -10,6 +10,7 @@ import androidx.databinding.BindingMethods;
 
 import com.tiger.yunda.ui.home.TrainLocations;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,7 +26,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WorkLog {
+public class WorkLog implements Serializable {
 
 
         /**

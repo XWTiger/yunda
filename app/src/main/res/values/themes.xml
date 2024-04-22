@@ -22,4 +22,10 @@
 
         <item name="background">@drawable/ic_yunda </item>
     </style>
+
+    <style name="Theme.Yunda.DetailTitle" parent="Theme.MaterialComponents.DialogWhenLarge">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/black</item>
+
+    </style>
 </resources>

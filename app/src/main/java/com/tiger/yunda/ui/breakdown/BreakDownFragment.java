@@ -39,7 +39,7 @@ public class BreakDownFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private BreakdownRecordeListBinding breakdownRecordeListBinding;
+
     private FragmentBreakDownBinding fragmentBreakDownBinding;
 
     private static final String TIME_ACTION_START = "start";
@@ -96,7 +96,7 @@ public class BreakDownFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        breakdownRecordeListBinding = BreakdownRecordeListBinding.inflate(inflater, container, false);
+
         // Inflate the layout for this fragment
         fragmentBreakDownBinding = FragmentBreakDownBinding.inflate(inflater, container, false);
 
@@ -110,7 +110,7 @@ public class BreakDownFragment extends Fragment {
                     @Override
                     public void onChanged(List<BreakRecord> breakRecords) {
                         if (Objects.isNull(breakDownListAdapter)) {
-                            breakDownListAdapter = new BreakDownListAdapter(getContext(), fragmentBreakDownBinding.list.getId(), breakRecords, breakdownRecordeListBinding);
+                            breakDownListAdapter = new BreakDownListAdapter(getContext(), fragmentBreakDownBinding.list.getId(), breakRecords, getFragmentManager());
                             fragmentBreakDownBinding.list.setAdapter(breakDownListAdapter);
                             fragmentBreakDownBinding.list.setOnScrollListener(viewHolder);
                         } else {
@@ -127,6 +127,11 @@ public class BreakDownFragment extends Fragment {
         return fragmentBreakDownBinding.getRoot();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        fragmentBreakDownBinding = null;
+    }
     public static class ViewHolder implements View.OnClickListener, AbsListView.OnScrollListener, SwipeRefreshLayout.OnRefreshListener {
 
         private TextView startTime;
