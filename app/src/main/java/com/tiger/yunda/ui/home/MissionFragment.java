@@ -128,13 +128,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
         }
 
-
-
-
-
-        navController = NavHostFragment.findNavController(this);
-
-        missionViewModel.getData().observe(getViewLifecycleOwner(), new Observer<MissionResult>() {
+        missionViewModel.getData(1, 30 , null, null).observe(getViewLifecycleOwner(), new Observer<MissionResult>() {
             @Override
             public void onChanged(MissionResult missionResult) {
                 if (missionResult.getData().size() == 0) {
@@ -150,12 +144,18 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         listView.setAdapter(listViewAdapter);
                     } else {
                         listViewAdapter.setObjects(missionResult.getData());
-                       // listView.setAdapter(listViewAdapter);
+                        // listView.setAdapter(listViewAdapter);
                         listViewAdapter.notifyDataSetChanged();
                     }
                 }
             }
         });
+
+
+
+        navController = NavHostFragment.findNavController(this);
+
+
 
         return root;
     }
@@ -174,6 +174,11 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
         return super.onOptionsItemSelected(item);
     }*/
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+    }
 
     @Override
     public void onResume() {

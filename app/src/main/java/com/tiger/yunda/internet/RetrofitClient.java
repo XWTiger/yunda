@@ -4,6 +4,8 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.tiger.yunda.MainActivity;
+
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -25,8 +27,9 @@ public class RetrofitClient {
     private File httpCacheDirectory;
     private static Context mContext;
 
+    private MainActivity mainActivity;
 
-
+    private  AuthInterceptor authInterceptor;
 
     //http://ip:port/
     private static final String BASE_URL = "http://120.26.110.91:9291";
@@ -55,14 +58,15 @@ public class RetrofitClient {
         } catch (Exception e) {
             Log.e("OKHttp", "Could not create http cache", e);
         }
+        authInterceptor  = new AuthInterceptor(context, mainActivity);
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
 
                 .cookieJar(new NovateCookieManger(context))
                 .cache(cache)
                 .addInterceptor(new BaseInterceptor(headers))
-                .addInterceptor(new AuthInterceptor(context))
-                .addInterceptor(new CaheInterceptor(context))
-                .addNetworkInterceptor(new CaheInterceptor(context))
+                .addInterceptor(authInterceptor)
+               /* .addInterceptor(new CaheInterceptor(context))*/
+               /* .addNetworkInterceptor(new CaheInterceptor(context))*/
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .connectionPool(new ConnectionPool(8, 15, TimeUnit.SECONDS))
@@ -88,7 +92,7 @@ public class RetrofitClient {
     public static synchronized RetrofitClient getInstance(Context context) {
 
         if (retrofitClient == null) {
-            synchronized (retrofitClient) {
+            synchronized (BASE_URL) {
                 if (context != null) {
                     mContext = context;
                 }
@@ -112,4 +116,13 @@ public class RetrofitClient {
         return retrofitClient;
     }
 
+    public MainActivity getMainActivity() {
+        return mainActivity;
+    }
+
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
+        authInterceptor.setMainActivity(mainActivity);
+
+    }
 }

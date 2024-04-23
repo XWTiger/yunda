@@ -1,11 +1,14 @@
 package com.tiger.yunda.ui.login;
 
+import android.Manifest;
 import android.app.Activity;
 
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -14,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -36,20 +40,33 @@ public class LoginActivity extends AppCompatActivity {
     private LoginViewModel loginViewModel;
     private ActivityLoginBinding binding;
 
-    public static RetrofitClient retrofitClient;
+  /*  public static RetrofitClient retrofitClient;*/
 
     public static String LOGIN_RESULT_KEY = "loginResult";
+    private String[] REQUIRED_PERMISSIONS = {
+            android.Manifest.permission.CAMERA,
+            android.Manifest.permission.RECORD_AUDIO,
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.INTERNET,
+            android.Manifest.permission.READ_MEDIA_IMAGES,
+            Manifest.permission.READ_MEDIA_VIDEO,
+            Manifest.permission.READ_MEDIA_AUDIO,
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestPermissions(REQUIRED_PERMISSIONS, 10);
         //校验网络是否正常
         if (!NetworkUtil.isNetworkAvailable(getApplicationContext())) {
             Toast.makeText(getApplicationContext(), "网络不可用", Toast.LENGTH_SHORT).show();
             return;
         }
-        retrofitClient = RetrofitClient.getInstance(getApplicationContext());
-
+        /*retrofitClient = RetrofitClient.getInstance(getApplicationContext());*/
+        /*if (!allPermissionsGranted()) {
+            Log.w("xiaweihu", "application has no permission ");
+            return;
+        }*/
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -151,5 +168,13 @@ public class LoginActivity extends AppCompatActivity {
 
     private void showLoginFailed(@StringRes Integer errorString) {
         Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
+    }
+    private boolean allPermissionsGranted() {
+        for (String permission : REQUIRED_PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
     }
 }

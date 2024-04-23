@@ -1,6 +1,8 @@
 package com.tiger.yunda.data;
 
+import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.data.model.LoggedInUser;
+import com.tiger.yunda.service.LoginService;
 
 /**
  * Class that requests authentication and user information from the remote data source and
@@ -45,6 +47,8 @@ public class LoginRepository {
 
     public Result<LoggedInUser> login(String username, String password) {
         // handle login
+
+
         Result<LoggedInUser> result = dataSource.login(username, password);
         if (result instanceof Result.Success) {
             setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());

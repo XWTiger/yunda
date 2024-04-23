@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.TaskStackBuilder;
 import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -22,6 +23,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.tiger.yunda.data.model.LoggedInUser;
 import com.tiger.yunda.databinding.ActivityMainBinding;
+import com.tiger.yunda.internet.RetrofitClient;
 import com.tiger.yunda.ui.login.LoginActivity;
 
 import java.util.Objects;
@@ -34,31 +36,25 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     public static LoggedInUser loggedInUser;
-    private String[] REQUIRED_PERMISSIONS = {
-            android.Manifest.permission.CAMERA,
-            android.Manifest.permission.RECORD_AUDIO,
-            android.Manifest.permission.READ_EXTERNAL_STORAGE,
-            android.Manifest.permission.READ_MEDIA_IMAGES,
-            Manifest.permission.READ_MEDIA_VIDEO,
-            Manifest.permission.READ_MEDIA_AUDIO,
-    };
 
+
+    public static RetrofitClient retrofitClient;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        if (Objects.isNull(loggedInUser) || TextUtils.isEmpty(loggedInUser.getToken())) {
+      /*  if (Objects.isNull(loggedInUser) || TextUtils.isEmpty(loggedInUser.getToken())) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivityForResult(intent, LOGIN_INTENT_RESULT_CODE);
+        }*/
+        super.onCreate(savedInstanceState);
+
+        if (Objects.isNull(retrofitClient)) {
+            retrofitClient = RetrofitClient.getInstance(getApplicationContext());
+            retrofitClient.setMainActivity(this);
         }
 
-        super.onCreate(savedInstanceState);
-        this.requestPermissions(REQUIRED_PERMISSIONS, 10);
-       /* if (!allPermissionsGranted()) {
-            Log.w("xiaweihu", "application has no permission ");
-            return;
-        }*/
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -88,14 +84,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private boolean allPermissionsGranted() {
-        for (String permission : REQUIRED_PERMISSIONS) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-        return true;
-    }
+
+
 
 
     @Override

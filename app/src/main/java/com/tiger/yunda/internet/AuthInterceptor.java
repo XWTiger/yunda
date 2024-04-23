@@ -3,6 +3,7 @@ package com.tiger.yunda.internet;
 import android.content.Context;
 import android.content.Intent;
 
+import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.ui.login.LoginActivity;
 
 import java.io.IOException;
@@ -12,10 +13,12 @@ import okhttp3.Response;
 
 public class AuthInterceptor implements Interceptor {
     private Context context;
+    private MainActivity mainActivity;
 
 
-    public AuthInterceptor(Context context) {
+    public AuthInterceptor(Context context, MainActivity mainActivity) {
         this.context = context;
+        this.mainActivity = mainActivity;
     }
 
     @Override
@@ -27,10 +30,18 @@ public class AuthInterceptor implements Interceptor {
             // 这里执行401错误的处理逻辑
             // 例如：重新登录、更新token等
             Intent intent = new Intent(context, LoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
+            //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            mainActivity.startActivityForResult(intent, MainActivity.LOGIN_INTENT_RESULT_CODE);
         }
 
         return response;
+    }
+
+    public MainActivity getMainActivity() {
+        return mainActivity;
+    }
+
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
     }
 }
