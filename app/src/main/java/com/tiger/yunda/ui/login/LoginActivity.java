@@ -25,20 +25,30 @@ import android.widget.Toast;
 
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
+import com.tiger.yunda.internet.RetrofitClient;
 import com.tiger.yunda.ui.login.LoginViewModel;
 import com.tiger.yunda.ui.login.LoginViewModelFactory;
 import com.tiger.yunda.databinding.ActivityLoginBinding;
+import com.tiger.yunda.utils.NetworkUtil;
 
 public class LoginActivity extends AppCompatActivity {
 
     private LoginViewModel loginViewModel;
     private ActivityLoginBinding binding;
 
+    public static RetrofitClient retrofitClient;
+
     public static String LOGIN_RESULT_KEY = "loginResult";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //校验网络是否正常
+        if (!NetworkUtil.isNetworkAvailable(getApplicationContext())) {
+            Toast.makeText(getApplicationContext(), "网络不可用", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        retrofitClient = RetrofitClient.getInstance(getApplicationContext());
 
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

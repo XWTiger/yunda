@@ -29,7 +29,7 @@ public class RetrofitClient {
 
 
     //http://ip:port/
-    private static final String BASE_URL = "";
+    private static final String BASE_URL = "http://120.26.110.91:9291";
     private RetrofitClient(Context context) {
         this(context, BASE_URL, null);
     }
@@ -60,6 +60,7 @@ public class RetrofitClient {
                 .cookieJar(new NovateCookieManger(context))
                 .cache(cache)
                 .addInterceptor(new BaseInterceptor(headers))
+                .addInterceptor(new AuthInterceptor(context))
                 .addInterceptor(new CaheInterceptor(context))
                 .addNetworkInterceptor(new CaheInterceptor(context))
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
