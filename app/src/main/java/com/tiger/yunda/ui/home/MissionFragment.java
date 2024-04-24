@@ -1,5 +1,7 @@
 package com.tiger.yunda.ui.home;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
 import android.graphics.Color;
@@ -31,6 +33,8 @@ import com.tiger.yunda.databinding.FragmentHomeBinding;
 import com.tiger.yunda.enums.RoleType;
 import com.tiger.yunda.ui.login.LoginActivity;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -98,6 +102,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
             // 设置自定义视图
             actionBar.setCustomView(customView);
         }
+
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -136,6 +141,11 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     textView.setVisibility(View.VISIBLE);
                 } else {
 
+                    if (Objects.isNull(missionResult.getData()) || missionResult.getData().size() <= 0) {
+                        textView.setVisibility(View.VISIBLE);
+                    } else {
+                        textView.setVisibility(View.GONE);
+                    }
                     if (Objects.isNull(listViewAdapter)) {
                         listViewAdapter = new ListViewAdapter(getActivity(), listView.getId(), missionResult.getData(), getActivity());
                         listViewAdapter.setNavController(navController);

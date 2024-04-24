@@ -3,6 +3,7 @@ package com.tiger.yunda.service;
 import com.tiger.yunda.data.model.CreateMission;
 import com.tiger.yunda.data.model.DeliverMissionDTO;
 import com.tiger.yunda.data.model.Train;
+import com.tiger.yunda.data.model.User;
 import com.tiger.yunda.ui.home.MissionResult;
 
 import java.util.List;
@@ -28,4 +29,7 @@ public interface MissionService {
 
     @POST("/api/Train/GetNameList")
     Call<List<Train>> queryTrains();
+
+    @POST("/api/User/LoadByDept")
+    Call<List<User>> queryUsers(@Query("deptid") String deptId);
 }

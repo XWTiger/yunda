@@ -1,5 +1,7 @@
 package com.tiger.yunda.data.model;
 
+import androidx.databinding.ObservableField;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -16,23 +18,35 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CreateMission {
 
-    private String name ;
+    private ObservableField<String> nameObserver ;
+    private String name;
     private String deptId;
     private String leaderId;
     private String planStartTime;
     private String planEndTime;
     private List<String> trainNo;
-    private String trainNoStr;
+    private ObservableField<String> trainNoStr;
 
 
     public void covertTrainNoStr() {
-        if (StringUtils.isNotBlank(trainNoStr)) {
-            String[] arr = trainNoStr.split(",");
+        if (StringUtils.isNotBlank(trainNoStr.get())) {
+            String[] arr = trainNoStr.get().split(",");
             List<String> buffer = new ArrayList<>();
             for (int i = 0; i < arr.length; i++) {
                 buffer.add(arr[i]);
             }
             trainNo = buffer;
+        }
+        //name = nameObserver.get();
+    }
+
+
+
+    public void addOneTrain(String name) {
+        if (StringUtils.isBlank(trainNoStr.get())) {
+            trainNoStr.set(name);
+        } else {
+            trainNoStr.set(trainNoStr.get() + "," + name);
         }
     }
 }

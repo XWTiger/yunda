@@ -17,6 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.tiger.yunda.data.model.Train;
 import com.tiger.yunda.databinding.FragmentTrainDialogItemBinding;
 import com.tiger.yunda.databinding.FragmentTrainDialogListDialogBinding;
+import com.tiger.yunda.ui.home.CreateMissionFragment;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ public class TrainListDialogFragment extends BottomSheetDialogFragment {
     // TODO: Customize parameter argument names
     private static final String ARG_ITEM_COUNT = "item_count";
     private FragmentTrainDialogListDialogBinding binding;
+    private CreateMissionFragment createMissionFragment;
 
     // TODO: Customize parameters
     public static TrainListDialogFragment newInstance(List<Train> itemCount) {
@@ -96,7 +98,6 @@ public class TrainListDialogFragment extends BottomSheetDialogFragment {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            binding.list.setOnClickListener(this);
             return new ViewHolder(FragmentTrainDialogItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
 
         }
@@ -104,6 +105,8 @@ public class TrainListDialogFragment extends BottomSheetDialogFragment {
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             holder.text.setText(mItemCount.get(position).getText());
+            holder.text.setTag(mItemCount.get(position).getText());
+            holder.text.setOnClickListener(this);
         }
 
         @Override
@@ -114,9 +117,18 @@ public class TrainListDialogFragment extends BottomSheetDialogFragment {
             return mItemCount.size();
         }
 
+
         @Override
         public void onClick(View v) {
-            Log.i("xiaweihu", "选择item ================ ");
+            createMissionFragment.onItemClicked((String) v.getTag());
         }
+    }
+
+    public CreateMissionFragment getCreateMissionFragment() {
+        return createMissionFragment;
+    }
+
+    public void setCreateMissionFragment(CreateMissionFragment createMissionFragment) {
+        this.createMissionFragment = createMissionFragment;
     }
 }

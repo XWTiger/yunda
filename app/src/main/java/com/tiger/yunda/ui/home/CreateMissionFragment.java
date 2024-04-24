@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.loper7.date_time_picker.DateTimePicker;
 import com.tiger.yunda.R;
@@ -24,6 +25,8 @@ import com.tiger.yunda.databinding.FragmentCreateMissionBinding;
 import com.tiger.yunda.ui.common.TrainListDialogFragment;
 import com.tiger.yunda.ui.home.viewmodel.CreateMissionViewModel;
 import com.tiger.yunda.utils.TimeUtil;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -38,8 +41,7 @@ import kotlin.jvm.functions.Function1;
  */
 public class CreateMissionFragment extends Fragment implements View.OnClickListener {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -49,10 +51,11 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
 
     private static final String ACTION_TRAIN_ADD = "train_add";
     private static final String ACTION_FINISHED = "finished";
-    // TODO: Rename and change types of parameters
+
     private String mParam1;
     private String mParam2;
 
+    private TrainListDialogFragment trainListDialogFragment;
     private FragmentCreateMissionBinding binding;
     private DateTimePicker dateTimePicker;
 
@@ -62,9 +65,12 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
 
     private CreateMissionViewModel createMissionViewModel;
 
-    public CreateMissionFragment() {
-        // Required empty public constructor
-    }
+    private String startTime;
+
+    private String endTime;
+
+    private NavController navController;
+
 
     /**
      * Use this factory method to create a new instance of
@@ -81,6 +87,7 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -91,6 +98,7 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        navController = NavHostFragment.findNavController(this);
         setHasOptionsMenu(true);
     }
 
@@ -107,6 +115,7 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
         binding.trainNoAdd.setTag(ACTION_TRAIN_ADD);
         binding.trainNoText.setVisibility(View.INVISIBLE);
         binding.finishedCreation.setTag(ACTION_FINISHED);
+        binding.finishedCreation.setOnClickListener(this);
         if (Objects.isNull(createMissionViewModel)) {
             createMissionViewModel = new CreateMissionViewModel();
         }
@@ -123,18 +132,63 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
             }
         });
         dateTimePickerEnd.setOnDateTimeChangedListener(aLong -> {
-            String time = TimeUtil.getDateStringFromMs(aLong);
-            Log.i("xiaweihu", "invoke: =========>" + time);
+             endTime = TimeUtil.getDateStringFromMs(aLong);
+            Log.i("xiaweihu", "invoke: =========>" + endTime);
+
             return null;
         });
         dateTimePicker.setOnDateTimeChangedListener(aLong -> {
-            String time = TimeUtil.getDateStringFromMs(aLong);
-            Log.i("xiaweihu", "invoke: =========>" + time);
+             startTime = TimeUtil.getDateStringFromMs(aLong);
+            Log.i("xiaweihu", "invoke: =========>" + startTime);
             return null;
         });
 
         /* return inflater.inflate(R.layout.fragment_create_mission, container, false);*/
         return binding.getRoot();
+    }
+
+
+    public void onItemClicked(String text) {
+        CreateMission createMission =  binding.getCreation();
+        createMission.addOneTrain(text);
+        binding.trainNoText.setVisibility(View.VISIBLE);
+        trainListDialogFragment.dismiss();
+    }
+
+    @Override
+    public void onClick(View v) {
+        String tag = (String) v.getTag();
+        if (ACTION_TRAIN_ADD.equals(tag)) {
+            trainListDialogFragment = TrainListDialogFragment.newInstance(trainList);
+            trainListDialogFragment.setCreateMissionFragment(this);
+            trainListDialogFragment.show(getFragmentManager(), "select_train");
+        }
+
+        if (ACTION_FINISHED.equals(tag)) {
+            CreateMission createMission =  binding.getCreation();
+            createMission.covertTrainNoStr();
+            if (StringUtils.isBlank(createMission.getName())) {
+                binding.missionName.setError("任务名称不能为空");
+                return;
+            } else {
+                binding.missionName.setError(null);
+            }
+            if (StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
+                Toast.makeText(getContext(), "请选择时间", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (StringUtils.isBlank(createMission.getTrainNoStr().get())) {
+                Toast.makeText(getContext(), "请选择车号", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            createMissionViewModel.createMission(createMission).observe(getViewLifecycleOwner(), new Observer<String>() {
+                @Override
+                public void onChanged(String s) {
+                    //navController.
+                }
+            });
+
+        }
     }
 
     @Override
@@ -146,16 +200,9 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
     }
 
 
-
     @Override
-    public void onClick(View v) {
-        String tag = (String) v.getTag();
-        if (ACTION_TRAIN_ADD.equals(tag)) {
-            TrainListDialogFragment.newInstance(trainList).show(getFragmentManager(), "select_train");
-        }
-
-        if (ACTION_FINISHED.equals(tag)) {
-
-        }
+    public void onDestroy() {
+        super.onDestroy();
+        binding = null;
     }
 }

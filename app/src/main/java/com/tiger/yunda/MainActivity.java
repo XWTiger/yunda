@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     public static String SYSTEM_VERSION = "V0.0.1";
     public static String TOKEN_STR_KEY = "token";
 
-    private String TOKEN_FLAG = "login_token";
+    public static String TOKEN_FLAG = "login_token";
 
     private ActivityMainBinding binding;
 
@@ -114,6 +114,10 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(TOKEN_STR_KEY, loggedInUser.getToken());
             Log.i("xiaweihu", "login result =============> " + loggedInUser.getDisplayName());
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Authorization", "Bearer " + loggedInUser.getToken());
+            MainActivity.retrofitClient.addHeaders(headers);
+
         }
     }
 }
