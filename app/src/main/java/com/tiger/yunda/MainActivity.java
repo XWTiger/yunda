@@ -2,7 +2,9 @@ package com.tiger.yunda;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,12 +28,17 @@ import com.tiger.yunda.databinding.ActivityMainBinding;
 import com.tiger.yunda.internet.RetrofitClient;
 import com.tiger.yunda.ui.login.LoginActivity;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
     public static int LOGIN_INTENT_RESULT_CODE = 9;
     public static String SYSTEM_VERSION = "V0.0.1";
+    public static String TOKEN_STR_KEY = "token";
+
+    private String TOKEN_FLAG = "login_token";
 
     private ActivityMainBinding binding;
 
@@ -53,6 +60,16 @@ public class MainActivity extends AppCompatActivity {
         if (Objects.isNull(retrofitClient)) {
             retrofitClient = RetrofitClient.getInstance(getApplicationContext());
             retrofitClient.setMainActivity(this);
+        } else {
+            //从缓存中获取 token 并放在header
+            SharedPreferences sharedPreferences =  getApplicationContext().getSharedPreferences(TOKEN_FLAG, Context.MODE_PRIVATE);
+            String token = sharedPreferences.getString(TOKEN_STR_KEY, "");
+            if (Objects.nonNull(token)) {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + token);
+                retrofitClient.addHeaders(headers);
+            }
+
         }
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -93,6 +110,9 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LOGIN_INTENT_RESULT_CODE && resultCode == Activity.RESULT_OK) {
             loggedInUser = (LoggedInUser) Objects.requireNonNull(data).getSerializableExtra(LoginActivity.LOGIN_RESULT_KEY);
+            SharedPreferences sharedPreferences =  getApplicationContext().getSharedPreferences(TOKEN_FLAG, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(TOKEN_STR_KEY, loggedInUser.getToken());
             Log.i("xiaweihu", "login result =============> " + loggedInUser.getDisplayName());
         }
     }

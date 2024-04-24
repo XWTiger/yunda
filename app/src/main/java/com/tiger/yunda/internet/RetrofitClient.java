@@ -8,6 +8,7 @@ import com.tiger.yunda.MainActivity;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
@@ -30,6 +31,8 @@ public class RetrofitClient {
     private MainActivity mainActivity;
 
     private  AuthInterceptor authInterceptor;
+
+    private BaseInterceptor baseInterceptor;
 
     //http://ip:port/
     private static final String BASE_URL = "http://120.26.110.91:9291";
@@ -59,11 +62,12 @@ public class RetrofitClient {
             Log.e("OKHttp", "Could not create http cache", e);
         }
         authInterceptor  = new AuthInterceptor(context, mainActivity);
+        baseInterceptor = new BaseInterceptor(headers);
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
 
                 .cookieJar(new NovateCookieManger(context))
                 .cache(cache)
-                .addInterceptor(new BaseInterceptor(headers))
+                .addInterceptor(baseInterceptor)
                 .addInterceptor(authInterceptor)
                /* .addInterceptor(new CaheInterceptor(context))*/
                /* .addNetworkInterceptor(new CaheInterceptor(context))*/
@@ -123,6 +127,17 @@ public class RetrofitClient {
     public void setMainActivity(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
         authInterceptor.setMainActivity(mainActivity);
+
+    }
+
+    public void addHeaders(Map<String, String> headers) {
+        Map<String, String> header = baseInterceptor.getHeaders();
+        if (Objects.isNull(header)) {
+            header = headers;
+        } else {
+            header.putAll(headers);
+        }
+        baseInterceptor.setHeaders(header);
 
     }
 }

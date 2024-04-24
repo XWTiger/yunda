@@ -26,6 +26,7 @@ import com.tiger.yunda.ui.home.viewmodel.CreateMissionViewModel;
 import com.tiger.yunda.utils.TimeUtil;
 
 import java.util.List;
+import java.util.Objects;
 
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
@@ -58,6 +59,8 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
     private DateTimePicker dateTimePickerEnd;
 
     private List<Train> trainList;
+
+    private CreateMissionViewModel createMissionViewModel;
 
     public CreateMissionFragment() {
         // Required empty public constructor
@@ -104,7 +107,9 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
         binding.trainNoAdd.setTag(ACTION_TRAIN_ADD);
         binding.trainNoText.setVisibility(View.INVISIBLE);
         binding.finishedCreation.setTag(ACTION_FINISHED);
-        CreateMissionViewModel createMissionViewModel = new CreateMissionViewModel();
+        if (Objects.isNull(createMissionViewModel)) {
+            createMissionViewModel = new CreateMissionViewModel();
+        }
         createMissionViewModel.getCreation().observe(getViewLifecycleOwner(), new Observer<CreateMission>() {
             @Override
             public void onChanged(CreateMission createMission) {
