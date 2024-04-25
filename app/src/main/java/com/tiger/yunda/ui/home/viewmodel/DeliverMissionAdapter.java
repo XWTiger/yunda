@@ -17,13 +17,14 @@ import com.tiger.yunda.data.model.DeliverMssion;
 import com.tiger.yunda.data.model.User;
 import com.tiger.yunda.databinding.DeliverMissionBinding;
 import com.tiger.yunda.ui.common.SpinnerAdapter;
+import com.tiger.yunda.ui.common.SpinnerCallBack;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class DeliverMissionAdapter extends ArrayAdapter<DeliverMssion> {
+public class DeliverMissionAdapter extends ArrayAdapter<DeliverMssion> implements SpinnerCallBack {
     List<DeliverMssion> deliverMissions;
 
     List<User> users;
@@ -47,7 +48,7 @@ public class DeliverMissionAdapter extends ArrayAdapter<DeliverMssion> {
             deliverMissionBinding = DataBindingUtil.getBinding(convertView);
         }
         deliverMissionBinding.setDeliver(deliverMissions.get(position));
-        SpinnerAdapter spinnerAdapter = new SpinnerAdapter(covertUserToSpinnerObj(users), getContext());
+        SpinnerAdapter spinnerAdapter = new SpinnerAdapter(covertUserToSpinnerObj(users), getContext(), this, position);
         deliverMissionBinding.spinnerPerson.setAdapter(spinnerAdapter);
         setCheck(deliverMissionBinding.spinnerPerson, deliverMissions.get(position));
 
@@ -84,5 +85,20 @@ public class DeliverMissionAdapter extends ArrayAdapter<DeliverMssion> {
             }
         }
         ;
+
+    }
+
+    public void spinnerChecked(int deliverMissionIndex, int userIndex) {
+        DeliverMssion deliverMssion  = deliverMissions.get(deliverMissionIndex);
+        deliverMssion.getInspector().set(users.get(userIndex).getText());
+        deliverMssion.getInspectorId().set(users.get(userIndex).getValue());
+    }
+
+    public List<DeliverMssion> getDeliverMissions() {
+        return deliverMissions;
+    }
+
+    public void setDeliverMissions(List<DeliverMssion> deliverMissions) {
+        this.deliverMissions = deliverMissions;
     }
 }

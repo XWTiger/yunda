@@ -53,6 +53,8 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     private ListView listView;
 
+    private MissionResult missionResult;
+
     private NavController navController;
     private View customView;
 
@@ -205,6 +207,9 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
         }
         if (Objects.nonNull(listView)) {
             listView.setAdapter(listViewAdapter);
+        }
+        if (Objects.isNull(missionResult)) {
+            missionViewModel.getData(1, 30, null, null);
         }
     }
 

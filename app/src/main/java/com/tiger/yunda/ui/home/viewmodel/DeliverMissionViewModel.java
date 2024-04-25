@@ -1,5 +1,7 @@
 package com.tiger.yunda.ui.home.viewmodel;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -54,6 +56,12 @@ public class DeliverMissionViewModel extends ViewModel {
                 public void onResponse(Call<DeliverMissionDTO> call, Response<DeliverMissionDTO> response) {
                     if (response.code() == MissionService.HTTP_OK) {
 
+                    } else {
+                        try {
+                            Log.e("xiaweihu", "查询任务: ===========>" + response.errorBody().string());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
 

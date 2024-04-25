@@ -1,13 +1,17 @@
 package com.tiger.yunda.data.model;
 
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class DeliverMissionDTO {
+@Builder
+public class DeliverMissionDTO implements Serializable {
     private int inspectorId;
     private String inspector;
     private int positionId;

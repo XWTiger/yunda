@@ -12,6 +12,7 @@ import com.tiger.yunda.ui.login.LoginActivity;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,10 +61,13 @@ public class MissionViewModel extends ViewModel {
         Map<String, Object> body = new HashMap<>();
         body.put("page", page);
         body.put("limit", pageSize);//createTime
+        List<Map> sortList = new ArrayList<>();
+
         Map<String, String> sorts = new HashMap<>();
         sorts.put("filed", "createTime");
         sorts.put("type", "1");
-        body.put("sorts", sorts);
+        sortList.add(sorts);
+        body.put("sorts", sortList);
         if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
             body.put("startTime", startTime);
             body.put("endTime", endTime);
@@ -72,9 +76,16 @@ public class MissionViewModel extends ViewModel {
         result.enqueue(new Callback<MissionResult>() {
             @Override
             public void onResponse(Call<MissionResult> call, Response<MissionResult> response) {
-                if (Objects.nonNull(response.body())) {
+                if (response.code() == MissionService.HTTP_OK) {
                     count = response.body().getCount();
                     resultMutableLiveData.setValue(response.body());
+                } else {
+
+                    try {
+                        Log.e("xiaweihu", "查询任务列表: ===========>" + response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 

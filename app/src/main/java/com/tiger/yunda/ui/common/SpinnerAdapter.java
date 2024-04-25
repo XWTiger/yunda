@@ -13,18 +13,25 @@ import androidx.annotation.Nullable;
 
 import com.tiger.yunda.R;
 import com.tiger.yunda.data.BreakDownType;
+import com.tiger.yunda.ui.home.viewmodel.DeliverMissionAdapter;
 
 import java.util.List;
 
-public class SpinnerAdapter extends BaseAdapter {
+public class SpinnerAdapter extends BaseAdapter implements View.OnClickListener {
 
     private List<BreakDownType> types;
     private Context context;
 
+    private SpinnerCallBack deliverMissionAdapter;
 
-    public SpinnerAdapter(List<BreakDownType> types, Context context) {
+    private int parentIndex;
+
+
+    public SpinnerAdapter(List<BreakDownType> types, Context context, SpinnerCallBack deliverMissionAdapter, int parentIndex) {
         this.types = types;
         this.context = context;
+        this.deliverMissionAdapter = deliverMissionAdapter;
+        this.parentIndex = parentIndex;
     }
 
     public void setData(List<BreakDownType> types) {
@@ -40,7 +47,8 @@ public class SpinnerAdapter extends BaseAdapter {
         if(convertView!=null)
         {
             TextView view =(TextView)convertView.findViewById(R.id.spinner_item);
-            view.setTag(types.get(position).getType());
+            view.setTag(position);
+            view.setOnClickListener(this);
             view.setText(types.get(position).getName());
         }
         return convertView;
@@ -65,5 +73,11 @@ public class SpinnerAdapter extends BaseAdapter {
     @Override
     public int getCount() {
         return types.size();
+    }
+
+    @Override
+    public void onClick(View v) {
+        int positon = (int) v.getTag();
+        deliverMissionAdapter.spinnerChecked(parentIndex, positon);
     }
 }

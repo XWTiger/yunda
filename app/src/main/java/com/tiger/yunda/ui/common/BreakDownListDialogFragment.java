@@ -58,7 +58,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *     BreakDownListDialogFragment.newInstance(30).show(getSupportFragmentManager(), "dialog");
  * </pre>
  */
-public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
+public class BreakDownListDialogFragment extends BottomSheetDialogFragment implements SpinnerCallBack {
 
 
     private static final String ARG_ITEM_COUNT = "item_count";
@@ -108,7 +108,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
                 .name("AIS")
                 .build());
         context = getContext();
-        spinnerAdapter = new SpinnerAdapter(breakDownTypes, context);
+        spinnerAdapter = new SpinnerAdapter(breakDownTypes, context, this, -1);
 
 
 
@@ -157,6 +157,11 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void spinnerChecked(int deliverMissionIndex, int userIndex) {
+
     }
 
     private class ViewHolder implements View.OnClickListener, Switch.OnCheckedChangeListener, AdapterView.OnItemSelectedListener{
@@ -262,6 +267,8 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment {
 
             }
         }
+
+
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

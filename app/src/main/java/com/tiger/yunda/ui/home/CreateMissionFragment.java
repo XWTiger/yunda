@@ -184,7 +184,12 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
             createMissionViewModel.createMission(createMission).observe(getViewLifecycleOwner(), new Observer<String>() {
                 @Override
                 public void onChanged(String s) {
-                    //navController.
+                    Mission mission = new Mission();
+                    mission.setId("-1");
+                    mission.setTaskId(s);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(ListViewAdapter.MISSION_KEY, mission);
+                    navController.navigate(R.id.to_deliver_mission, bundle);
                 }
             });
 

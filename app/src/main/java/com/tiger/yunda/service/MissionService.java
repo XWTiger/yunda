@@ -53,4 +53,21 @@ public interface MissionService {
      */
     @POST("/api/PatrolTask/IssuTask")
     Call<ResponseBody>  deliverMission(@Body SaveMission saveMission);
+
+    /**
+     * 接受任务
+     * @param subtaskId
+     * @return
+     */
+    @POST("/api/PatrolTask/ReceiveTask")
+    Call<ResponseBody>  acceptMission(@Query("subtaskId") String  subtaskId);
+
+
+    /**
+     * 巡检
+     * @param id
+     * @return
+     */
+    @POST("/api/PatrolTask/PatrolTask")
+    Call<ResponseBody> inspection(@Query("id") String id);
 }

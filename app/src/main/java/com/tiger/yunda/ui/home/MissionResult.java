@@ -1,10 +1,11 @@
 package com.tiger.yunda.ui.home;
 
+import java.io.Serializable;
 import java.util.List;
 
 
 
-public class MissionResult {
+public class MissionResult implements Serializable {
     private int count;
     private List<Mission> data;
 

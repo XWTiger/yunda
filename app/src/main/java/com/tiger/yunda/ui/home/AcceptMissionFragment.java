@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +16,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
+import com.tiger.yunda.data.model.DeliverMissionDTO;
 import com.tiger.yunda.data.model.DeliverMssion;
 import com.tiger.yunda.data.model.SaveMission;
 import com.tiger.yunda.data.model.User;
@@ -22,6 +24,7 @@ import com.tiger.yunda.databinding.DeliverMissionBinding;
 import com.tiger.yunda.databinding.FragmentAcceptMissionBinding;
 import com.tiger.yunda.ui.home.viewmodel.DeliverMissionAdapter;
 import com.tiger.yunda.ui.home.viewmodel.DeliverMissionViewModel;
+import com.tiger.yunda.utils.CollectionUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -142,19 +145,46 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
             navController.navigate(R.id.back_to_mission);
             return;
         }
+        DeliverMissionAdapter adapter = (DeliverMissionAdapter) binding.listItem.getAdapter();
+        List<DeliverMssion> subList = adapter.getDeliverMissions();
+        if (CollectionUtil.isEmpty(subList)) {
+            Toast.makeText(getContext(), "子任务列表为空", Toast.LENGTH_SHORT).show();
+            navController.navigate(R.id.back_to_mission);
+            return;
+        }
         SaveMission saveMission = SaveMission.builder()
                 .taskId(mission.getTaskId())
-
-                .build();
+                .action(1).build();
+        List<DeliverMissionDTO> subMissions = new ArrayList<>();
+        subList.forEach(deliverMssion -> {
+            DeliverMissionDTO deliverMissionDTO = DeliverMissionDTO.builder()
+                    .inspectorId(deliverMssion.getInspectorId().get())
+                    .positionId(deliverMssion.getPositionId().get())
+                    .inspector(deliverMssion.getInspector().get())
+                    .positionName(deliverMssion.getPositionName().get())
+                    .inspectionUnit(deliverMssion.getInspectionUnit().get())
+                    .duration(deliverMssion.getDuration().get())
+                    .build();
+            subMissions.add(deliverMissionDTO);
+        });
+        saveMission.setSubtasks(subMissions);
 
         if (tag.equals(BTN_DELIVER_TAG)) {
-
-
+            saveMission.setAction(1);
+            if (acceptMissionViewModel.saveSubMissions(saveMission)) {
+                Toast.makeText(getContext(), "派发成功", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "派发失败", Toast.LENGTH_SHORT).show();
+            }
         }
         if (tag.equals(BTN_SAVE_TAG)) {
+            saveMission.setAction(2);
 
-
-            acceptMissionViewModel.saveSubMissions();
+            if (acceptMissionViewModel.saveSubMissions(saveMission)) {
+                Toast.makeText(getContext(), "保存成功", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "保存失败", Toast.LENGTH_SHORT).show();
+            }
         }
         navController.navigate(R.id.back_to_mission);
     }

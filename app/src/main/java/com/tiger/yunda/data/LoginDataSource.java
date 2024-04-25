@@ -68,8 +68,8 @@ public class LoginDataSource extends Thread {
             TokenResult tokenResult = resultCall.execute().body();
             fakeUser.setToken(tokenResult.getToken());
             fakeUser.setDisplayName(JWTUtil.decoder(tokenResult.getToken()));
-            fakeUser.setDeptId("123");
-            fakeUser.setUserId("1");
+            fakeUser.setDeptId("17");
+            fakeUser.setUserId("27");
         } catch (IOException e) {
            e.printStackTrace();
             fakeUser = null;

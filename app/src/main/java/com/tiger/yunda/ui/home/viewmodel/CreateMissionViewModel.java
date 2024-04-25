@@ -1,5 +1,7 @@
 package com.tiger.yunda.ui.home.viewmodel;
 
+import android.util.Log;
+
 import androidx.databinding.ObservableField;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -70,6 +72,12 @@ public class CreateMissionViewModel extends ViewModel {
             public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
                 if (response.code() == 200) {
                     data.setValue(response.body().get("id"));
+                } else {
+                    try {
+                        Log.e("xiaweihu", "onResponse: ===========>" + response.errorBody().string());
+                    } catch (IOException e) {
+                       e.printStackTrace();
+                    }
                 }
             }
 
