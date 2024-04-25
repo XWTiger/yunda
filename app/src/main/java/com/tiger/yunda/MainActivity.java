@@ -31,6 +31,10 @@ import com.tiger.yunda.ui.login.LoginActivity;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,6 +50,25 @@ public class MainActivity extends AppCompatActivity {
 
 
     public static RetrofitClient retrofitClient;
+
+    private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
+
+    // Instantiates the queue of Runnables as a LinkedBlockingQueue
+    public static  final BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
+
+    // Sets the amount of time an idle thread waits before terminating
+    private static final int KEEP_ALIVE_TIME = 6;
+    // Sets the Time Unit to seconds
+    private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
+
+    // Creates a thread pool manager
+    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+            1,       // Initial pool size
+            NUMBER_OF_CORES,       // Max pool size
+            KEEP_ALIVE_TIME,
+            KEEP_ALIVE_TIME_UNIT,
+            workQueue
+    );
 
 
     @Override

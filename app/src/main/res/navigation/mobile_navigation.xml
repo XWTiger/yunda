@@ -45,7 +45,9 @@
         android:name="com.tiger.yunda.ui.home.AcceptMissionFragment"
         android:label="派发任务"
         tools:layout="@layout/fragment_accept_mission"
-        />
+        >
+        <action android:id="@+id/back_to_mission" app:destination="@id/navigation_mission"/>
+    </fragment>
 
     <fragment android:id="@+id/inspection_mission"
         android:name="com.tiger.yunda.ui.home.inspection.InspectionFragment"
@@ -70,7 +72,10 @@
     <fragment android:id="@+id/create_mission"
         android:name="com.tiger.yunda.ui.home.CreateMissionFragment"
         tools:layout="@layout/fragment_create_mission"
-        />
+        >
+        <action android:id="@+id/to_deliver_mission" app:destination="@id/deliver_mission"/>
+
+    </fragment>
 
     <fragment android:id="@+id/inspection_camera"
         android:name="com.tiger.yunda.ui.common.CameraFragment"

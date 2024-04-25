@@ -4,6 +4,7 @@ import androidx.databinding.ObservableField;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateMission {
+public class CreateMission  implements Serializable {
 
     private ObservableField<String> nameObserver ;
     private String name;

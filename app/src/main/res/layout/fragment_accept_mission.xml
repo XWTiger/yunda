@@ -21,17 +21,18 @@
         tools:listitem="@layout/deliver_mission" />
 
     <Button
+        android:id="@+id/save_btn"
         android:layout_width="80dp"
         android:layout_height="40dp"
         android:layout_marginEnd="35dp"
         android:layout_marginBottom="20dp"
         android:text="保存"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button"
+        app:layout_constraintEnd_toStartOf="@id/deliver_button"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/deliver_button"
         android:layout_width="80dp"
         android:layout_height="40dp"
         android:layout_marginEnd="-40dp"
@@ -41,6 +42,7 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline2" />
 
     <Button
+        android:id="@+id/cancel_button"
         android:layout_width="80dp"
         android:layout_height="40dp"
         android:layout_marginEnd="30dp"

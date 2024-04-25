@@ -14,7 +14,9 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.tiger.yunda.MainActivity;
+import com.tiger.yunda.R;
 import com.tiger.yunda.data.model.DeliverMssion;
+import com.tiger.yunda.data.model.SaveMission;
 import com.tiger.yunda.data.model.User;
 import com.tiger.yunda.databinding.DeliverMissionBinding;
 import com.tiger.yunda.databinding.FragmentAcceptMissionBinding;
@@ -23,17 +25,26 @@ import com.tiger.yunda.ui.home.viewmodel.DeliverMissionViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 //接受任务界面
-public class AcceptMissionFragment extends Fragment {
+public class AcceptMissionFragment extends Fragment implements View.OnClickListener {
 
     private FragmentAcceptMissionBinding binding;
 
     private DeliverMissionBinding deliverMissionBinding;
 
+    private DeliverMissionViewModel acceptMissionViewModel;
+
     private Mission mission;
 
+    private NavController navController;
+
+    public static String BTN_CANCEL_TAG = "cancel";
+
+    public static String BTN_DELIVER_TAG = "deliver";
+    public static String BTN_SAVE_TAG = "save";
 
     public AcceptMissionFragment() {
 
@@ -70,10 +81,24 @@ public class AcceptMissionFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        if (Objects.isNull(binding)) {
+            binding = FragmentAcceptMissionBinding.inflate(inflater, container, false);
+            binding.cancelButton.setTag(BTN_CANCEL_TAG);
+            binding.cancelButton.setOnClickListener(this);
+            binding.deliverButton.setTag(BTN_DELIVER_TAG);
+            binding.deliverButton.setOnClickListener(this);
+            binding.saveBtn.setTag(BTN_SAVE_TAG);
+            binding.saveBtn.setOnClickListener(this);
+        }
 
-        binding = FragmentAcceptMissionBinding.inflate(inflater, container, false);
 
-        DeliverMissionViewModel acceptMissionViewModel = new DeliverMissionViewModel();
+        if (Objects.isNull(navController)) {
+            navController = NavHostFragment.findNavController(this);
+        }
+
+        if (Objects.isNull(acceptMissionViewModel)) {
+            acceptMissionViewModel = new DeliverMissionViewModel();
+        }
 
         List<User> dusers = new ArrayList<>();
         acceptMissionViewModel.getUsers(MainActivity.loggedInUser.getDeptId()).observe(getViewLifecycleOwner(), new Observer<List<User>>() {
@@ -83,7 +108,7 @@ public class AcceptMissionFragment extends Fragment {
                 dusers.addAll(users);
             }
         });
-        acceptMissionViewModel.getDatas(mission.getTaskId()).observe(getViewLifecycleOwner(), new Observer<List<DeliverMssion>>() {
+        acceptMissionViewModel.getDatas(mission.getTaskId(), mission.getId().equals("-1")?1:0).observe(getViewLifecycleOwner(), new Observer<List<DeliverMssion>>() {
             @Override
             public void onChanged(List<DeliverMssion> deliverMssions) {
                 DeliverMissionAdapter deliverMissionAdapter = new DeliverMissionAdapter(getContext(), binding.listItem.getId(),  deliverMssions, dusers);
@@ -109,4 +134,28 @@ public class AcceptMissionFragment extends Fragment {
     }
 
 
+    @Override
+    public void onClick(View view) {
+        String tag = (String) view.getTag();
+
+        if (tag.equals(BTN_CANCEL_TAG)) {
+            navController.navigate(R.id.back_to_mission);
+            return;
+        }
+        SaveMission saveMission = SaveMission.builder()
+                .taskId(mission.getTaskId())
+
+                .build();
+
+        if (tag.equals(BTN_DELIVER_TAG)) {
+
+
+        }
+        if (tag.equals(BTN_SAVE_TAG)) {
+
+
+            acceptMissionViewModel.saveSubMissions();
+        }
+        navController.navigate(R.id.back_to_mission);
+    }
 }
