@@ -18,7 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -131,7 +135,73 @@ public class MissionViewModel extends ViewModel {
                 }
             });
         }
-
-
     }
+
+    public Boolean acceptMission(String subtaskId) {
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        Call<ResponseBody> responseBodyCall = missionService.acceptMission(subtaskId);
+        AtomicBoolean result = new AtomicBoolean();
+        MainActivity.threadPoolExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    int code = responseBodyCall.execute().code();
+                    if (MissionService.HTTP_OK == code) {
+                        result.set(true);
+                    }
+                    countDownLatch.countDown();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+           e.printStackTrace();
+        }
+
+        if (result.get()) {
+            return true;
+        }
+        return false;
+    }
+
+    public LiveData<Boolean> acceptMissions(List<String>  subtaskIds) {
+        MutableLiveData<Boolean> result = new MutableLiveData<>();
+        AtomicInteger atomicInteger = new AtomicInteger(0);
+        subtaskIds.forEach(subtaskId -> {
+            Call<ResponseBody> responseBodyCall = missionService.acceptMission(subtaskId);
+            responseBodyCall.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.code() == MissionService.HTTP_OK) {
+                        atomicInteger.getAndIncrement();
+                        if (atomicInteger.get() == subtaskIds.size()) {
+                            result.setValue(true);
+                        }
+                    } else {
+                        try {
+                            Log.e("xiaweihu", "批量接受任务: ===========>" + response.errorBody().string());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                    throwable.printStackTrace();
+                    Log.e("xiaweihu", "批量接受任务失败: ===========>", throwable);
+                    result.setValue(false);
+                }
+            });
+        });
+
+        return result;
+    }
+
+
+
 }

@@ -15,6 +15,23 @@
         android:textStyle="bold" />
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@+id/insp_title">
+
+        <TextView
+            android:id="@+id/inspection_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            tools:text="车头巡检开始">
+
+        </TextView>
+    </LinearLayout>
+    <LinearLayout
         android:id="@+id/inspection_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

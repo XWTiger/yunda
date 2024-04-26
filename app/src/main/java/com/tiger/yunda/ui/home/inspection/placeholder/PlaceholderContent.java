@@ -32,11 +32,11 @@ public class PlaceholderContent {
     static {
         // Add some sample items.
 
-        addItem(createPlaceholderItem("1", "车头", "巡检车头"));
+       /* addItem(createPlaceholderItem("1", "车头", "巡检车头"));
         addItem(createPlaceholderItem("2", "车左侧", "巡检车左侧"));
         addItem(createPlaceholderItem("3", "车右侧", "巡检车右侧"));
         addItem(createPlaceholderItem("4", "车底", "巡检车底"));
-        addItem(createPlaceholderItem("5", "车内", "巡检车内"));
+        addItem(createPlaceholderItem("5", "车内", "巡检车内"));*/
 
     }
 

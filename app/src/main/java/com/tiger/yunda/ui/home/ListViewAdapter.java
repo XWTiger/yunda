@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
+import android.graphics.BlendMode;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,22 +24,40 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.navigation.NavController;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
 import com.tiger.yunda.databinding.FragmentHomeBinding;
+import com.tiger.yunda.databinding.LayoutMissionBinding;
 import com.tiger.yunda.enums.RoleType;
+import com.tiger.yunda.service.MissionService;
 import com.tiger.yunda.utils.TimeUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundButton.OnCheckedChangeListener {
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
 
     public static String MISSION_KEY = "mission";
+    private static final int MISSION_STATE_DELIVERING = 1;//下发中
+    private static final int MISSION_STATE_DELIVERED = 2; //已下发
+    private static final int MISSION_STATE_INSPECTION = 3; //巡检中
+    private static final int MISSION_STATE_FINISHED = 4; //完成
+    private static final int MISSION_STATE_ACCEPTED = 5; //已接受
     private Context context;
     private NavController navController;
     private FragmentManager fragmentManager;
@@ -46,17 +67,22 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
     private List<Mission> objects;
 
     private Button acceptAll;
+    private MissionService missionService;
+
+    private MissionViewModel missionViewModel;
+    private MissionFragment missionFragment;
 
 
 
     private int[]  checkedArr;
 
-    public ListViewAdapter(@NonNull Context context, int resource,@NonNull List<Mission> objects, Activity activity) {
+    public ListViewAdapter(@NonNull Context context, int resource,@NonNull List<Mission> objects, Activity activity, MissionViewModel missionViewModel) {
         super(context, resource, objects);
         this.context = context;
         this.activity = activity;
         this.objects = objects;
         checkedArr = new int[objects.size()];
+        this.missionViewModel = missionViewModel;
 
     }
 
@@ -67,17 +93,66 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
         ViewHolder viewHolder;
         if (convertView == null ) {
 
-            convertView = inflater.inflate(R.layout.layout_mission, parent, false);
+            LayoutMissionBinding binding = LayoutMissionBinding.inflate(inflater, parent, false);
 
+            convertView = binding.getRoot();
 
-            TextView tvItem = convertView.findViewById(R.id.editTextTextMultiLine);
-            Button btnItem = convertView.findViewById(R.id.button_accept);
+            TextView tvItem = binding.editTextTextMultiLine;
+            Button btnItem = binding.buttonAccept;
             btnItem.setTag(position);
-            Button btnReject = convertView.findViewById(R.id.button_reject);
+            Button btnReject = binding.buttonReject;
             btnReject.setTag(position);
-            CheckBox checkBox = convertView.findViewById(R.id.checkBox);
+            CheckBox checkBox = binding.checkBox;
             checkBox.setTag(position);
             checkBox.setOnCheckedChangeListener(this);
+            Button inspectionBtn = binding.buttonInspection;
+            inspectionBtn.setTag(position);
+
+
+            int state = objects.get(position).getState();
+            if (state == MISSION_STATE_ACCEPTED || MISSION_STATE_INSPECTION == state) {
+                btnReject.setVisibility(View.GONE);
+                btnItem.setEnabled(false);
+                ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
+                btnItem.setBackgroundTintList(colorStateList);
+                inspectionBtn.setVisibility(View.VISIBLE);
+            }
+            if (state == MISSION_STATE_FINISHED) {
+                btnItem.setEnabled(false);
+                ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
+                btnItem.setBackgroundTintList(colorStateList);
+            }
+
+            //点击巡检按钮
+            inspectionBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = (int) view.getTag();
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(MISSION_KEY, objects.get(position));
+                    Call<ResponseBody> responseBodyCall = missionService.inspection(objects.get(position).getId());
+                    responseBodyCall.enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            if (response.code() == MissionService.HTTP_OK) {
+                                getNavController().navigate(R.id.to_inspection_mission, bundle);
+                            } else {
+                                Toast.makeText(context, "巡检请求失败", Toast.LENGTH_SHORT).show();
+                                try {
+                                    Log.e("xiaweihu", "请求巡检接口失败:  =====>" + response.body().string());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+
+                        }
+                    });
+                }
+            });
 
             btnItem.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -100,10 +175,14 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                                 public void onClick(DialogInterface dialog, int which) {
 
                                     // 点击“OK”按钮后的操作
-                                    Toast.makeText(context, "点击确定", Toast.LENGTH_SHORT).show();
                                     if (StringUtils.isNotBlank(objects.get(position).getId())) {
+                                        Boolean result = missionViewModel.acceptMission(objects.get(position).getId());
                                         //巡检员
-                                        getNavController().navigate(R.id.to_inspection_mission, bundle);
+                                        if (result) {
+                                            getNavController().navigate(R.id.to_inspection_mission, bundle);
+                                        } else {
+                                            Toast.makeText(context, "接受任务失败", Toast.LENGTH_SHORT).show();
+                                        }
                                     }
                                     //to_accept_mission
                                     if (StringUtils.isNotBlank(objects.get(position).getTaskId())) {
@@ -189,6 +268,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
 
     public void setAcceptAll(Button acceptAll) {
         this.acceptAll = acceptAll;
+        acceptAll.setOnClickListener(this);
     }
 
     public NavController getNavController() {
@@ -197,6 +277,33 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
 
     public void setNavController(NavController navController) {
         this.navController = navController;
+    }
+
+    @Override
+    public void onClick(View view) {
+        List<String> ids = new ArrayList<>();
+        for (int i = 0; i < checkedArr.length; i++) {
+            if (checkedArr[i] == 1) {
+                if (StringUtils.isNotBlank(objects.get(i).getId())) {
+                    ids.add(objects.get(i).getId());
+                }
+                checkedArr[i] = 0;
+            }
+        }
+        LiveData<Boolean> result = missionViewModel.acceptMissions(ids);
+        AppCompatActivity appCompatActivity = (AppCompatActivity) activity;
+        result.observe(appCompatActivity, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (aBoolean) {
+                    Toast.makeText(context, "接受任务成功", Toast.LENGTH_SHORT).show();
+                    acceptAll.setVisibility(View.INVISIBLE);
+                    missionViewModel.getData(1, 30, null, null);
+                } else {
+                    Toast.makeText(context, "接受任务失败", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     public static class ViewHolder  {

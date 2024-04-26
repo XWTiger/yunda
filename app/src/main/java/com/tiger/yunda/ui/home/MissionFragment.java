@@ -149,7 +149,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         textView.setVisibility(View.GONE);
                     }
                     if (Objects.isNull(listViewAdapter)) {
-                        listViewAdapter = new ListViewAdapter(getActivity(), listView.getId(), missionResult.getData(), getActivity());
+                        listViewAdapter = new ListViewAdapter(activity, listView.getId(), missionResult.getData(), getActivity(), missionViewModel);
                         listViewAdapter.setNavController(navController);
                         listViewAdapter.setFragmentManager(getFragmentManager());
                         listViewAdapter.setAcceptAll(myButton);
