@@ -1,6 +1,7 @@
 package com.tiger.yunda.ui.home;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-//接受任务界面
+//派发任务界面
 public class AcceptMissionFragment extends Fragment implements View.OnClickListener {
 
     private FragmentAcceptMissionBinding binding;
@@ -76,6 +77,7 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
             Bundle bundle = getArguments();
             mission = (Mission) bundle.getSerializable(ListViewAdapter.MISSION_KEY);
         }
+        setHasOptionsMenu(true);
     }
 
     //实际这个类是派发任务的类
@@ -100,7 +102,7 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
         }
 
         if (Objects.isNull(acceptMissionViewModel)) {
-            acceptMissionViewModel = new DeliverMissionViewModel();
+            acceptMissionViewModel = new DeliverMissionViewModel(getContext());
         }
 
         List<User> dusers = new ArrayList<>();
@@ -109,18 +111,18 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
             public void onChanged(List<User> users) {
                 dusers.clear();
                 dusers.addAll(users);
-            }
-        });
-        acceptMissionViewModel.getDatas(mission.getTaskId(), mission.getId().equals("-1")?1:0).observe(getViewLifecycleOwner(), new Observer<List<DeliverMssion>>() {
-            @Override
-            public void onChanged(List<DeliverMssion> deliverMssions) {
-                DeliverMissionAdapter deliverMissionAdapter = new DeliverMissionAdapter(getContext(), binding.listItem.getId(),  deliverMssions, dusers);
-                          binding.listItem.setAdapter(deliverMissionAdapter);
+                acceptMissionViewModel.getDatas(mission.getTaskId(), mission.getId().equals("-1")?1:0).observe(getViewLifecycleOwner(), new Observer<List<DeliverMssion>>() {
+                    @Override
+                    public void onChanged(List<DeliverMssion> deliverMssions) {
+                        DeliverMissionAdapter deliverMissionAdapter = new DeliverMissionAdapter(getContext(), binding.listItem.getId(),  deliverMssions, dusers);
+                        binding.listItem.setAdapter(deliverMissionAdapter);
+                    }
+                });
             }
         });
 
-        View root = binding.getRoot();
-        return root;
+
+        return binding.getRoot();
     }
 
     @Override
@@ -142,14 +144,15 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
         String tag = (String) view.getTag();
 
         if (tag.equals(BTN_CANCEL_TAG)) {
-            navController.navigate(R.id.back_to_mission);
+            //取消
+            navController.popBackStack();
             return;
         }
         DeliverMissionAdapter adapter = (DeliverMissionAdapter) binding.listItem.getAdapter();
         List<DeliverMssion> subList = adapter.getDeliverMissions();
         if (CollectionUtil.isEmpty(subList)) {
             Toast.makeText(getContext(), "子任务列表为空", Toast.LENGTH_SHORT).show();
-            navController.navigate(R.id.back_to_mission);
+            navController.popBackStack();
             return;
         }
         SaveMission saveMission = SaveMission.builder()
@@ -186,6 +189,8 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
                 Toast.makeText(getContext(), "保存失败", Toast.LENGTH_SHORT).show();
             }
         }
-        navController.navigate(R.id.back_to_mission);
+        navController.popBackStack();
     }
+
+
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
@@ -24,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class DeliverMissionAdapter extends ArrayAdapter<DeliverMssion> implements SpinnerCallBack {
+public class DeliverMissionAdapter extends ArrayAdapter<DeliverMssion> implements SpinnerCallBack, AdapterView.OnItemSelectedListener {
     List<DeliverMssion> deliverMissions;
 
     List<User> users;
@@ -44,15 +45,17 @@ public class DeliverMissionAdapter extends ArrayAdapter<DeliverMssion> implement
         if (convertView == null) {
             deliverMissionBinding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.deliver_mission, parent, false);;
             convertView = deliverMissionBinding.getRoot();
+            deliverMissionBinding.setDeliver(deliverMissions.get(position));
         } else {
             deliverMissionBinding = DataBindingUtil.getBinding(convertView);
         }
-        deliverMissionBinding.setDeliver(deliverMissions.get(position));
         SpinnerAdapter spinnerAdapter = new SpinnerAdapter(covertUserToSpinnerObj(users), getContext(), this, position);
         deliverMissionBinding.spinnerPerson.setAdapter(spinnerAdapter);
+        deliverMissionBinding.spinnerPerson.setTag(position);
+        deliverMissionBinding.spinnerPerson.setOnItemSelectedListener(this);
         setCheck(deliverMissionBinding.spinnerPerson, deliverMissions.get(position));
 
-        return deliverMissionBinding.getRoot();
+        return convertView;
 
     }
 
@@ -100,5 +103,16 @@ public class DeliverMissionAdapter extends ArrayAdapter<DeliverMssion> implement
 
     public void setDeliverMissions(List<DeliverMssion> deliverMissions) {
         this.deliverMissions = deliverMissions;
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        int mindex = (int) parent.getTag();
+        spinnerChecked(mindex, position);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }

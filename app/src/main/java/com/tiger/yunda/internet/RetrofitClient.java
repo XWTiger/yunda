@@ -35,8 +35,11 @@ public class RetrofitClient {
 
     private BaseInterceptor baseInterceptor;
 
-    //http://ip:port/
+    //http://ip:port/10.1.8.105:9291
     private static final String BASE_URL = "http://120.26.110.91:9291";
+
+    //内网环境
+    //private static final String BASE_URL = "http://10.1.8.105:9291";
     private RetrofitClient(Context context) {
         this(context, BASE_URL, null);
     }

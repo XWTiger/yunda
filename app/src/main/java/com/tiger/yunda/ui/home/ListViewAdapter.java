@@ -37,6 +37,7 @@ import com.tiger.yunda.databinding.FragmentHomeBinding;
 import com.tiger.yunda.databinding.LayoutMissionBinding;
 import com.tiger.yunda.enums.RoleType;
 import com.tiger.yunda.service.MissionService;
+import com.tiger.yunda.utils.CollectionUtil;
 import com.tiger.yunda.utils.TimeUtil;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +45,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -107,17 +109,32 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
             checkBox.setOnCheckedChangeListener(this);
             Button inspectionBtn = binding.buttonInspection;
             inspectionBtn.setTag(position);
-
+            Mission mission =  objects.get(position);
+            if (Objects.nonNull(mission.getMasterMission()) && mission.getMasterMission()) {
+                checkBox.setEnabled(false);
+            }
 
             int state = objects.get(position).getState();
-            if (state == MISSION_STATE_ACCEPTED || MISSION_STATE_INSPECTION == state) {
+            if ((state == MISSION_STATE_ACCEPTED || MISSION_STATE_INSPECTION == state) && StringUtils.isNotBlank(objects.get(position).getId())) {
                 btnReject.setVisibility(View.GONE);
                 btnItem.setEnabled(false);
                 ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
                 btnItem.setBackgroundTintList(colorStateList);
                 inspectionBtn.setVisibility(View.VISIBLE);
             }
-            if (state == MISSION_STATE_FINISHED) {
+            if (state == MISSION_STATE_FINISHED && StringUtils.isNotBlank(objects.get(position).getId())) {
+                btnItem.setEnabled(false);
+                ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
+                btnItem.setBackgroundTintList(colorStateList);
+            }
+
+            if (state == MISSION_STATE_DELIVERED && StringUtils.isBlank(objects.get(position).getId())) {
+                /// 待下发 主任务
+                btnItem.setText("派发");
+            }
+
+            if ((state >= MISSION_STATE_INSPECTION ) && StringUtils.isBlank(objects.get(position).getId())) {
+                //已下发 巡检中  已完成 6 已作废
                 btnItem.setEnabled(false);
                 ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
                 btnItem.setBackgroundTintList(colorStateList);
@@ -185,8 +202,8 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                                         }
                                     }
                                     //to_accept_mission
-                                    if (StringUtils.isNotBlank(objects.get(position).getTaskId())) {
-                                        //工班长
+                                    if (StringUtils.isNotBlank(objects.get(position).getTaskId()) && StringUtils.isBlank(objects.get(position).getId())) {
+                                        //工班长 的主任务
                                         getNavController().navigate(R.id.to_accept_mission, bundle);
                                     }
                                     dialog.dismiss();
@@ -240,7 +257,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
         TextView textView = viewHolder.getTvItem();
         final Mission item = getItem(position);
         textView.setText(item.getInspectionUnit());
-
+        textView.setTooltipText(item.getInspectionUnit());
         return convertView;
     }
 
@@ -279,6 +296,8 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
         this.navController = navController;
     }
 
+
+    //一键接受子任务
     @Override
     public void onClick(View view) {
         List<String> ids = new ArrayList<>();
@@ -298,7 +317,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                 if (aBoolean) {
                     Toast.makeText(context, "接受任务成功", Toast.LENGTH_SHORT).show();
                     acceptAll.setVisibility(View.INVISIBLE);
-                    missionViewModel.getData(1, 30, null, null);
+                    missionViewModel.getData(1, 30, null, null, false);
                 } else {
                     Toast.makeText(context, "接受任务失败", Toast.LENGTH_SHORT).show();
                 }
@@ -341,8 +360,15 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
         return objects;
     }
 
-    public void setObjects(List<Mission> objects) {
-        this.objects = objects;
+    public void setObjects(List<Mission> updateObjets) {
+        if (!CollectionUtil.isEmpty(updateObjets)) {
+            /*updateObjets.forEach(mission -> {
+                if (!this.objects.contains(mission)) {
+                    this.objects.add(mission);
+                }
+            });*/
+            this.objects = updateObjets;
+        }
         checkedArr = new int[objects.size()];
     }
 }

@@ -1,5 +1,6 @@
 package com.tiger.yunda.ui.home.viewmodel;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -9,9 +10,12 @@ import androidx.lifecycle.ViewModel;
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.data.model.DeliverMissionDTO;
 import com.tiger.yunda.data.model.DeliverMssion;
+import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.data.model.SaveMission;
 import com.tiger.yunda.data.model.User;
 import com.tiger.yunda.service.MissionService;
+import com.tiger.yunda.utils.CollectionUtil;
+import com.tiger.yunda.utils.JsonUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,9 +36,12 @@ public class DeliverMissionViewModel extends ViewModel {
 
     private MissionService missionService;
 
+    private Context context;
 
-    public DeliverMissionViewModel() {
-            missionService = MainActivity.retrofitClient.create(MissionService.class);
+
+    public DeliverMissionViewModel(Context context) {
+        missionService = MainActivity.retrofitClient.create(MissionService.class);
+        this.context = context;
     }
 
     /**
@@ -45,20 +52,28 @@ public class DeliverMissionViewModel extends ViewModel {
      */
     public LiveData<List<DeliverMssion>> getDatas(String taskId, int type) {
         List<DeliverMssion> list = new ArrayList<>();
-        if (type == 0) {
+       /* if (type == 0) {
             list.add(new DeliverMssion(1, "tiger",1, "二段", "A单元","5h"));
             list.add(new DeliverMssion(1, "tiger",1, "二段", "B单元","5h"));
             deliverMissions.setValue(list);
-        } else {
-            Call<DeliverMissionDTO> result = missionService.queryCreatedMission(taskId);
-            result.enqueue(new Callback<DeliverMissionDTO>() {
+        } else {*/
+            Call<List<DeliverMissionDTO>> result = missionService.queryCreatedMission(taskId);
+            result.enqueue(new Callback<List<DeliverMissionDTO>>() {
                 @Override
-                public void onResponse(Call<DeliverMissionDTO> call, Response<DeliverMissionDTO> response) {
+                public void onResponse(Call<List<DeliverMissionDTO>> call, Response<List<DeliverMissionDTO>> response) {
                     if (response.code() == MissionService.HTTP_OK) {
-
+                        List<DeliverMissionDTO> resultList = response.body();
+                        if (!CollectionUtil.isEmpty(resultList)) {
+                            resultList.forEach(deliverMissionDTO -> {
+                                list.add(deliverMissionDTO.covertToDeliverMission());
+                            });
+                        }
+                        deliverMissions.setValue(list);
                     } else {
                         try {
-                            Log.e("xiaweihu", "查询任务: ===========>" + response.errorBody().string());
+                            String errStr = response.errorBody().string();
+                            ErrorResult errorResult = JsonUtil.getObject(errStr, context);
+                            Log.e("xiaweihu", "查询任务: ===========>" + errStr);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -66,20 +81,39 @@ public class DeliverMissionViewModel extends ViewModel {
                 }
 
                 @Override
-                public void onFailure(Call<DeliverMissionDTO> call, Throwable throwable) {
+                public void onFailure(Call<List<DeliverMissionDTO>> call, Throwable throwable) {
 
                 }
             });
-        }
+      /*  }*/
         return deliverMissions;
     }
 
     public MutableLiveData<List<User>> getUsers(String deptId) {
 
-        List<User> userList = new ArrayList<>();
-        userList.add(new User(1, "张三"));
-        userList.add(new User(2, "王力宏"));
-        users.setValue(userList);
+        Call<List<User>> call = missionService.queryUsers(deptId);
+        call.enqueue(new Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                List<User> list = new ArrayList<>();
+                if (response.code() == MissionService.HTTP_OK) {
+                     list = response.body();
+                } else {
+                    try {
+                        Log.e("xiaweihu", "通过部门查询用户: ===========>" + response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                users.setValue(list);
+            }
+
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable throwable) {
+
+            }
+        });
+
         return users;
     }
 

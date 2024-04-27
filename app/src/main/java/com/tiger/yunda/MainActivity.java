@@ -2,6 +2,7 @@ package com.tiger.yunda;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,6 +27,7 @@ import com.google.android.material.navigation.NavigationBarView;
 import com.tiger.yunda.data.model.LoggedInUser;
 import com.tiger.yunda.databinding.ActivityMainBinding;
 import com.tiger.yunda.internet.RetrofitClient;
+import com.tiger.yunda.ui.home.MissionFragment;
 import com.tiger.yunda.ui.login.LoginActivity;
 
 import java.util.HashMap;
@@ -73,11 +75,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-      /*  if (Objects.isNull(loggedInUser) || TextUtils.isEmpty(loggedInUser.getToken())) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivityForResult(intent, LOGIN_INTENT_RESULT_CODE);
-        }*/
         super.onCreate(savedInstanceState);
 
         if (Objects.isNull(retrofitClient)) {

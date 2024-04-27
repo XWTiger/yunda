@@ -53,10 +53,7 @@ public class LoginDataSource extends Thread {
 
     @Override
     public void run() {
-        fakeUser =
-                new LoggedInUser(
-                        java.util.UUID.randomUUID().toString(),
-                        "tiger", RoleType.WORKER_LEADER );
+        fakeUser = new LoggedInUser();
 
 
 
@@ -66,10 +63,9 @@ public class LoginDataSource extends Thread {
         Call<TokenResult> resultCall = loginService.login(body);
         try {
             TokenResult tokenResult = resultCall.execute().body();
-            fakeUser.setToken(tokenResult.getToken());
-            fakeUser.setDisplayName(JWTUtil.decoder(tokenResult.getToken()));
-            fakeUser.setDeptId("17");
-            fakeUser.setUserId("27");
+            //http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier
+            JWTUtil.decoder(tokenResult.getToken(), fakeUser);
+            Log.i("xiaweihu", "user info ===========> " + fakeUser.toString());
         } catch (IOException e) {
            e.printStackTrace();
             fakeUser = null;

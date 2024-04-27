@@ -18,4 +18,10 @@ public class DeliverMissionDTO implements Serializable {
     private String positionName;
     private String inspectionUnit;
     private String duration;
+
+
+    public DeliverMssion covertToDeliverMission() {
+        DeliverMssion deliverMssion = new DeliverMssion(inspectorId, inspector, positionId, positionName, inspectionUnit, duration);
+        return deliverMssion;
+    }
 }

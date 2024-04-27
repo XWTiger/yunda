@@ -1,5 +1,6 @@
 package com.tiger.yunda.ui.home;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -7,8 +8,13 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.tiger.yunda.MainActivity;
+import com.tiger.yunda.data.model.DeliverTask;
+import com.tiger.yunda.data.model.ErrorResult;
+import com.tiger.yunda.data.model.PageResult;
 import com.tiger.yunda.service.MissionService;
 import com.tiger.yunda.ui.login.LoginActivity;
+import com.tiger.yunda.utils.CollectionUtil;
+import com.tiger.yunda.utils.JsonUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,34 +39,29 @@ public class MissionViewModel extends ViewModel {
 
     private MissionService missionService;
 
+    private Context context;
+
     private  int page;
     private  int pageSize;
     private  String startTime;
     private String endTime;
 
     private int count = 0;
+
+    private int masterCount = 0;
+    private  int masterPage ;
+    private  int masterPageSize;
+
     public MissionViewModel() {
         resultMutableLiveData = new MutableLiveData<>();
-      /*  List<Mission> data = new ArrayList<>();
-        Mission mission = new Mission("1", "", 1, "测试用户", 1, "车头", "AC12344", "AC12344-A、AC12344-B", "1200", 2, "已下发", "", "", "", "", "", "", "", null);
-
-        List<TrainLocations> trainLocations = new ArrayList<>();
-        trainLocations.add(new TrainLocations("1","1", "2024-01-01 00:00:00", "2024-05-01 00:00:00", 1, "车头", "", 0, 0, "初始"));
-        trainLocations.add(new TrainLocations("2","2", "2024-01-01 00:00:00", "2024-05-01 00:00:00", 2, "车顶", "", 0, 0, "初始"));
-        data.add(mission);
-        mission.setTrainLocations(trainLocations);
-        data.add(new Mission("", "123", 1, "测试用户", 1, "车头", "AC12344", "AC12344-A、AC12344-B", "1200", 2,"已下发", "","","","","","","", null));
-        MissionResult missionResult = new MissionResult(data.size(), data);
-        resultMutableLiveData.setValue(missionResult);*/
 
     }
 
-    public LiveData<MissionResult> getData(int page, int pageSize, String startTime, String endTime) {
+    public LiveData<MissionResult> getData(int page, int pageSize, String startTime, String endTime, Boolean masterMission) {
         if (Objects.isNull(missionService)) {
             missionService = MainActivity.retrofitClient.create(MissionService.class);
         }
-        this.page = page;
-        this.pageSize = pageSize;
+
 
         Map<String, Object> body = new HashMap<>();
         body.put("page", page);
@@ -76,65 +77,179 @@ public class MissionViewModel extends ViewModel {
             body.put("startTime", startTime);
             body.put("endTime", endTime);
         }
-        Call<MissionResult> result =  missionService.query(body);
-        result.enqueue(new Callback<MissionResult>() {
-            @Override
-            public void onResponse(Call<MissionResult> call, Response<MissionResult> response) {
-                if (response.code() == MissionService.HTTP_OK) {
-                    count = response.body().getCount();
-                    resultMutableLiveData.setValue(response.body());
-                } else {
+        if (!masterMission) { //巡检员的子任务
+            this.page = page;
+            this.pageSize = pageSize;
 
-                    try {
-                        Log.e("xiaweihu", "查询任务列表: ===========>" + response.errorBody().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<MissionResult> call, Throwable throwable) {
-                throwable.printStackTrace();
-                Log.e("xiaweihu", "onFailure: ===========", throwable);
-
-            }
-        });
-        return resultMutableLiveData;
-    }
-
-    public void addOne() {
-
-        if ( (page +1)  * pageSize < count) {
-            Map<String, Object> body = new HashMap<>();
-            body.put("page", page + 1);
-            body.put("limit", pageSize);
-            Map<String, String> sorts = new HashMap<>();
-            sorts.put("filed", "createTime");
-            sorts.put("type", "1");
-            body.put("sorts", sorts);
-            if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
-                body.put("startTime", startTime);
-                body.put("endTime", endTime);
-            }
             Call<MissionResult> result =  missionService.query(body);
             result.enqueue(new Callback<MissionResult>() {
                 @Override
                 public void onResponse(Call<MissionResult> call, Response<MissionResult> response) {
-                    count = response.body().getCount();
-                    page = page + 1;
-                    List<Mission> data = resultMutableLiveData.getValue().getData();
-                    data.addAll(response.body().getData());
-                    MissionResult missionResult = new MissionResult(data.size(), data);
-                    resultMutableLiveData.setValue(missionResult);
+                    if (response.code() == MissionService.HTTP_OK) {
+                        count = response.body().getCount();
+                        resultMutableLiveData.setValue(response.body());
+                    } else {
+
+                        try {
+                            resultMutableLiveData.setValue(new MissionResult(0, new ArrayList<>()));
+                            Log.e("xiaweihu", "查询任务列表: ===========>" + response.errorBody().string());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
 
                 @Override
                 public void onFailure(Call<MissionResult> call, Throwable throwable) {
+                    throwable.printStackTrace();
+                    Log.e("xiaweihu", "onFailure: ===========", throwable);
 
                 }
             });
+        } else { //主任务
+            this.masterPage = page;
+            this.masterPageSize = pageSize;
+
+
+            if (Objects.nonNull(MainActivity.loggedInUser)) {
+                body.put("deptId", MainActivity.loggedInUser.getDeptId());
+            }
+            //默认查待分发的任务
+            body.put("state", 0);
+            Call<PageResult<DeliverTask>> resultCall = missionService.queryMasterMission(body);
+            resultCall.enqueue(new Callback<PageResult<DeliverTask>>() {
+                @Override
+                public void onResponse(Call<PageResult<DeliverTask>> call, Response<PageResult<DeliverTask>> response) {
+                    MissionResult missionResult =  new MissionResult(0, new ArrayList<>());
+                    if (response.code() == MissionService.HTTP_OK) {
+                        PageResult<DeliverTask> result  = response.body();
+
+                        if (result.getCount() > 0) {
+                            List<Mission> data = new ArrayList<>();
+                            result.getData().forEach(deliverTask -> {
+                                data.add(deliverTask.allInOne());
+                            });
+                            missionResult.setData(data);
+                            missionResult.setCount(result.getCount());
+                            masterCount = result.getCount();
+                            resultMutableLiveData.setValue(missionResult);
+                        }
+
+                    } else {
+
+                        try {
+                            resultMutableLiveData.setValue(new MissionResult(0, new ArrayList<>()));
+                            Log.e("xiaweihu", "查询主任务列表失败: ===========>" + response.errorBody().string());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+
+                @Override
+                public void onFailure(Call<PageResult<DeliverTask>> call, Throwable throwable) {
+
+                    Log.e("xiaweihu", "onFailure: ============", throwable );
+                }
+            });
         }
+
+        return resultMutableLiveData;
+    }
+
+    public void addOne(Boolean masterMission) {
+
+        if (!masterMission) {
+            if ( (page)  * pageSize < count) {
+                Map<String, Object> body = new HashMap<>();
+                body.put("page", page + 1);
+                body.put("limit", pageSize);
+                Map<String, String> sorts = new HashMap<>();
+                sorts.put("filed", "createTime");
+                sorts.put("type", "1");
+                body.put("sorts", sorts);
+                if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+                    body.put("startTime", startTime);
+                    body.put("endTime", endTime);
+                }
+                Call<MissionResult> result =  missionService.query(body);
+                result.enqueue(new Callback<MissionResult>() {
+                    @Override
+                    public void onResponse(Call<MissionResult> call, Response<MissionResult> response) {
+                        count = response.body().getCount();
+                        page = page + 1;
+                        List<Mission> data = resultMutableLiveData.getValue().getData();
+                        data.addAll(response.body().getData());
+                        MissionResult missionResult = new MissionResult(data.size(), data);
+                        resultMutableLiveData.setValue(missionResult);
+                    }
+
+                    @Override
+                    public void onFailure(Call<MissionResult> call, Throwable throwable) {
+
+                    }
+                });
+            }
+        } else {
+            if ( (masterPage)  * masterPageSize < masterCount) {
+                Map<String, Object> body = new HashMap<>();
+                body.put("page", masterPage + 1);
+                body.put("limit", masterPageSize);
+                Map<String, String> sorts = new HashMap<>();
+                sorts.put("filed", "createTime");
+                sorts.put("type", "1");
+                body.put("sorts", sorts);
+                if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+                    body.put("startTime", startTime);
+                    body.put("endTime", endTime);
+                }
+                if (Objects.nonNull(MainActivity.loggedInUser)) {
+                    body.put("deptId", MainActivity.loggedInUser.getDeptId());
+                }
+
+                Call<PageResult<DeliverTask>> resultCall = missionService.queryMasterMission(body);
+                resultCall.enqueue(new Callback<PageResult<DeliverTask>>() {
+                    @Override
+                    public void onResponse(Call<PageResult<DeliverTask>> call, Response<PageResult<DeliverTask>> response) {
+                        MissionResult missionResult =  new MissionResult(0, new ArrayList<>());
+                        if (response.code() == MissionService.HTTP_OK) {
+                            PageResult<DeliverTask> result  = response.body();
+                            masterCount = result.getCount();
+                            masterPage += 1;
+                            if (result.getCount() > 0) {
+                                List<Mission> data = new ArrayList<>();
+                                result.getData().forEach(deliverTask -> {
+                                    data.add(deliverTask.allInOne());
+                                });
+                                missionResult.setData(data);
+                                missionResult.setCount(result.getCount());
+                                masterCount = result.getCount();
+                            }
+
+                        } else {
+
+                            try {
+                                resultMutableLiveData.setValue(new MissionResult(0, new ArrayList<>()));
+                                String errStr = response.errorBody().string();
+                                ErrorResult errorResult = JsonUtil.getObject(errStr, context);
+                                Log.e("xiaweihu", "查询主任务列表失败: ===========>" + errStr);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        resultMutableLiveData.setValue(missionResult);
+                    }
+
+                    @Override
+                    public void onFailure(Call<PageResult<DeliverTask>> call, Throwable throwable) {
+
+                    }
+                });
+            }
+        }
+
+
     }
 
     public Boolean acceptMission(String subtaskId) {
@@ -145,9 +260,12 @@ public class MissionViewModel extends ViewModel {
             @Override
             public void run() {
                 try {
-                    int code = responseBodyCall.execute().code();
-                    if (MissionService.HTTP_OK == code) {
+                    Response<ResponseBody> response = responseBodyCall.execute();
+                    if (response.isSuccessful()) {
                         result.set(true);
+                    } else {
+                        String errStr = response.errorBody().string();
+                        Log.e("xiaweihu", "查询主任务列表失败: ===========>" + errStr);
                     }
                     countDownLatch.countDown();
                 } catch (IOException e) {
@@ -203,5 +321,11 @@ public class MissionViewModel extends ViewModel {
     }
 
 
+    public Context getContext() {
+        return context;
+    }
 
+    public void setContext(Context context) {
+        this.context = context;
+    }
 }

@@ -181,6 +181,8 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
                 Toast.makeText(getContext(), "请选择车号", Toast.LENGTH_SHORT).show();
                 return;
             }
+            createMission.setPlanStartTime(startTime);
+            createMission.setPlanEndTime(endTime);
             createMissionViewModel.createMission(createMission).observe(getViewLifecycleOwner(), new Observer<String>() {
                 @Override
                 public void onChanged(String s) {

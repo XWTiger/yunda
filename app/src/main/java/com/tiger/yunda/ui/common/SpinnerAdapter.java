@@ -17,7 +17,7 @@ import com.tiger.yunda.ui.home.viewmodel.DeliverMissionAdapter;
 
 import java.util.List;
 
-public class SpinnerAdapter extends BaseAdapter implements View.OnClickListener {
+public class SpinnerAdapter extends BaseAdapter  {
 
     private List<BreakDownType> types;
     private Context context;
@@ -42,22 +42,12 @@ public class SpinnerAdapter extends BaseAdapter implements View.OnClickListener 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-       //super.getView(position, convertView, parent);
-        convertView = LayoutInflater.from(context).inflate(R.layout.fragment_breakdownt_dialog_list_dialog, null);
-        if(convertView!=null)
-        {
+            convertView = LayoutInflater.from(context).inflate(R.layout.fragment_breakdownt_dialog_list_dialog, null);
             TextView view =(TextView)convertView.findViewById(R.id.spinner_item);
             view.setTag(position);
-            view.setOnClickListener(this);
             view.setText(types.get(position).getName());
-        }
         return convertView;
 
-      /*  TextView view = (TextView) new TextView(context);
-       // view.setWidth(ConstraintLayout.LayoutParams.WRAP_CONTENT);
-        view.setTag(types.get(position).getType());
-        view.setText(types.get(position).getName());
-        return view;*/
     }
 
     @Override
@@ -75,9 +65,5 @@ public class SpinnerAdapter extends BaseAdapter implements View.OnClickListener 
         return types.size();
     }
 
-    @Override
-    public void onClick(View v) {
-        int positon = (int) v.getTag();
-        deliverMissionAdapter.spinnerChecked(parentIndex, positon);
-    }
+
 }

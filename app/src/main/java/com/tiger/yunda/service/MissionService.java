@@ -2,6 +2,8 @@ package com.tiger.yunda.service;
 
 import com.tiger.yunda.data.model.CreateMission;
 import com.tiger.yunda.data.model.DeliverMissionDTO;
+import com.tiger.yunda.data.model.DeliverTask;
+import com.tiger.yunda.data.model.PageResult;
 import com.tiger.yunda.data.model.SaveMission;
 import com.tiger.yunda.data.model.Train;
 import com.tiger.yunda.data.model.User;
@@ -21,6 +23,11 @@ public interface MissionService {
 
     public static int HTTP_OK = 200;
 
+    /**
+     * 查询子任务
+     * @param body
+     * @return
+     */
     @POST("/api/PatrolTask/GetSubtaskPage")
     Call<MissionResult> query(@Body Map<String, Object> body);
 
@@ -33,7 +40,7 @@ public interface MissionService {
      * @return
      */
     @POST("/api/PatrolTask/ViewTask")
-    Call<DeliverMissionDTO> queryCreatedMission(@Query("id") String id);
+    Call<List<DeliverMissionDTO>> queryCreatedMission(@Query("id") String id);
 
 
     @POST("/api/Train/GetNameList")
@@ -70,4 +77,13 @@ public interface MissionService {
      */
     @POST("/api/PatrolTask/PatrolTask")
     Call<ResponseBody> inspection(@Query("id") String id);
+
+
+    /**
+     * 查询主任务
+     * @param body
+     * @return
+     */
+    @POST("/api/PatrolTask/GetPage")
+    Call<PageResult<DeliverTask>> queryMasterMission(@Body Map<String, Object> body);
 }

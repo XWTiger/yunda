@@ -27,15 +27,20 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.material.tabs.TabItem;
+import com.google.android.material.tabs.TabLayout;
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
 import com.tiger.yunda.databinding.FragmentHomeBinding;
+import com.tiger.yunda.databinding.HeaderMissionLayoutBinding;
 import com.tiger.yunda.enums.RoleType;
+import com.tiger.yunda.ui.common.Constraints;
 import com.tiger.yunda.ui.login.LoginActivity;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -51,58 +56,109 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private  ListViewAdapter listViewAdapter;
     private MissionViewModel missionViewModel;
 
+
     private ListView listView;
 
-    private MissionResult missionResult;
+    public  AtomicInteger missionFlag = new AtomicInteger(0);
 
     private NavController navController;
     private View customView;
+
+    private HeaderMissionLayoutBinding headerMissionLayoutBinding;
+
+    private TabLayout tabLayout;
+    private TextView todoTv;
+
+    private Boolean leader = false;
+
+    private Boolean masterMission = false;
+
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
        // setHasOptionsMenu(true);
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         ActionBar actionBar = activity.getSupportActionBar();
+
+
         if (actionBar != null) { //自定义应用栏
             actionBar.setDisplayShowCustomEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false); // 可选，如果不需要显示默认标题
-
+            if (Objects.isNull(headerMissionLayoutBinding)) {
+                headerMissionLayoutBinding = HeaderMissionLayoutBinding.inflate(LayoutInflater.from(getContext()));
+            }
             // 创建自定义视图
-            customView = LayoutInflater.from(getContext()).inflate(R.layout.header_mission_layout, null);
+            //customView = LayoutInflater.from(getContext()).inflate(R.layout.header_mission_layout, null);
 
-            myButton = customView.findViewById(R.id.accept_all);
-            missionyButton = customView.findViewById(R.id.create_mission);
+            View headerView = actionBar.getCustomView();
+            if (Objects.isNull(headerView)) {
 
+                customView = headerMissionLayoutBinding.getRoot();
 
-            // BlendModeColorFilter filter = new BlendModeColorFilter(Color.parseColor("#ffffff"), BlendMode.SRC_ATOP);
+                myButton = headerMissionLayoutBinding.acceptAll;
 
-            NavController navController = NavHostFragment.findNavController(this);
-            // 按钮的点击事件,一键领取
-            myButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // 按钮点击后的操作
-                    Log.i("xiaweihu", "header on click:  =========================");
+                missionyButton = headerMissionLayoutBinding.createMission;
+                tabLayout = headerMissionLayoutBinding.tabLayout;
+                todoTv = headerMissionLayoutBinding.todoMission;
+                if (leader) {
+                    missionyButton.setVisibility(View.VISIBLE);
+                    tabLayout.setVisibility(View.VISIBLE);
+                } else {
+                    missionyButton.setVisibility(View.GONE);
+                    tabLayout.setVisibility(View.GONE);
                 }
-            });
+                tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                    @Override
+                    public void onTabSelected(TabLayout.Tab tab) {
+                        Log.i("xiaweihu", "onTabSelected: ========>" + tab.getText());
+                        if (Constraints.MISSION_TYPE_MASTER.equals(tab.getText())) {
+                            masterMission = true;
+                        } else {
+                            masterMission = false;
+                        }
+                        missionViewModel.getData(1, 30, null, null, masterMission);
+                    }
 
-            //新建任务
-            missionyButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // 按钮点击后的操作
-                    Log.i("xiaweihu", "header on click:  =========================");
-                    navController.navigate(R.id.to_create_mission);
-                    actionBar.setDisplayShowCustomEnabled(false);
-                    actionBar.setDisplayShowTitleEnabled(true);
-                    //actionBar
-                }
-            });
+                    @Override
+                    public void onTabUnselected(TabLayout.Tab tab) {
+                        Log.i("xiaweihu", "unSelected: ========>" + tab.getText());
+                    }
 
-            // 设置自定义视图
-            actionBar.setCustomView(customView);
+                    @Override
+                    public void onTabReselected(TabLayout.Tab tab) {
+                        Log.i("xiaweihu", "reSelected: ========>" + tab.getText());
+                    }
+                });
+
+                NavController navController = NavHostFragment.findNavController(this);
+                // 按钮的点击事件,一键领取
+                myButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // 按钮点击后的操作
+                        Log.i("xiaweihu", "header on click:  =========================");
+                    }
+                });
+
+                //新建任务
+                missionyButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // 按钮点击后的操作
+                        Log.i("xiaweihu", "header on click:  =========================");
+                        navController.navigate(R.id.to_create_mission);
+                        actionBar.setDisplayShowCustomEnabled(false);
+                        actionBar.setDisplayShowTitleEnabled(true);
+                        //actionBar
+                    }
+                });
+
+                // 设置自定义视图
+                actionBar.setCustomView(customView);
+            }
         }
 
     }
@@ -112,7 +168,9 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if (Objects.isNull(missionViewModel)) {
             missionViewModel =
                 new ViewModelProvider(this).get(MissionViewModel.class);
+            missionViewModel.setContext(getContext());
         }
+
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -135,40 +193,29 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
         }
 
-        missionViewModel.getData(1, 30 , null, null).observe(getViewLifecycleOwner(), new Observer<MissionResult>() {
+        missionViewModel.getData(1, 30 , null, null, masterMission).observe(getViewLifecycleOwner(), new Observer<MissionResult>() {
             @Override
             public void onChanged(MissionResult missionResult) {
-                if (missionResult.getData().size() == 0) {
-                    //设置暂无任务
+                if (missionFlag.get() < 1) {
+                    missionFlag.getAndIncrement();
+                }
+
+                if (Objects.isNull(missionResult.getData()) || missionResult.getData().size() <= 0) {
                     textView.setVisibility(View.VISIBLE);
                 } else {
-
-                    if (Objects.isNull(missionResult.getData()) || missionResult.getData().size() <= 0) {
-                        textView.setVisibility(View.VISIBLE);
-                    } else {
-                        textView.setVisibility(View.GONE);
-                    }
-                    if (Objects.isNull(listViewAdapter)) {
-                        listViewAdapter = new ListViewAdapter(activity, listView.getId(), missionResult.getData(), getActivity(), missionViewModel);
-                        listViewAdapter.setNavController(navController);
-                        listViewAdapter.setFragmentManager(getFragmentManager());
-                        listViewAdapter.setAcceptAll(myButton);
-                        listView.setAdapter(listViewAdapter);
-                    } else {
-                        listViewAdapter.setObjects(missionResult.getData());
-                        // listView.setAdapter(listViewAdapter);
-                        listViewAdapter.notifyDataSetChanged();
-                    }
+                    textView.setVisibility(View.GONE);
                 }
+
+                listViewAdapter = new ListViewAdapter(activity, listView.getId(), missionResult.getData(), getActivity(), missionViewModel);
+                listViewAdapter.setNavController(navController);
+                listViewAdapter.setFragmentManager(getFragmentManager());
+                listViewAdapter.setAcceptAll(myButton);
+                listView.setAdapter(listViewAdapter);
+
+
             }
         });
-
-
-
         navController = NavHostFragment.findNavController(this);
-
-
-
         return root;
     }
 
@@ -192,11 +239,16 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     }
 
+
+
+
     @Override
     public void onResume() {
         super.onResume();
         if (Objects.nonNull(MainActivity.loggedInUser) && MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
             missionyButton.setVisibility(View.VISIBLE);
+            leader = true;
+            masterMission = true;
         }
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         ActionBar actionBar = activity.getSupportActionBar();
@@ -205,12 +257,24 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
             actionBar.setDisplayShowTitleEnabled(false);
 
         }
-        if (Objects.nonNull(listView)) {
+       /* if (Objects.nonNull(listView)) {
             listView.setAdapter(listViewAdapter);
+        }*/
+
+        if (missionFlag.get() ==  1) {
+            missionViewModel.getData(1, 30, null, null, masterMission);
+            missionFlag.getAndIncrement();
         }
-        if (Objects.isNull(missionResult)) {
-            missionViewModel.getData(1, 30, null, null);
+        if (leader) {
+            missionyButton.setVisibility(View.VISIBLE);
+            tabLayout.setVisibility(View.VISIBLE);
+            todoTv.setVisibility(View.GONE);
+        } else {
+            missionyButton.setVisibility(View.GONE);
+            tabLayout.setVisibility(View.GONE);
+            todoTv.setVisibility(View.VISIBLE);
         }
+
     }
 
     @Override
@@ -221,7 +285,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     @Override
     public void onRefresh() {
-        missionViewModel.addOne();
+        missionViewModel.addOne(masterMission);
         swipeRefreshLayout.setRefreshing(false);
     }
 }
