@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -42,7 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AbsListView.OnScrollListener {
 
     private FragmentHomeBinding binding;
 
@@ -82,83 +83,11 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
        // setHasOptionsMenu(true);
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         ActionBar actionBar = activity.getSupportActionBar();
+        this.customHeaderBar(actionBar);
+        if (Objects.nonNull(MainActivity.loggedInUser) && MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
 
-
-        if (actionBar != null) { //自定义应用栏
-            actionBar.setDisplayShowCustomEnabled(true);
-            actionBar.setDisplayShowTitleEnabled(false); // 可选，如果不需要显示默认标题
-            if (Objects.isNull(headerMissionLayoutBinding)) {
-                headerMissionLayoutBinding = HeaderMissionLayoutBinding.inflate(LayoutInflater.from(getContext()));
-            }
-            // 创建自定义视图
-            //customView = LayoutInflater.from(getContext()).inflate(R.layout.header_mission_layout, null);
-
-            View headerView = actionBar.getCustomView();
-            if (Objects.isNull(headerView)) {
-
-                customView = headerMissionLayoutBinding.getRoot();
-
-                myButton = headerMissionLayoutBinding.acceptAll;
-
-                missionyButton = headerMissionLayoutBinding.createMission;
-                tabLayout = headerMissionLayoutBinding.tabLayout;
-                todoTv = headerMissionLayoutBinding.todoMission;
-                if (leader) {
-                    missionyButton.setVisibility(View.VISIBLE);
-                    tabLayout.setVisibility(View.VISIBLE);
-                } else {
-                    missionyButton.setVisibility(View.GONE);
-                    tabLayout.setVisibility(View.GONE);
-                }
-                tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-                    @Override
-                    public void onTabSelected(TabLayout.Tab tab) {
-                        Log.i("xiaweihu", "onTabSelected: ========>" + tab.getText());
-                        if (Constraints.MISSION_TYPE_MASTER.equals(tab.getText())) {
-                            masterMission = true;
-                        } else {
-                            masterMission = false;
-                        }
-                        missionViewModel.getData(1, 30, null, null, masterMission);
-                    }
-
-                    @Override
-                    public void onTabUnselected(TabLayout.Tab tab) {
-                        Log.i("xiaweihu", "unSelected: ========>" + tab.getText());
-                    }
-
-                    @Override
-                    public void onTabReselected(TabLayout.Tab tab) {
-                        Log.i("xiaweihu", "reSelected: ========>" + tab.getText());
-                    }
-                });
-
-                NavController navController = NavHostFragment.findNavController(this);
-                // 按钮的点击事件,一键领取
-                myButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // 按钮点击后的操作
-                        Log.i("xiaweihu", "header on click:  =========================");
-                    }
-                });
-
-                //新建任务
-                missionyButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // 按钮点击后的操作
-                        Log.i("xiaweihu", "header on click:  =========================");
-                        navController.navigate(R.id.to_create_mission);
-                        actionBar.setDisplayShowCustomEnabled(false);
-                        actionBar.setDisplayShowTitleEnabled(true);
-                        //actionBar
-                    }
-                });
-
-                // 设置自定义视图
-                actionBar.setCustomView(customView);
-            }
+            leader = true;
+            masterMission = true;
         }
 
     }
@@ -177,10 +106,12 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
 
         listView = binding.listItem;
+        listView.setOnScrollListener(this);
 
         textView = binding.missionResultTv;
         swipeRefreshLayout = binding.freshList;
         swipeRefreshLayout.setOnRefreshListener(this);
+
         //自定义header
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         ActionBar actionBar = activity.getSupportActionBar();
@@ -246,7 +177,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public void onResume() {
         super.onResume();
         if (Objects.nonNull(MainActivity.loggedInUser) && MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
-            missionyButton.setVisibility(View.VISIBLE);
+
             leader = true;
             masterMission = true;
         }
@@ -255,13 +186,17 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if (actionBar != null) { //自定义应用栏
             actionBar.setDisplayShowCustomEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
+            // 设置自定义视图
+            if (Objects.isNull(customView)) {
+                customHeaderBar(actionBar);
+            }
 
         }
        /* if (Objects.nonNull(listView)) {
             listView.setAdapter(listViewAdapter);
         }*/
 
-        if (missionFlag.get() ==  1) {
+        if (Objects.nonNull(missionFlag) && missionFlag.get() ==  1) {
             missionViewModel.getData(1, 30, null, null, masterMission);
             missionFlag.getAndIncrement();
         }
@@ -287,5 +222,112 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public void onRefresh() {
         missionViewModel.addOne(masterMission);
         swipeRefreshLayout.setRefreshing(false);
+    }
+
+
+    private void customHeaderBar(ActionBar actionBar) {
+
+        if (actionBar != null) { //自定义应用栏
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false); // 可选，如果不需要显示默认标题
+            if (Objects.isNull(headerMissionLayoutBinding)) {
+                headerMissionLayoutBinding = HeaderMissionLayoutBinding.inflate(LayoutInflater.from(getContext()));
+            }
+            // 创建自定义视图
+            //customView = LayoutInflater.from(getContext()).inflate(R.layout.header_mission_layout, null);
+
+            View headerView = actionBar.getCustomView();
+            if (Objects.isNull(headerView)) {
+
+                customView = headerMissionLayoutBinding.getRoot();
+
+                myButton = headerMissionLayoutBinding.acceptAll;
+
+                missionyButton = headerMissionLayoutBinding.createMission;
+                tabLayout = headerMissionLayoutBinding.tabLayout;
+                todoTv = headerMissionLayoutBinding.todoMission;
+                if (leader) {
+                    masterMission = true;
+                    missionyButton.setVisibility(View.VISIBLE);
+                    tabLayout.setVisibility(View.VISIBLE);
+                } else {
+                    missionyButton.setVisibility(View.GONE);
+                    tabLayout.setVisibility(View.GONE);
+                }
+                tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                    @Override
+                    public void onTabSelected(TabLayout.Tab tab) {
+                        Log.i("xiaweihu", "onTabSelected: ========>" + tab.getText());
+                        if (Constraints.MISSION_TYPE_MASTER.equals(tab.getText())) {
+                            masterMission = true;
+                        } else {
+                            masterMission = false;
+                        }
+                        missionViewModel.getData(1, 30, null, null, masterMission);
+                    }
+
+                    @Override
+                    public void onTabUnselected(TabLayout.Tab tab) {
+                        Log.i("xiaweihu", "unSelected: ========>" + tab.getText());
+                    }
+
+                    @Override
+                    public void onTabReselected(TabLayout.Tab tab) {
+                        Log.i("xiaweihu", "reSelected: ========>" + tab.getText());
+                    }
+                });
+
+                NavController navController = NavHostFragment.findNavController(this);
+                // 按钮的点击事件,一键领取
+                myButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // 按钮点击后的操作
+                        Log.i("xiaweihu", "header on click:  =========================");
+                    }
+                });
+
+                //新建任务
+                missionyButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // 按钮点击后的操作
+                        Log.i("xiaweihu", "header on click:  =========================");
+                        navController.navigate(R.id.to_create_mission);
+                        actionBar.setDisplayShowCustomEnabled(false);
+                        actionBar.setDisplayShowTitleEnabled(true);
+                        //actionBar
+                    }
+                });
+
+                // 设置自定义视图
+                actionBar.setCustomView(customView);
+            }
+        }
+
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        if (firstVisibleItem == 0) {
+            if (Objects.nonNull(swipeRefreshLayout)) {
+                swipeRefreshLayout.setEnabled(true);
+            }
+            // 列表滚动到了顶部
+            // 在这里执行刷新数据的操作
+        }
+        if (firstVisibleItem + visibleItemCount == totalItemCount) {
+            // 列表滚动到了底部
+            // 在这里执行加载更多数据的操作
+            if (Objects.nonNull(swipeRefreshLayout)) {
+                swipeRefreshLayout.setEnabled(false);
+            }
+
+        }
     }
 }

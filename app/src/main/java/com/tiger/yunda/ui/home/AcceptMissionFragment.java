@@ -176,6 +176,7 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
             saveMission.setAction(1);
             if (acceptMissionViewModel.saveSubMissions(saveMission)) {
                 Toast.makeText(getContext(), "派发成功", Toast.LENGTH_SHORT).show();
+                navController.navigate(R.id.back_to_mission);
             } else {
                 Toast.makeText(getContext(), "派发失败", Toast.LENGTH_SHORT).show();
             }
@@ -185,11 +186,11 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
 
             if (acceptMissionViewModel.saveSubMissions(saveMission)) {
                 Toast.makeText(getContext(), "保存成功", Toast.LENGTH_SHORT).show();
+                navController.navigate(R.id.back_to_mission);
             } else {
                 Toast.makeText(getContext(), "保存失败", Toast.LENGTH_SHORT).show();
             }
         }
-        navController.popBackStack();
     }
 
 

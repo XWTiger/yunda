@@ -46,7 +46,7 @@
         android:label="派发任务"
         tools:layout="@layout/fragment_accept_mission"
         >
-        <action android:id="@+id/back_to_mission" app:destination="@id/navigation_mission"/>
+        <action android:id="@+id/back_to_mission" app:destination="@id/navigation_mission" app:popUpToInclusive="true"/>
     </fragment>
 
     <fragment android:id="@+id/inspection_mission"
@@ -81,7 +81,7 @@
         android:name="com.tiger.yunda.ui.common.CameraFragment"
         android:label="拍照"
         tools:layout="@layout/fragment_camera">
-         <action android:id="@+id/to_inspection_mission" app:destination="@id/inspection_mission" />
+         <action android:id="@+id/to_inspection_mission" app:destination="@id/inspection_mission"  app:popUpToInclusive="true" />
     </fragment>
 
     <dialog android:id="@+id/problem_dialog"

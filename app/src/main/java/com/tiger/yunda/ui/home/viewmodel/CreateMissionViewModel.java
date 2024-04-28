@@ -1,5 +1,6 @@
 package com.tiger.yunda.ui.home.viewmodel;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.databinding.ObservableField;
@@ -9,8 +10,10 @@ import androidx.lifecycle.ViewModel;
 
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.data.model.CreateMission;
+import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.data.model.Train;
 import com.tiger.yunda.service.MissionService;
+import com.tiger.yunda.utils.JsonUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,8 +32,11 @@ public class CreateMissionViewModel extends ViewModel {
 
     private MissionService missionService;
 
-    public CreateMissionViewModel() {
+    private Context context;
+
+    public CreateMissionViewModel(Context context) {
         missionService = MainActivity.retrofitClient.create(MissionService.class);
+        this.context = context;
     }
 
     public LiveData<List<Train>> getTrains() {
@@ -74,9 +80,12 @@ public class CreateMissionViewModel extends ViewModel {
                     data.setValue(response.body().get("id"));
                 } else {
                     try {
-                        Log.e("xiaweihu", "onResponse: ===========>" + response.errorBody().string());
+
+                        String errStr = response.errorBody().string();
+                        ErrorResult errorResult = JsonUtil.getObject(errStr, context);
+                        Log.e("xiaweihu", "创建任务失败: ===========>" + errStr);
                     } catch (IOException e) {
-                       e.printStackTrace();
+                        e.printStackTrace();
                     }
                 }
             }

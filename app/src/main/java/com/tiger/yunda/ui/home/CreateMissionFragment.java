@@ -117,7 +117,7 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
         binding.finishedCreation.setTag(ACTION_FINISHED);
         binding.finishedCreation.setOnClickListener(this);
         if (Objects.isNull(createMissionViewModel)) {
-            createMissionViewModel = new CreateMissionViewModel();
+            createMissionViewModel = new CreateMissionViewModel(getContext());
         }
         createMissionViewModel.getCreation().observe(getViewLifecycleOwner(), new Observer<CreateMission>() {
             @Override

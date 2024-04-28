@@ -138,6 +138,15 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                 btnItem.setEnabled(false);
                 ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
                 btnItem.setBackgroundTintList(colorStateList);
+                if (state == MISSION_STATE_INSPECTION) {
+                    btnItem.setText("已下发");
+                }
+                if (state == MISSION_STATE_FINISHED) {
+                    btnItem.setText("巡检中");
+                }
+                if (state == MISSION_STATE_ACCEPTED) {
+                    btnItem.setText("已完成");
+                }
             }
 
             //点击巡检按钮
