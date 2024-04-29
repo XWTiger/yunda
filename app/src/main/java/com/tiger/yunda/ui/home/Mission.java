@@ -1,5 +1,7 @@
 package com.tiger.yunda.ui.home;
 
+import com.tiger.yunda.data.model.Faults;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -39,6 +41,18 @@ public class Mission implements Serializable {
     private List<TrainLocations> trainLocations;
 
     private Boolean masterMission;
+
+    private List<Faults> faults;
+    private String actualTime;
+    private String locatorCardNo;
+    private String deptName;
+    private int faultState;
+    private String faultStateText;
+    private String staffLocationSysLink;
+    private String staffLocationSysLinkArgs;
+    private String isAppeal;
+    private int appealState;
+    private String appealStateText;
 
 
 

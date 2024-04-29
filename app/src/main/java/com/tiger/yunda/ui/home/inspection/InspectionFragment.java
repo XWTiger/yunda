@@ -22,6 +22,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
 import com.tiger.yunda.data.BreakDownInfo;
+import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.databinding.FragmentInspectionBinding;
 import com.tiger.yunda.service.InspectionService;
 import com.tiger.yunda.service.MissionService;
@@ -31,6 +32,7 @@ import com.tiger.yunda.ui.common.CameraContentBean;
 import com.tiger.yunda.ui.home.ListViewAdapter;
 import com.tiger.yunda.ui.home.Mission;
 import com.tiger.yunda.ui.home.inspection.placeholder.PlaceholderContent;
+import com.tiger.yunda.utils.JsonUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -88,8 +90,33 @@ public class InspectionFragment extends Fragment {
         if (Objects.isNull(breakDownInfo)) {
             breakDownInfo = new BreakDownInfo();
         }
+        //查询任务
         if (getArguments() != null) {
-            mission = (Mission) getArguments().getSerializable(ListViewAdapter.MISSION_KEY);
+            Mission submission = (Mission) getArguments().getSerializable(ListViewAdapter.MISSION_KEY);
+            Call<Mission> missionCall = inspectionService.querySubtaskDetail(submission.getId());
+            missionCall.enqueue(new Callback<Mission>() {
+                @Override
+                public void onResponse(Call<Mission> call, Response<Mission> response) {
+                    if (response.isSuccessful()) {
+                        mission = response.body();
+                    } else {
+                        String errStr = null;
+                        try {
+                            errStr = response.errorBody().string();
+                            ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                            Log.e("xiaweihu", "查询子任务详情: ===========>" + errStr);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Mission> call, Throwable throwable) {
+
+                }
+            });
         }
         if (Objects.isNull(inspectionService)) {
             inspectionService = MainActivity.retrofitClient.create(InspectionService.class);

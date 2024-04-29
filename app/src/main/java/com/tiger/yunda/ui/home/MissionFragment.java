@@ -85,7 +85,6 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
         ActionBar actionBar = activity.getSupportActionBar();
         this.customHeaderBar(actionBar);
         if (Objects.nonNull(MainActivity.loggedInUser) && MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
-
             leader = true;
             masterMission = true;
         }
@@ -177,7 +176,6 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public void onResume() {
         super.onResume();
         if (Objects.nonNull(MainActivity.loggedInUser) && MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
-
             leader = true;
             masterMission = true;
         }

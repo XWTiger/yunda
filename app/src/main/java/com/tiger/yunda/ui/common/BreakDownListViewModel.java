@@ -5,11 +5,14 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.tiger.yunda.data.BreakDownType;
+import com.tiger.yunda.service.InspectionService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BreakDownListViewModel extends ViewModel {
+
+    private InspectionService inspectionService;
 
     private MutableLiveData<List<BreakDownType>> types = new MutableLiveData<>();
 
@@ -28,6 +31,8 @@ public class BreakDownListViewModel extends ViewModel {
     }
 
 
+
+
     public LiveData<List<BreakDownType>> getTypes() {
 
         List<BreakDownType> list = new ArrayList<>();
@@ -43,5 +48,13 @@ public class BreakDownListViewModel extends ViewModel {
 
 
         return types;
+    }
+
+    public InspectionService getInspectionService() {
+        return inspectionService;
+    }
+
+    public void setInspectionService(InspectionService inspectionService) {
+        this.inspectionService = inspectionService;
     }
 }

@@ -354,7 +354,7 @@ public class CameraFragment extends Fragment {
                         String msg = "图片保存成功: " + output.getSavedUri().toString();
                         Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
                         Log.d("tiger", msg);
-                        CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.IMAGE,  output.getSavedUri().toString(), "1".equals(recordType));
+                        CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.IMAGE,  output.getSavedUri().getPath(), "1".equals(recordType));
                         contentBeans.add(cameraContentBean);
                         viewholder.setExitButtonEnable(true);
                     }
@@ -387,7 +387,7 @@ public class CameraFragment extends Fragment {
                         if (!((VideoRecordEvent.Finalize) videoRecordEvent).hasError()) {
                             String msg = "Video capture succeeded: " + ((VideoRecordEvent.Finalize) videoRecordEvent).getOutputResults().getOutputUri();
                             Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
-                            CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, ((VideoRecordEvent.Finalize) videoRecordEvent).getOutputResults().getOutputUri().toString(), "1".equals(recordType));
+                            CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, ((VideoRecordEvent.Finalize) videoRecordEvent).getOutputResults().getOutputUri().getPath(), "1".equals(recordType));
                             this.contentBeans.add(cameraContentBean);
                             viewholder.setExitButtonEnable(true);
                         } else {

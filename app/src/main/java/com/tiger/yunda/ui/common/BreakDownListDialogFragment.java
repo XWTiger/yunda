@@ -37,19 +37,33 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
 import com.tiger.yunda.data.BreakDownInfo;
 import com.tiger.yunda.data.BreakDownType;
+import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.databinding.ChipFileBinding;
 import com.tiger.yunda.databinding.FragmentBreakdownListDialogItemBinding;
 import com.tiger.yunda.enums.CameraFileType;
+import com.tiger.yunda.service.InspectionService;
+import com.tiger.yunda.utils.CollectionUtil;
+import com.tiger.yunda.utils.JsonUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * <p>A fragment that shows a list of items as a modal bottom sheet.</p>
@@ -75,6 +89,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
     private BreakDownInfo breakDownInfo = null;
     private SpinnerAdapter spinnerAdapter;
     ActivityResultLauncher<PickVisualMediaRequest>  pickMultipleMedia;
+    private InspectionService inspectionService;
 
 
 
@@ -97,16 +112,14 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Objects.isNull(inspectionService)) {
+            inspectionService =  MainActivity.retrofitClient.create(InspectionService.class);
+        }
+
+
         viewModel = new ViewModelProvider(this).get(BreakDownListViewModel.class);
+        viewModel.setInspectionService(inspectionService);
         List<BreakDownType> breakDownTypes = new ArrayList<>();
-        breakDownTypes.add(BreakDownType.builder()
-                        .type(1)
-                        .name("PIS")
-                .build());
-        breakDownTypes.add(BreakDownType.builder()
-                .type(2)
-                .name("AIS")
-                .build());
         context = getContext();
         spinnerAdapter = new SpinnerAdapter(breakDownTypes, context, this, -1);
 
@@ -364,6 +377,46 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                                 .show();
                         break;
                     case "finished":
+                        //提交故障
+
+                        if (StringUtils.isBlank(breakDownInfo.getDesc())) {
+                            problemDesc.setError("故障描述不能为空");
+                            return;
+                        } else {
+                            problemDesc.setError(null);
+                        }
+                        if (breakDownInfo.getType() <= 0) {
+                            Toast.makeText(getContext(), "故障类型不能为空", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        if (breakDownInfo.getBreakFilesUri().isEmpty()) {
+                            Toast.makeText(getContext(), "故障文件不能为空", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        Call<Map<String, String>> result = inspectionService.createBreakDownRecord(breakDownInfo.getSubtaskId(), breakDownInfo.getTrainLocationId(), breakDownInfo.getType(), breakDownInfo.getDesc(), breakDownInfo.getDiscretion(), breakDownInfo.getBreakFilesUri(), breakDownInfo.getHandleDesc(), breakDownInfo.getHandleFilesUri());
+                        result.enqueue(new Callback<Map<String, String>>() {
+                            @Override
+                            public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                                if (response.isSuccessful()) {
+                                   dismiss();
+                                } else {
+                                    try {
+                                        String errStr = response.errorBody().string();
+                                        ErrorResult errorResult = JsonUtil.getObject(errStr, context);
+                                        Log.e("xiaweihu", "创建故障失败: ===========>" + errStr);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<Map<String, String>> call, Throwable throwable) {
+
+                            }
+                        });
+
                         break;
                     default: //文件chip 选择
                         if (tag.startsWith("problem_")) { //删除故障图片或视频
