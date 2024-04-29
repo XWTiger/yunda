@@ -1,5 +1,6 @@
 package com.tiger.yunda.data.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class InitConfig {
+public class InitConfig implements Serializable {
     private String from;
     private String to;
     private List<String> num;

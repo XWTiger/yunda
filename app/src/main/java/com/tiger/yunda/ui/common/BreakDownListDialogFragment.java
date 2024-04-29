@@ -77,6 +77,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
 
     private static final String ARG_ITEM_COUNT = "item_count";
     private FragmentBreakdownListDialogItemBinding binding;
+    private List<BreakDownType> breakDownTypes;
 
 
     private int CHOOSE_CODE = 3;
@@ -119,9 +120,9 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
 
         viewModel = new ViewModelProvider(this).get(BreakDownListViewModel.class);
         viewModel.setInspectionService(inspectionService);
-        List<BreakDownType> breakDownTypes = new ArrayList<>();
+
         context = getContext();
-        spinnerAdapter = new SpinnerAdapter(breakDownTypes, context, this, -1);
+
 
 
 
@@ -133,17 +134,18 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                              @Nullable Bundle savedInstanceState) {
         //return inflater.inflate(R.layout.fragment_breakdown_list_dialog_item, container);
         binding = FragmentBreakdownListDialogItemBinding.inflate(inflater, container, false);
-        binding.problemCatalogSelect.setAdapter(spinnerAdapter);
         if (Objects.nonNull(viewModel)) {
             viewModel.getTypes().observe(this, new Observer<List<BreakDownType>>() {
                 @Override
                 public void onChanged(List<BreakDownType> breakDownTypes) {
+                    spinnerAdapter = new SpinnerAdapter(breakDownTypes, context,  -1);
                     spinnerAdapter.setData(breakDownTypes);
-                    spinnerAdapter.notifyDataSetChanged();
+                    binding.problemCatalogSelect.setAdapter(spinnerAdapter);
                 }
             });
 
         }
+
         ViewHolder viewHolder = new ViewHolder(this);
         pickMultipleMedia =
                 registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(4), uris -> {

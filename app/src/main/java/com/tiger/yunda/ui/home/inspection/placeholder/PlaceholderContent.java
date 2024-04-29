@@ -49,7 +49,7 @@ public class PlaceholderContent {
             return;
         }
         mission.getTrainLocations().forEach(trainLocations -> {
-            addItem(createPlaceholderItem(trainLocations.getId(), trainLocations.getLocationTypeName(), trainLocations.getLocationType() + "_" + trainLocations.getLocationTypeName()));
+            addItem(createPlaceholderItem(trainLocations.getId(), trainLocations.getLocationTypeName(), trainLocations.getLocationType() + "_" + trainLocations.getLocationTypeName(), trainLocations.getState(), trainLocations.getStateText()));
         });
     }
 
@@ -58,8 +58,8 @@ public class PlaceholderContent {
         ITEM_MAP.put(item.id, item);
     }
 
-    private static PlaceholderItem createPlaceholderItem(String position, String content,  String details) {
-        return new PlaceholderItem(position, content,  details);
+    private static PlaceholderItem createPlaceholderItem(String position, String content,  String details,int state,  String stateText) {
+        return new PlaceholderItem(position, content,  details, state, stateText);
     }
 
 
@@ -72,15 +72,16 @@ public class PlaceholderContent {
         public final String content;
         public final String details;
 
-        public PlaceholderItem(String id, String content, String details) {
+        public final int state;//状态，1:初始、2:已开始、3:已暂停、4:已恢复、5:已结束
+
+        public final String stateText;
+
+        public PlaceholderItem(String id, String content, String details, int state, String stateText) {
             this.id = id;
             this.content = content;
             this.details = details;
-        }
-
-        @Override
-        public String toString() {
-            return content;
+            this.state = state;
+            this.stateText = stateText;
         }
     }
 }

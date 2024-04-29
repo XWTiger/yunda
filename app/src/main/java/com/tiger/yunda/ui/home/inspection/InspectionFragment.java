@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -87,40 +88,19 @@ public class InspectionFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Objects.isNull(breakDownInfo)) {
-            breakDownInfo = new BreakDownInfo();
-        }
-        //查询任务
-        if (getArguments() != null) {
-            Mission submission = (Mission) getArguments().getSerializable(ListViewAdapter.MISSION_KEY);
-            Call<Mission> missionCall = inspectionService.querySubtaskDetail(submission.getId());
-            missionCall.enqueue(new Callback<Mission>() {
-                @Override
-                public void onResponse(Call<Mission> call, Response<Mission> response) {
-                    if (response.isSuccessful()) {
-                        mission = response.body();
-                    } else {
-                        String errStr = null;
-                        try {
-                            errStr = response.errorBody().string();
-                            ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
-                            Log.e("xiaweihu", "查询子任务详情: ===========>" + errStr);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Mission> call, Throwable throwable) {
-
-                }
-            });
-        }
         if (Objects.isNull(inspectionService)) {
             inspectionService = MainActivity.retrofitClient.create(InspectionService.class);
         }
+        if (Objects.isNull(breakDownInfo)) {
+            breakDownInfo = new BreakDownInfo();
+        }
+
+        //查询任务
+        if (getArguments() != null) {
+            Mission submission = (Mission) getArguments().getSerializable(ListViewAdapter.MISSION_KEY);
+            queryMissionDetail(submission.getId());
+        }
+
         setHasOptionsMenu(true);
 
 
@@ -186,6 +166,11 @@ public class InspectionFragment extends Fragment {
     }
 
     public class ViewHolder  implements View.OnClickListener {
+        private int TRAIN_LOCATION_STATE_INIT = 1;
+        private int TRAIN_LOCATION_STATE_STARTED = 2;
+        private int TRAIN_LOCATION_STATE_PAUSED = 3;
+        private int TRAIN_LOCATION_STATE_COVERED = 4;
+        private int TRAIN_LOCATION_STATE_FINISHED = 5;
 
         public LinearLayout linearLayout;
         public LinearLayout listchild;
@@ -211,16 +196,24 @@ public class InspectionFragment extends Fragment {
                 if (mItems.size() > 0) {
                     Log.i("tiger", "ViewHolder: ================ ");
 
-                    for (PlaceholderContent.PlaceholderItem item : mItems) {
+                    for (int i = 0, mItemsSize = mItems.size(); i < mItemsSize; i++) {
+                        PlaceholderContent.PlaceholderItem item = mItems.get(i);
                         mapper.put(item.id, item);
 
-                         listchild = (LinearLayout) inflater.inflate(R.layout.fragment_inspection_list, linearLayout, false);
-                        //inflater.inflate(R.id.item_train_position, listchild, false);
+                        listchild = (LinearLayout) inflater.inflate(R.layout.fragment_inspection_list, linearLayout, false);
+                        //inflater.inflate(R.id.item_train_position, listchild, false);btnItem.setEnabled(false);
+                        //                ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
+                        //                btnItem.setBackgroundTintList(colorStateList);
 
                         TextView view = (TextView) listchild.getChildAt(0);
                         Button startBtn = (Button) listchild.getChildAt(1);
                         Button pauseBtn = (Button) listchild.getChildAt(2);
                         Button finishBtn = (Button) listchild.getChildAt(3);
+                        if (item.state == 1) {
+                            pauseBtn.setEnabled(false);
+                            ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
+                            pauseBtn.setBackgroundTintList(colorStateList);
+                        }
 
                         view.setText(item.content);
                         startBtn.setTag(item.id);
@@ -259,9 +252,10 @@ public class InspectionFragment extends Fragment {
                             ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
                             button.setBackgroundTintList(colorStateList);
                         } else {
-                            Toast.makeText(getContext(), "请求失败", Toast.LENGTH_SHORT).show();
                             try {
-                                Log.e("xiaweihu", "请求开始巡检接口失败:  =====>" + response.body().string());
+                                String errStr = response.errorBody().string();
+                                ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                                Log.e("xiaweihu", "开始巡检失败: ===========>" + errStr);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -281,11 +275,14 @@ public class InspectionFragment extends Fragment {
                 String content = pauseBtn.getText().toString();
                 PauseParams params = PauseParams.builder()
                         .id((String) v.getTag())
-                        .build();
-                if (content.equals(TV_CONTINUE_VALUE)) {
+                        .action(0).build();
+                PlaceholderContent.PlaceholderItem placeholderItem =  mapper.get((String) v.getTag());
+                if (3 == placeholderItem.state) {//已暂停
                     params.setAction(2);
-                } else {
+                    pauseBtn.setText("恢复");
+                } else {//已恢复
                     params.setAction(1);
+                    pauseBtn.setText("暂停");
                 }
                 Call<ResponseBody>  responseBodyCall = inspectionService.pauseOrResumeInspection(params);
                 responseBodyCall.enqueue(new Callback<ResponseBody>() {
@@ -302,9 +299,11 @@ public class InspectionFragment extends Fragment {
                                 breakDownListDialogFragment.show(getParentFragmentManager(), "breakdownReport");
                             }
                         } else {
-                            Toast.makeText(getContext(), "请求失败", Toast.LENGTH_SHORT).show();
+
                             try {
-                                Log.e("xiaweihu", "请求暂停接口失败:  =====>" + response.body().string());
+                                String errStr = response.errorBody().string();
+                                ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                                Log.e("xiaweihu", "暂停巡检失败: ===========>" + errStr);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -330,9 +329,11 @@ public class InspectionFragment extends Fragment {
                         if (response.code() == MissionService.HTTP_OK) {
                             binding.inspectionAction.setText(null);
                         } else {
-                            Toast.makeText(getContext(), "请求失败", Toast.LENGTH_SHORT).show();
+
                             try {
-                                Log.e("xiaweihu", "请求巡检接口失败:  =====>" + response.body().string());
+                                String errStr = response.errorBody().string();
+                                ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                                Log.e("xiaweihu", "暂停巡检失败: ===========>" + errStr);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -364,6 +365,40 @@ public class InspectionFragment extends Fragment {
 
         public void setmItems(List<PlaceholderContent.PlaceholderItem> mItems) {
             this.mItems = mItems;
+        }
+    }
+
+    private void queryMissionDetail(String missionId) {
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        Call<Mission> missionCall = inspectionService.querySubtaskDetail(missionId);
+        MainActivity.threadPoolExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Response<Mission> response = missionCall.execute();
+                    if (response.isSuccessful()) {
+                        mission = response.body();
+                    } else {
+                        String errStr = null;
+                        try {
+                            errStr = response.errorBody().string();
+                            ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                            Log.e("xiaweihu", "查询子任务详情: ===========>" + errStr);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    countDownLatch.countDown();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

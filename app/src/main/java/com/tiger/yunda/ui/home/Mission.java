@@ -1,6 +1,7 @@
 package com.tiger.yunda.ui.home;
 
 import com.tiger.yunda.data.model.Faults;
+import com.tiger.yunda.data.model.SysLinkArg;
 
 import java.io.Serializable;
 import java.util.List;
@@ -49,7 +50,7 @@ public class Mission implements Serializable {
     private int faultState;
     private String faultStateText;
     private String staffLocationSysLink;
-    private String staffLocationSysLinkArgs;
+    private SysLinkArg staffLocationSysLinkArgs;
     private String isAppeal;
     private int appealState;
     private String appealStateText;

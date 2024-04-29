@@ -22,15 +22,14 @@ public class SpinnerAdapter extends BaseAdapter  {
     private List<BreakDownType> types;
     private Context context;
 
-    private SpinnerCallBack deliverMissionAdapter;
 
     private int parentIndex;
 
 
-    public SpinnerAdapter(List<BreakDownType> types, Context context, SpinnerCallBack deliverMissionAdapter, int parentIndex) {
+    public SpinnerAdapter(List<BreakDownType> types, Context context,  int parentIndex) {
         this.types = types;
         this.context = context;
-        this.deliverMissionAdapter = deliverMissionAdapter;
+
         this.parentIndex = parentIndex;
     }
 

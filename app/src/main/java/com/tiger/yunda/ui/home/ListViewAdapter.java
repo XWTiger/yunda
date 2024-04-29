@@ -85,6 +85,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
         this.objects = objects;
         checkedArr = new int[objects.size()];
         this.missionViewModel = missionViewModel;
+        missionService = MainActivity.retrofitClient.create(MissionService.class);
 
     }
 
@@ -121,6 +122,8 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                 ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
                 btnItem.setBackgroundTintList(colorStateList);
                 inspectionBtn.setVisibility(View.VISIBLE);
+                inspectionBtn.setText("巡检");
+
             }
             if (state == MISSION_STATE_FINISHED && StringUtils.isNotBlank(objects.get(position).getId())) {
                 btnItem.setEnabled(false);
@@ -381,5 +384,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
         }
         checkedArr = new int[objects.size()];
     }
+
+
 }
 

@@ -45,7 +45,7 @@ public interface InspectionService {
      * @param id 巡检车位置id
      * @return
      */
-    @POST("/api/PatrolTask/PatrolTrainLocationAction")
+    @POST("/api/PatrolTask/PatrolTrainLocationEnd")
     Call<ResponseBody>  finishedInspection(@Query("id") String id);
 
 

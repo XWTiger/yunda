@@ -87,7 +87,12 @@ public class MissionViewModel extends ViewModel {
                 public void onResponse(Call<MissionResult> call, Response<MissionResult> response) {
                     if (response.code() == MissionService.HTTP_OK) {
                         count = response.body().getCount();
-                        resultMutableLiveData.setValue(response.body());
+                        MissionResult missionResult = response.body();
+                        missionResult.getData().add(Mission.builder()
+                                        .id("788edbf0-f511-4f16-a8d7-201f5823ad34")
+                                        .taskId("28992644-eec7-4e84-9b98-d54f1b6e8e23")
+                                .inspectorId(1).positionId(1).positionName("L1-A").inspectionUnit("0412-A").state(5).faultState(3).appealState(0).build());
+                        resultMutableLiveData.setValue(missionResult);
                     } else {
 
                         try {

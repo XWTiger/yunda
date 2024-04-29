@@ -117,9 +117,8 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if (actionBar != null) { //自定义应用栏
             actionBar.setDisplayShowCustomEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false); // 可选，如果不需要显示默认标题
-            if (Objects.nonNull(customView)) {
-                // 设置自定义视图
-                actionBar.setCustomView(customView);
+            if (Objects.isNull(customView)) {
+                customHeaderBar(actionBar);
             }
         }
 
@@ -190,6 +189,14 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
 
         }
+        if (Objects.nonNull(headerMissionLayoutBinding)) {
+            myButton = headerMissionLayoutBinding.acceptAll;
+
+            missionyButton = headerMissionLayoutBinding.createMission;
+            tabLayout = headerMissionLayoutBinding.tabLayout;
+            todoTv = headerMissionLayoutBinding.todoMission;
+        }
+
        /* if (Objects.nonNull(listView)) {
             listView.setAdapter(listViewAdapter);
         }*/
