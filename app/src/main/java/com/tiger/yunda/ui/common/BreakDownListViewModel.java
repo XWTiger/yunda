@@ -30,7 +30,7 @@ public class BreakDownListViewModel extends ViewModel {
 
 
     public BreakDownListViewModel() {
-        List<BreakDownType> list = new ArrayList<>();
+        /*List<BreakDownType> list = new ArrayList<>();
         list.add(BreakDownType.builder()
                         .type(1)
                         .name("PIS")
@@ -39,7 +39,7 @@ public class BreakDownListViewModel extends ViewModel {
                 .type(2)
                 .name("AIS")
                 .build());
-        this.types.setValue(list);
+        this.types.setValue(list);*/
     }
 
 

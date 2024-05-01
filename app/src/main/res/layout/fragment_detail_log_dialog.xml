@@ -1,265 +1,297 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/list"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:clipToPadding="false"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    tools:context=".ui.log.LogDialogFragment"
-    android:orientation="vertical">
+    <data>
+        <variable
+            name="log"
+            type="com.tiger.yunda.data.model.WorkLog" />
+
+    </data>
+
     <LinearLayout
-
+        android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:text="作业详情"
-            android:layout_marginStart="10dp"
-            android:theme="@style/Theme.Yunda.DetailTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:background="@drawable/text_view_boder"
-        android:layout_marginStart="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
 
-        <TextView
-            android:id="@+id/report_person_title"
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-            android:text="巡检车辆:  "
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/report_person"
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="王力宏"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintStart_toEndOf="@id/report_person_title"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="巡检单元:  "
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toStartOf="@id/report_person_title"
-            app:layout_constraintTop_toBottomOf="@id/report_person_title" />
-
-        <TextView
-            android:id="@+id/unit"
-            android:layout_width="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_height="wrap_content"
-            android:text="AAFE8"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="@id/textView2"
-            app:layout_constraintStart_toEndOf="@id/textView2" />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:background="@drawable/text_view_boder"
-        android:layout_marginStart="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/report_time_title"
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-            android:text="开始巡检时间:  "
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/report_time"
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="2024-04-22 20:26:22"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintStart_toEndOf="@id/report_time_title"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/report_deal_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="巡检完成时间:  "
-            android:textColor="@color/black"
-            android:textSize="16sp"
-
-            app:layout_constraintStart_toStartOf="@id/report_time_title"
-            app:layout_constraintTop_toBottomOf="@id/report_time_title" />
-
-        <TextView
-            android:id="@+id/deal_time"
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="2024-04-22 20:26:22"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="@id/report_deal_time"
-            app:layout_constraintStart_toEndOf="@id/report_deal_time" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:background="@drawable/text_view_boder"
-        android:layout_marginStart="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/inspection_person"
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-            android:text="巡检人:  "
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/ins_person"
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="王力宏"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintStart_toEndOf="@id/inspection_person"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/report_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="该单元是否提报故障:  "
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toStartOf="@id/inspection_person"
-            app:layout_constraintTop_toBottomOf="@id/inspection_person" />
-
-        <TextView
-            android:id="@+id/report_state_text"
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-            android:text="是"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:layout_marginStart="16dp"
-            app:layout_constraintBottom_toBottomOf="@id/report_state"
-            app:layout_constraintStart_toEndOf="@id/report_state"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1.0" />
-
-        <TextView
-            android:id="@+id/deal_state_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="故障是否处理:  "
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toStartOf="@id/report_state"
-            app:layout_constraintTop_toBottomOf="@id/report_state" />
-
-        <TextView
-            android:id="@+id/deal_person"
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-            android:text="王大狗"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:layout_marginStart="16dp"
-            app:layout_constraintBottom_toBottomOf="@id/deal_state_title"
-            app:layout_constraintStart_toEndOf="@id/deal_state_title"
-            />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    <LinearLayout
-        android:background="@drawable/text_view_boder"
         android:orientation="vertical"
-        android:layout_marginStart="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-       
-        <TextView
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:text="故障详情"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:text="司机室广播声音小"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <ImageView
-            android:src="@drawable/ic_yunda"
-            android:layout_width="200dp"
-            android:layout_height="200dp"/>
-    </LinearLayout>
-    <LinearLayout
-        android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/btn_yes"
-            android:text="确认"
-            android:textSize="17sp"
-            android:textColor="@color/black"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:text="编辑"
-            android:id="@+id/btn_edit"
-            android:textSize="17sp"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/black"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:text="申述"
-            android:id="@+id/btn_reject"
-            android:textSize="17sp"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/black"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:text="取消"
-            android:id="@+id/btn_cancle"
-            android:textSize="17sp"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/black"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+        tools:context=".ui.log.LogDialogFragment">
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="作业详情"
+                android:textStyle="bold"
+                android:theme="@style/Theme.Yunda.DetailTitle" />
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/text_view_boder">
+
+            <TextView
+                android:id="@+id/report_person_title"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:text="巡检车辆:  "
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/report_person"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@{log.trainNo}"
+                tools:text="王力宏"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintStart_toEndOf="@id/report_person_title"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="巡检单元:  "
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@id/report_person_title"
+                app:layout_constraintTop_toBottomOf="@id/report_person_title" />
+
+            <TextView
+                android:id="@+id/unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@{log.inspectionUnit}"
+                tools:text="AAFE8"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@id/textView2"
+                app:layout_constraintStart_toEndOf="@id/textView2" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/text_view_boder">
+
+            <TextView
+                android:id="@+id/report_time_title"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:text="开始巡检时间:  "
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/report_time"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@{log.patrolTime}"
+                tools:text="2024-04-22 20:26:22"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintStart_toEndOf="@id/report_time_title"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/report_deal_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="巡检完成时间:  "
+                android:textColor="@color/black"
+                android:textSize="16sp"
+
+                app:layout_constraintStart_toStartOf="@id/report_time_title"
+                app:layout_constraintTop_toBottomOf="@id/report_time_title" />
+
+            <TextView
+                android:id="@+id/deal_time"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@{log.completeTime}"
+                tools:text="2024-04-22 20:26:22"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@id/report_deal_time"
+                app:layout_constraintStart_toEndOf="@id/report_deal_time" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/text_view_boder">
+
+            <TextView
+                android:id="@+id/inspection_person"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:text="巡检人:  "
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/ins_person"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@{log.inspector}"
+                tools:text="王力宏"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintStart_toEndOf="@id/inspection_person"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/report_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="该单元是否提报故障:  "
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@id/inspection_person"
+                app:layout_constraintTop_toBottomOf="@id/inspection_person" />
+
+            <TextView
+                android:id="@+id/report_state_text"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text='@{log.faultState==0?"否":"是"}'
+                tools:text="是"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@id/report_state"
+                app:layout_constraintStart_toEndOf="@id/report_state"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0" />
+
+            <TextView
+                android:id="@+id/deal_state_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="故障是否处理:  "
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@id/report_state"
+                app:layout_constraintTop_toBottomOf="@id/report_state" />
+
+            <TextView
+                android:id="@+id/deal_person"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="是"
+                tools:text="是"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@id/deal_state_title"
+                app:layout_constraintStart_toEndOf="@id/deal_state_title" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:id="@+id/problem_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/text_view_boder"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="故障详情"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="司机室广播声音小"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:src="@drawable/ic_yunda" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btn_yes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="确认"
+                android:textColor="@color/black"
+                android:textSize="17sp" />
+
+            <Button
+                android:id="@+id/btn_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="编辑"
+                android:textColor="@color/black"
+                android:textSize="17sp" />
+
+            <Button
+                android:id="@+id/btn_reject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="申述"
+                android:textColor="@color/black"
+                android:textSize="17sp" />
+
+            <Button
+                android:id="@+id/btn_cancle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="取消"
+                android:textColor="@color/black"
+                android:textSize="17sp" />
+
+        </LinearLayout>
 
     </LinearLayout>
-
-</LinearLayout>
+</layout>

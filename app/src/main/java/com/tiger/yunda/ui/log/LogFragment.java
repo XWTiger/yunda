@@ -101,11 +101,12 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
         if (Objects.isNull(logViewModel)) {
 
             logViewModel = new ViewModelProvider(this).get(LogViewModel.class);
+            logViewModel.setContext(getContext());
             logViewModel.getLogs(1, 10, 1, "", "").observe(getViewLifecycleOwner(), new Observer<List<WorkLog>>() {
                 @Override
                 public void onChanged(List<WorkLog> workLogs) {
                     if (Objects.isNull(logAdapter)) {
-                        logAdapter = new LogAdapter(getContext(), fragmentLogBinding.list.getId(), workLogs);
+                        logAdapter = new LogAdapter(getContext(), fragmentLogBinding.list.getId(), workLogs,getChildFragmentManager());
                         fragmentLogBinding.list.setAdapter(logAdapter);
                     } else {
                         logAdapter.setWorkLogList(workLogs);

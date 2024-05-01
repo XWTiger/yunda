@@ -1,6 +1,7 @@
 package com.tiger.yunda.ui.log;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,21 +10,34 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 
+import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.data.model.WorkLog;
 import com.tiger.yunda.databinding.LogListBinding;
+import com.tiger.yunda.service.WorkLogService;
 
 import java.util.List;
 import java.util.Objects;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class LogAdapter extends ArrayAdapter<WorkLog> {
     private List<WorkLog> workLogList;
+    private WorkLogService workLogService;
+
+     FragmentManager fragmentManager;
 
 
-    public LogAdapter(@NonNull Context context, int resource, @NonNull List<WorkLog> objects) {
+
+
+    public LogAdapter(@NonNull Context context, int resource, @NonNull List<WorkLog> objects,  FragmentManager fragmentManager) {
         super(context, resource, objects);
         this.workLogList = objects;
-
+        workLogService = MainActivity.retrofitClient.create(WorkLogService.class);
+        this.fragmentManager = fragmentManager;
     }
 
 
@@ -49,7 +63,7 @@ public class LogAdapter extends ArrayAdapter<WorkLog> {
 
                 logListBinding.textScore.setLayoutParams(marginLayoutParams); // 将修改后的LayoutParams重新设置给View
             }
-            ViewHolder viewHolder = new ViewHolder(logListBinding.workerDetailButton);
+            ViewHolder viewHolder = new ViewHolder(logListBinding.workerDetailButton, workLogService, fragmentManager);
             logListBinding.setLog(workLogList.get(position));
             convertView = logListBinding.getRoot();
         }
@@ -68,17 +82,37 @@ public class LogAdapter extends ArrayAdapter<WorkLog> {
     public static class ViewHolder implements View.OnClickListener {
 
         private  Button detail;
+        private String WORK_LOG_SHOW = "work_log";
 
+        private WorkLogService workLogService;
+        private FragmentManager fragmentManager;
 
-        public ViewHolder(Button detail) {
+        public ViewHolder(Button detail, WorkLogService workLogService, FragmentManager fragmentManager) {
             this.detail = detail;
             detail.setOnClickListener(this);
+            this.workLogService = workLogService;
+            this.fragmentManager = fragmentManager;
         }
 
 
         @Override
         public void onClick(View v) {
             String id = (String) v.getTag();
+
+            Call<WorkLog> call = workLogService.queryById(id);
+            call.enqueue(new Callback<WorkLog>() {
+                @Override
+                public void onResponse(Call<WorkLog> call, Response<WorkLog> response) {
+                    WorkLog workLog = response.body();
+                    LogDialogFragment.newInstance(workLog).show(fragmentManager, WORK_LOG_SHOW);
+                }
+
+                @Override
+                public void onFailure(Call<WorkLog> call, Throwable throwable) {
+
+                }
+            });
+
         }
     }
 
