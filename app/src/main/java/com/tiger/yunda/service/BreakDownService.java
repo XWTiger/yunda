@@ -2,13 +2,16 @@ package com.tiger.yunda.service;
 
 import com.tiger.yunda.data.model.BreakRecord;
 import com.tiger.yunda.data.model.PageResult;
+import com.tiger.yunda.data.model.User;
 
+import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface BreakDownService {
 
@@ -28,4 +31,13 @@ public interface BreakDownService {
      */
     @POST("/api/PatrolFault/Get/{id}")
     Call<BreakRecord> queryByBreakId(@Path("id") String id);
+
+    /**
+     * 查询用户列表
+     *
+     * @param deptId
+     * @return
+     */
+    @POST("/api/User/LoadByDept")
+    Call<List<User>> queryUsers(@Query("deptid") String deptId);
 }

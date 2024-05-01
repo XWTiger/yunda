@@ -33,11 +33,13 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
+import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.databinding.FragmentHomeBinding;
 import com.tiger.yunda.databinding.LayoutMissionBinding;
 import com.tiger.yunda.enums.RoleType;
 import com.tiger.yunda.service.MissionService;
 import com.tiger.yunda.utils.CollectionUtil;
+import com.tiger.yunda.utils.JsonUtil;
 import com.tiger.yunda.utils.TimeUtil;
 
 import org.apache.commons.lang3.StringUtils;
@@ -166,9 +168,11 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                             if (response.code() == MissionService.HTTP_OK) {
                                 getNavController().navigate(R.id.to_inspection_mission, bundle);
                             } else {
-                                Toast.makeText(context, "巡检请求失败", Toast.LENGTH_SHORT).show();
+
                                 try {
-                                    Log.e("xiaweihu", "请求巡检接口失败:  =====>" + response.body().string());
+                                    String errStr = response.errorBody().string();
+                                    ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                                    Log.e("xiaweihu", "绑定设备失败: ===========>" + errStr);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -188,12 +192,15 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                 public void onClick(View v) {
                     // 接受事件
                     Log.d("tiger", "onClick: ======================= ");
-                    AppCompatActivity ac = (AppCompatActivity) activity;
-                    ActionBar actionBar = ac.getSupportActionBar();
-                    if (actionBar != null) {
-                        actionBar.setDisplayShowCustomEnabled(false);
-                        actionBar.setDisplayShowTitleEnabled(true);
+                    if (MainActivity.loggedInUser.getRole() == RoleType.WORKER) {
+                        AppCompatActivity ac = (AppCompatActivity) activity;
+                        ActionBar actionBar = ac.getSupportActionBar();
+                        if (actionBar != null) {
+                            actionBar.setDisplayShowCustomEnabled(false);
+                            actionBar.setDisplayShowTitleEnabled(true);
+                        }
                     }
+
                     int position = (int) v.getTag();
                     Bundle bundle = new Bundle();
                     bundle.putSerializable(MISSION_KEY, objects.get(position));

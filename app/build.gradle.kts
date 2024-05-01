@@ -109,6 +109,8 @@ dependencies {
 
     // optional - Paging 3 Integration
     implementation("androidx.room:room-paging:$room_version")
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+
 
 
 

@@ -88,10 +88,10 @@ public class MissionViewModel extends ViewModel {
                     if (response.code() == MissionService.HTTP_OK) {
                         count = response.body().getCount();
                         MissionResult missionResult = response.body();
-                        missionResult.getData().add(Mission.builder()
+                      /*  missionResult.getData().add(Mission.builder()
                                         .id("788edbf0-f511-4f16-a8d7-201f5823ad34")
                                         .taskId("28992644-eec7-4e84-9b98-d54f1b6e8e23")
-                                .inspectorId(1).positionId(1).positionName("L1-A").inspectionUnit("0412-A").state(5).faultState(3).appealState(0).build());
+                                .inspectorId(1).positionId(1).positionName("L1-A").inspectionUnit("0412-A").state(5).faultState(3).appealState(0).build());*/
                         resultMutableLiveData.setValue(missionResult);
                     } else {
 
@@ -137,9 +137,9 @@ public class MissionViewModel extends ViewModel {
                             missionResult.setData(data);
                             missionResult.setCount(result.getCount());
                             masterCount = result.getCount();
-                            resultMutableLiveData.setValue(missionResult);
-                        }
 
+                        }
+                        resultMutableLiveData.setValue(missionResult);
                     } else {
 
                         try {

@@ -166,6 +166,7 @@ public class InspectionFragment extends Fragment {
     }
 
     public class ViewHolder  implements View.OnClickListener {
+        //状态，1:初始、2:已开始、3:已暂停、4:已恢复、5:已结束
         private int TRAIN_LOCATION_STATE_INIT = 1;
         private int TRAIN_LOCATION_STATE_STARTED = 2;
         private int TRAIN_LOCATION_STATE_PAUSED = 3;
@@ -178,6 +179,7 @@ public class InspectionFragment extends Fragment {
         private FragmentInspectionBinding binding;
         public List<PlaceholderContent.PlaceholderItem> mItems;
         private Map<String, PlaceholderContent.PlaceholderItem> mapper = new HashMap<>();
+        private Map<String, List<Button>> buttonMapper = new HashMap<>();
 
 
 
@@ -187,6 +189,7 @@ public class InspectionFragment extends Fragment {
             if (Objects.isNull(breakDownInfo)) {
                 breakDownInfo = new BreakDownInfo();
             }
+
             if (Objects.isNull(this.linearLayout)) {
 
                 LinearLayout linearLayout = binding.inspectionList;
@@ -209,11 +212,12 @@ public class InspectionFragment extends Fragment {
                         Button startBtn = (Button) listchild.getChildAt(1);
                         Button pauseBtn = (Button) listchild.getChildAt(2);
                         Button finishBtn = (Button) listchild.getChildAt(3);
-                        if (item.state == 1) {
-                            pauseBtn.setEnabled(false);
-                            ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
-                            pauseBtn.setBackgroundTintList(colorStateList);
-                        }
+                        List<Button> buttons = new ArrayList<>();
+                        buttons.add(startBtn);
+                        buttons.add(pauseBtn);
+                        buttons.add(finishBtn);
+                        buttonMapper.put(item.id, buttons);
+                        checkButtonsStateAndControl(item.state, startBtn, pauseBtn, finishBtn);
 
                         view.setText(item.content);
                         startBtn.setTag(item.id);
@@ -233,6 +237,61 @@ public class InspectionFragment extends Fragment {
 
         }
 
+        //状态，1:初始、2:已开始、3:已暂停、4:已恢复、5:已结束
+        public void checkButtonsStateAndControl(int state,Button startBtn,Button pauseBtn, Button finishBtn) {
+            ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
+            ColorStateList green = ColorStateList.valueOf(0x0b9d32);
+            if (state == TRAIN_LOCATION_STATE_INIT) {
+                //初始化
+                pauseBtn.setEnabled(false);
+                pauseBtn.setBackgroundTintList(colorStateList);
+                finishBtn.setEnabled(false);
+                finishBtn.setBackgroundTintList(colorStateList);
+            }
+            if (state == TRAIN_LOCATION_STATE_STARTED) {
+                //已开始
+                startBtn.setEnabled(false);
+                startBtn.setBackgroundTintList(colorStateList);
+                pauseBtn.setEnabled(true);
+                pauseBtn.setBackgroundTintList(green);
+                finishBtn.setEnabled(true);
+                finishBtn.setBackgroundTintList(green);
+            }
+
+            if (state == TRAIN_LOCATION_STATE_PAUSED) {
+                //已暂停
+                startBtn.setEnabled(false);
+                startBtn.setBackgroundTintList(colorStateList);
+                pauseBtn.setEnabled(true);
+                pauseBtn.setBackgroundTintList(green);
+                pauseBtn.setText("继续");
+                finishBtn.setEnabled(false);
+                finishBtn.setBackgroundTintList(colorStateList);
+            }
+
+            if (state == TRAIN_LOCATION_STATE_COVERED) {
+                //已恢复
+                startBtn.setEnabled(false);
+                startBtn.setBackgroundTintList(colorStateList);
+                pauseBtn.setEnabled(true);
+                pauseBtn.setBackgroundTintList(green);
+                pauseBtn.setText("暂停");
+                finishBtn.setEnabled(true);
+                finishBtn.setBackgroundTintList(green);
+            }
+
+            if (state == TRAIN_LOCATION_STATE_PAUSED) {
+                //已暂停
+                startBtn.setEnabled(false);
+                startBtn.setBackgroundTintList(colorStateList);
+                pauseBtn.setEnabled(false);
+                pauseBtn.setBackgroundTintList(colorStateList);
+                pauseBtn.setText("暂停");
+                finishBtn.setEnabled(false);
+                finishBtn.setBackgroundTintList(colorStateList);
+            }
+        }
+
         @Override
         public void onClick(View v) {
             int id = v.getId();
@@ -247,10 +306,9 @@ public class InspectionFragment extends Fragment {
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         if (response.code() == MissionService.HTTP_OK) {
                             binding.inspectionAction.setText("开始巡检: " + item.content);
-                            Button button = (Button) v;
-                            button.setEnabled(false);
-                            ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
-                            button.setBackgroundTintList(colorStateList);
+                            item.state = TRAIN_LOCATION_STATE_STARTED;
+                            List<Button> buttons = buttonMapper.get(v.getTag());
+                            checkButtonsStateAndControl(TRAIN_LOCATION_STATE_STARTED, buttons.get(0), buttons.get(1), buttons.get(2));
                         } else {
                             try {
                                 String errStr = response.errorBody().string();
@@ -277,24 +335,26 @@ public class InspectionFragment extends Fragment {
                         .id((String) v.getTag())
                         .action(0).build();
                 PlaceholderContent.PlaceholderItem placeholderItem =  mapper.get((String) v.getTag());
-                if (3 == placeholderItem.state) {//已暂停
+                if (TRAIN_LOCATION_STATE_PAUSED == placeholderItem.state) {//已暂停
                     params.setAction(2);
-                    pauseBtn.setText("恢复");
                 } else {//已恢复
                     params.setAction(1);
-                    pauseBtn.setText("暂停");
                 }
                 Call<ResponseBody>  responseBodyCall = inspectionService.pauseOrResumeInspection(params);
                 responseBodyCall.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         if (response.code() == MissionService.HTTP_OK) {
-                            if (content.equals(TV_CONTINUE_VALUE)) {
+                            if (TRAIN_LOCATION_STATE_PAUSED == placeholderItem.state) {
                                 binding.inspectionAction.setText("开始巡检: " + item.content);
-                                pauseBtn.setText(TV_PAUSE_VALUE);
+                                item.state = TRAIN_LOCATION_STATE_COVERED;
+                                List<Button> buttons = buttonMapper.get(v.getTag());
+                                checkButtonsStateAndControl(TRAIN_LOCATION_STATE_COVERED, buttons.get(0), buttons.get(1), buttons.get(2));
                             } else {
                                 binding.inspectionAction.setText("暂停巡检: " + item.content);
-                                pauseBtn.setText(TV_CONTINUE_VALUE);
+                                item.state = TRAIN_LOCATION_STATE_PAUSED;
+                                List<Button> buttons = buttonMapper.get(v.getTag());
+                                checkButtonsStateAndControl(TRAIN_LOCATION_STATE_COVERED, buttons.get(0), buttons.get(1), buttons.get(2));
                                 breakDownListDialogFragment = BreakDownListDialogFragment.newInstance(2, breakDownInfo);
                                 breakDownListDialogFragment.show(getParentFragmentManager(), "breakdownReport");
                             }
@@ -328,6 +388,9 @@ public class InspectionFragment extends Fragment {
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         if (response.code() == MissionService.HTTP_OK) {
                             binding.inspectionAction.setText(null);
+                            item.state = TRAIN_LOCATION_STATE_FINISHED;
+                            List<Button> buttons = buttonMapper.get(v.getTag());
+                            checkButtonsStateAndControl(TRAIN_LOCATION_STATE_COVERED, buttons.get(0), buttons.get(1), buttons.get(2));
                         } else {
 
                             try {
@@ -371,27 +434,24 @@ public class InspectionFragment extends Fragment {
     private void queryMissionDetail(String missionId) {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         Call<Mission> missionCall = inspectionService.querySubtaskDetail(missionId);
-        MainActivity.threadPoolExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Response<Mission> response = missionCall.execute();
-                    if (response.isSuccessful()) {
-                        mission = response.body();
-                    } else {
-                        String errStr = null;
-                        try {
-                            errStr = response.errorBody().string();
-                            ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
-                            Log.e("xiaweihu", "查询子任务详情: ===========>" + errStr);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+        MainActivity.threadPoolExecutor.execute(() -> {
+            try {
+                Response<Mission> response = missionCall.execute();
+                if (response.isSuccessful()) {
+                    mission = response.body();
+                } else {
+                    String errStr = null;
+                    try {
+                        errStr = response.errorBody().string();
+                        ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                        Log.e("xiaweihu", "查询子任务详情: ===========>" + errStr);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
-                    countDownLatch.countDown();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
                 }
+                countDownLatch.countDown();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
 

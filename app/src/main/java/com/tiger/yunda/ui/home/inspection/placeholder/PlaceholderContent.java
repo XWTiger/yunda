@@ -72,7 +72,7 @@ public class PlaceholderContent {
         public final String content;
         public final String details;
 
-        public final int state;//状态，1:初始、2:已开始、3:已暂停、4:已恢复、5:已结束
+        public  int state;//状态，1:初始、2:已开始、3:已暂停、4:已恢复、5:已结束
 
         public final String stateText;
 

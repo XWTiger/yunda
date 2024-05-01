@@ -138,7 +138,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
             viewModel.getTypes().observe(this, new Observer<List<BreakDownType>>() {
                 @Override
                 public void onChanged(List<BreakDownType> breakDownTypes) {
-                    spinnerAdapter = new SpinnerAdapter(breakDownTypes, context,  -1);
+                    spinnerAdapter = new SpinnerAdapter(breakDownTypes, context);
                     spinnerAdapter.setData(breakDownTypes);
                     binding.problemCatalogSelect.setAdapter(spinnerAdapter);
                 }

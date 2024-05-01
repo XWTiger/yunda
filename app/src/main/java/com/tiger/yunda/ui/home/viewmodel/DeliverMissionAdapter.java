@@ -49,7 +49,7 @@ public class DeliverMissionAdapter extends ArrayAdapter<DeliverMssion> implement
         } else {
             deliverMissionBinding = DataBindingUtil.getBinding(convertView);
         }
-        SpinnerAdapter spinnerAdapter = new SpinnerAdapter(covertUserToSpinnerObj(users), getContext(), position);
+        SpinnerAdapter spinnerAdapter = new SpinnerAdapter(covertUserToSpinnerObj(users), getContext());
         deliverMissionBinding.spinnerPerson.setAdapter(spinnerAdapter);
         deliverMissionBinding.spinnerPerson.setTag(position);
         deliverMissionBinding.spinnerPerson.setOnItemSelectedListener(this);

@@ -102,10 +102,10 @@ public class BreakDownFragment extends Fragment {
 
 
         if (Objects.isNull(viewHolder)) {
-            viewHolder = new ViewHolder(fragmentBreakDownBinding.selectStartTime, fragmentBreakDownBinding.selectEndTime, getContext(), new BreakDownViewModel());
+            viewHolder = new ViewHolder(fragmentBreakDownBinding.selectStartTime, fragmentBreakDownBinding.selectEndTime, getContext(), new BreakDownViewModel(getContext()));
             viewHolder.setSwipeRefreshLayout(fragmentBreakDownBinding.freshList);
         }
-        viewHolder.getBreakDownViewModel().getBreakRecords(1, 100, "2024-01-01 00:00:00", "2024-04-01 00:00:00", Integer.valueOf(MainActivity.loggedInUser.getDeptId()))
+        viewHolder.getBreakDownViewModel().getBreakRecords(1, 100, null, null, Integer.valueOf(MainActivity.loggedInUser.getDeptId()))
                 .observe(getViewLifecycleOwner(), new Observer<List<BreakRecord>>() {
                     @Override
                     public void onChanged(List<BreakRecord> breakRecords) {
@@ -165,8 +165,11 @@ public class BreakDownFragment extends Fragment {
                         .setOnChoose("选择", aLong -> {
                             //aLong  = millisecond
                             Date start = new Date(aLong);
-                             startDateTime = start;
-                             startTime.setText(TimeUtil.getDateYmdFromMs(start));
+                            startDateTime = start;
+                            startTime.setText(TimeUtil.getDateYmdFromMs(start));
+                            if (Objects.nonNull(startDateTime) && Objects.nonNull(endDateTime)) {
+                                breakDownViewModel.getBreakRecords(1, 100, TimeUtil.getSTrFromMs(startDateTime), TimeUtil.getSTrFromMs(endDateTime), Integer.valueOf(MainActivity.loggedInUser.getDeptId()));
+                            }
                             return null;
                         })
                         .setOnCancel("取消", () -> {
@@ -183,6 +186,9 @@ public class BreakDownFragment extends Fragment {
                             Date end = new Date(aLong);
                             endDateTime = end;
                             endTime.setText(TimeUtil.getDateYmdFromMs(end));
+                            if (Objects.nonNull(startDateTime) && Objects.nonNull(endDateTime)) {
+                                breakDownViewModel.getBreakRecords(1, 100, TimeUtil.getSTrFromMs(startDateTime), TimeUtil.getSTrFromMs(endDateTime), Integer.valueOf(MainActivity.loggedInUser.getDeptId()));
+                            }
                             return null;
                         })
                         .setOnCancel("取消", () -> {

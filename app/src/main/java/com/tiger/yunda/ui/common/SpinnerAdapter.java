@@ -23,14 +23,14 @@ public class SpinnerAdapter extends BaseAdapter  {
     private Context context;
 
 
-    private int parentIndex;
 
 
-    public SpinnerAdapter(List<BreakDownType> types, Context context,  int parentIndex) {
+
+    public SpinnerAdapter(List<BreakDownType> types, Context context) {
         this.types = types;
         this.context = context;
 
-        this.parentIndex = parentIndex;
+
     }
 
     public void setData(List<BreakDownType> types) {
