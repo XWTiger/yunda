@@ -1,5 +1,9 @@
 package com.tiger.yunda.ui.home;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,13 +28,26 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.tabs.TabLayout;
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
+import com.tiger.yunda.data.model.ErrorResult;
+import com.tiger.yunda.data.model.Version;
 import com.tiger.yunda.databinding.FragmentHomeBinding;
 import com.tiger.yunda.databinding.HeaderMissionLayoutBinding;
 import com.tiger.yunda.enums.RoleType;
+import com.tiger.yunda.service.LoginService;
+import com.tiger.yunda.service.MissionService;
 import com.tiger.yunda.ui.common.Constraints;
+import com.tiger.yunda.utils.DownLoadUtil;
+import com.tiger.yunda.utils.JsonUtil;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AbsListView.OnScrollListener {
 
@@ -52,6 +69,8 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public static AtomicInteger missionFlag = new AtomicInteger(0);
 
     private NavController navController;
+
+    private LoginService loginService;
     private View customView;
 
     private HeaderMissionLayoutBinding headerMissionLayoutBinding;
@@ -68,7 +87,9 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (Objects.isNull(loginService)) {
+            loginService = MainActivity.retrofitClient.create(LoginService.class);
+        }
        // setHasOptionsMenu(true);
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         ActionBar actionBar = activity.getSupportActionBar();
@@ -82,6 +103,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 tabLayout.getTabAt(1).select();
             }
         }
+
 
     }
 
@@ -208,6 +230,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
         }*/
 
         if (Objects.nonNull(missionFlag) && missionFlag.get() ==  1) {
+            checkUpdate();
             missionViewModel.getData(1, 30, null, null, masterMission);
             missionFlag.getAndIncrement();
             if (masterMission) {
@@ -298,13 +321,13 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                 NavController navController = NavHostFragment.findNavController(this);
                 // 按钮的点击事件,一键领取
-                myButton.setOnClickListener(new View.OnClickListener() {
+              /*  myButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         // 按钮点击后的操作
                         Log.i("xiaweihu", "header on click:  =========================");
                     }
-                });
+                });*/
 
 
                 //新建任务
@@ -349,5 +372,63 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
 
         }
+    }
+
+    public void checkUpdate() {
+        loginService.version().enqueue(new Callback<Version>() {
+            @Override
+            public void onResponse(Call<Version> call, Response<Version> response) {
+                if (response.code() == MissionService.HTTP_OK) {
+                    Version version = response.body();
+                    PackageManager manager = getActivity().getPackageManager();
+                    PackageInfo info = null;
+                    try {
+                        info = manager.getPackageInfo(getActivity().getPackageName(), 0);
+                        long versionCode = info.getLongVersionCode();
+                        if (versionCode < Long.parseLong(version.getVersionNumber())) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            builder.setTitle("更新")
+                                    .setMessage("当前版本：" +info.versionName + "\n存在新版本: " + version.getVersionNo())
+                                    .setPositiveButton("更新", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if (StringUtils.isNotBlank(version.getFilePath())) {
+                                                DownLoadUtil.downLoad(version.getFilePath(), getContext(), "Yunda.apk");
+                                            }
+                                            dialog.dismiss();
+                                        }
+                                    })
+                                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // 点击“Cancel”按钮后的操作
+                                            if (version.getIsForceUpdate()) {
+                                                System.exit(0);
+                                            }
+                                            dialog.dismiss();
+                                        }
+                                    })
+                                    .show();
+                        }
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+
+                    try {
+
+                        String errStr = response.errorBody().string();
+                        ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                        Log.e("xiaweihu", "查询主任务列表失败: ===========>" + errStr);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Version> call, Throwable throwable) {
+
+            }
+        });
     }
 }

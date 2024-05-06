@@ -1,10 +1,14 @@
 package com.tiger.yunda.utils;
 
 import android.content.Context;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.tiger.yunda.R;
 import com.tiger.yunda.data.model.ErrorResult;
 
 public class JsonUtil {
@@ -15,4 +19,6 @@ public class JsonUtil {
         Toast.makeText(context, errorResult.getTitle(), Toast.LENGTH_SHORT).show();
         return errorResult;
     }
+
+
 }

@@ -125,6 +125,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                 btnItem.setBackgroundTintList(colorStateList);
                 inspectionBtn.setVisibility(View.VISIBLE);
                 inspectionBtn.setText("巡检");
+                checkBox.setEnabled(false);
 
             }
             if (state == MISSION_STATE_FINISHED && StringUtils.isNotBlank(objects.get(position).getId())) {
@@ -329,6 +330,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                 checkedArr[i] = 0;
             }
         }
+
         LiveData<Boolean> result = missionViewModel.acceptMissions(ids);
         AppCompatActivity appCompatActivity = (AppCompatActivity) activity;
         result.observe(appCompatActivity, new Observer<Boolean>() {

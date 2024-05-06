@@ -225,63 +225,7 @@ public class LoginActivity extends AppCompatActivity {
         return true;
     }
 
-    public void checkUpdate() {
-        loginService.version().enqueue(new Callback<Version>() {
-            @Override
-            public void onResponse(Call<Version> call, Response<Version> response) {
-                if (response.code() == MissionService.HTTP_OK) {
-                    Version version = response.body();
-                    PackageManager manager = getPackageManager();
-                    PackageInfo info = null;
-                    try {
-                        info = manager.getPackageInfo(getPackageName(), 0);
-                        long versionCode = info.getLongVersionCode();
-                        if (versionCode < Long.parseLong(version.getVersionNumber())) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-                            builder.setTitle("更新")
-                                    .setMessage("存在新版本: " + version.getVersionNo())
-                                    .setPositiveButton("更新", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            if (StringUtils.isNotBlank(version.getFilePath())) {
-                                                DownLoadUtil.downLoad(version.getFilePath(), getApplicationContext(), "Yunda.apk");
-                                            }
-                                            dialog.dismiss();
-                                        }
-                                    })
-                                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            // 点击“Cancel”按钮后的操作
-                                            if (version.getIsForceUpdate()) {
-                                                finish();
-                                            }
-                                            dialog.dismiss();
-                                        }
-                                    })
-                                    .show();
-                        }
-                    } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
-                    }
 
-                } else {
-
-                    try {
-
-                        String errStr = response.errorBody().string();
-                        ErrorResult errorResult = JsonUtil.getObject(errStr, getApplicationContext());
-                        Log.e("xiaweihu", "查询主任务列表失败: ===========>" + errStr);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Version> call, Throwable throwable) {
-
-            }
-        });
-    }
 
 
 }
