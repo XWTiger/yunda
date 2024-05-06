@@ -3,11 +3,16 @@ package com.tiger.yunda.ui.login;
 import android.Manifest;
 import android.app.Activity;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -29,32 +34,55 @@ import android.widget.Toast;
 
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
+import com.tiger.yunda.data.model.DeliverTask;
+import com.tiger.yunda.data.model.ErrorResult;
+import com.tiger.yunda.data.model.PageResult;
+import com.tiger.yunda.data.model.Version;
+import com.tiger.yunda.entity.ResourceLocationEntity;
 import com.tiger.yunda.internet.RetrofitClient;
+import com.tiger.yunda.service.LoginService;
+import com.tiger.yunda.service.MissionService;
+import com.tiger.yunda.ui.home.Mission;
+import com.tiger.yunda.ui.home.MissionResult;
 import com.tiger.yunda.ui.login.LoginViewModel;
 import com.tiger.yunda.ui.login.LoginViewModelFactory;
 import com.tiger.yunda.databinding.ActivityLoginBinding;
+import com.tiger.yunda.utils.DownLoadUtil;
+import com.tiger.yunda.utils.JsonUtil;
 import com.tiger.yunda.utils.NetworkUtil;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
     private LoginViewModel loginViewModel;
     private ActivityLoginBinding binding;
 
-  /*  public static RetrofitClient retrofitClient;*/
+    private LoginService loginService;
 
     public static String LOGIN_RESULT_KEY = "loginResult";
     private String[] REQUIRED_PERMISSIONS = {
             android.Manifest.permission.CAMERA,
             android.Manifest.permission.RECORD_AUDIO,
-            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.INTERNET,
-            android.Manifest.permission.READ_MEDIA_IMAGES,
+            Manifest.permission.READ_MEDIA_IMAGES,
             Manifest.permission.READ_MEDIA_VIDEO,
             Manifest.permission.READ_MEDIA_AUDIO,
             Manifest.permission.ACCESS_WIFI_STATE,
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.CHANGE_WIFI_MULTICAST_STATE
+            Manifest.permission.CHANGE_WIFI_MULTICAST_STATE,
     };
 
     @Override
@@ -66,7 +94,11 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "网络不可用", Toast.LENGTH_SHORT).show();
             return;
         }
-        /*retrofitClient = RetrofitClient.getInstance(getApplicationContext());*/
+
+        if (Objects.isNull(loginService)) {
+            loginService = MainActivity.retrofitClient.create(LoginService.class);
+        }
+
         /*if (!allPermissionsGranted()) {
             Log.w("xiaweihu", "application has no permission ");
             return;
@@ -82,6 +114,8 @@ public class LoginActivity extends AppCompatActivity {
         final Button loginButton = binding.login;
         final ProgressBar loadingProgressBar = binding.loading;
         this.getSupportActionBar().hide();
+
+
 
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
             @Override
@@ -164,6 +198,9 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+
+
+
     private void updateUiWithUser(LoggedInUserView model) {
         String welcome = getString(R.string.welcome) + model.getDisplayName();
         // TODO : initiate successful logged in experience
@@ -181,4 +218,64 @@ public class LoginActivity extends AppCompatActivity {
         }
         return true;
     }
+
+    public void checkUpdate() {
+        loginService.version().enqueue(new Callback<Version>() {
+            @Override
+            public void onResponse(Call<Version> call, Response<Version> response) {
+                if (response.code() == MissionService.HTTP_OK) {
+                    Version version = response.body();
+                    PackageManager manager = getPackageManager();
+                    PackageInfo info = null;
+                    try {
+                        info = manager.getPackageInfo(getPackageName(), 0);
+                        long versionCode = info.getLongVersionCode();
+                        if (versionCode < Long.parseLong(version.getVersionNumber())) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+                            builder.setTitle("更新")
+                                    .setMessage("存在新版本: " + version.getVersionNo())
+                                    .setPositiveButton("更新", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if (StringUtils.isNotBlank(version.getFilePath())) {
+                                                DownLoadUtil.downLoad(version.getFilePath(), getApplicationContext(), "Yunda.apk");
+                                            }
+                                            dialog.dismiss();
+                                        }
+                                    })
+                                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // 点击“Cancel”按钮后的操作
+                                            if (version.getIsForceUpdate()) {
+                                                finish();
+                                            }
+                                            dialog.dismiss();
+                                        }
+                                    })
+                                    .show();
+                        }
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+
+                    try {
+
+                        String errStr = response.errorBody().string();
+                        ErrorResult errorResult = JsonUtil.getObject(errStr, getApplicationContext());
+                        Log.e("xiaweihu", "查询主任务列表失败: ===========>" + errStr);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Version> call, Throwable throwable) {
+
+            }
+        });
+    }
+
+
 }

@@ -1,10 +1,5 @@
 package com.tiger.yunda.ui.home;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.BlendMode;
-import android.graphics.BlendModeColorFilter;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,9 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -28,7 +21,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
@@ -36,10 +28,7 @@ import com.tiger.yunda.databinding.FragmentHomeBinding;
 import com.tiger.yunda.databinding.HeaderMissionLayoutBinding;
 import com.tiger.yunda.enums.RoleType;
 import com.tiger.yunda.ui.common.Constraints;
-import com.tiger.yunda.ui.login.LoginActivity;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -60,7 +49,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     private ListView listView;
 
-    public  AtomicInteger missionFlag = new AtomicInteger(0);
+    public static AtomicInteger missionFlag = new AtomicInteger(0);
 
     private NavController navController;
     private View customView;
@@ -70,9 +59,9 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private TabLayout tabLayout;
     private TextView todoTv;
 
-    private Boolean leader = false;
+    public static Boolean leader = false;
 
-    private Boolean masterMission = false;
+    public static Boolean masterMission = false;
 
 
 
@@ -87,20 +76,37 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if (Objects.nonNull(MainActivity.loggedInUser) && MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
             leader = true;
             masterMission = true;
+            if (masterMission) {
+                tabLayout.getTabAt(0).select();
+            } else {
+                tabLayout.getTabAt(1).select();
+            }
         }
 
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        if (Objects.nonNull(MainActivity.loggedInUser) && MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
+            leader = true;
+            masterMission = true;
+        }
         if (Objects.isNull(missionViewModel)) {
             missionViewModel =
                 new ViewModelProvider(this).get(MissionViewModel.class);
             missionViewModel.setContext(getContext());
         }
 
+        if (masterMission) {
+            tabLayout.getTabAt(0).select();
+        } else {
+            tabLayout.getTabAt(1).select();
+        }
 
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        if (Objects.isNull(binding)) {
+            binding = FragmentHomeBinding.inflate(inflater, container, false);
+        }
+
         View root = binding.getRoot();
 
 
@@ -184,9 +190,9 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
             actionBar.setDisplayShowCustomEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
             // 设置自定义视图
-            if (Objects.isNull(customView)) {
-                customHeaderBar(actionBar);
-            }
+
+            customHeaderBar(actionBar);
+
 
         }
         if (Objects.nonNull(headerMissionLayoutBinding)) {
@@ -204,6 +210,11 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if (Objects.nonNull(missionFlag) && missionFlag.get() ==  1) {
             missionViewModel.getData(1, 30, null, null, masterMission);
             missionFlag.getAndIncrement();
+            if (masterMission) {
+                tabLayout.getTabAt(0).select();
+            } else {
+                tabLayout.getTabAt(1).select();
+            }
         }
         if (leader) {
             missionyButton.setVisibility(View.VISIBLE);
@@ -242,7 +253,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
             //customView = LayoutInflater.from(getContext()).inflate(R.layout.header_mission_layout, null);
 
             View headerView = actionBar.getCustomView();
-            if (Objects.isNull(headerView)) {
+            if (Objects.isNull(customView)) {
 
                 customView = headerMissionLayoutBinding.getRoot();
 
@@ -268,7 +279,10 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         } else {
                             masterMission = false;
                         }
+                        if (Objects.nonNull(missionFlag) && missionFlag.get() >=  1) {
+
                         missionViewModel.getData(1, 30, null, null, masterMission);
+                        }
                     }
 
                     @Override
@@ -292,6 +306,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     }
                 });
 
+
                 //新建任务
                 missionyButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -305,9 +320,9 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     }
                 });
 
-                // 设置自定义视图
-                actionBar.setCustomView(customView);
             }
+            // 设置自定义视图
+            actionBar.setCustomView(customView);
         }
 
     }

@@ -1,6 +1,11 @@
 package com.tiger.yunda.ui.resource;
 
+import android.app.DownloadManager;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,8 +65,9 @@ public class ResourceFragment extends Fragment implements  SearchView.OnQueryTex
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        ResourceViewModel notificationsViewModel =
-                new ViewModelProvider(this).get(ResourceViewModel.class);
+        if (Objects.isNull(resourceViewModel)) {
+            resourceViewModel = new ResourceViewModel(getContext());
+        }
 
         binding = FragmentResourceBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -76,15 +82,13 @@ public class ResourceFragment extends Fragment implements  SearchView.OnQueryTex
                 actionBar.setCustomView(customView);
             }
         }
-        if (Objects.isNull(resourceViewModel)) {
-            resourceViewModel = new ResourceViewModel();
-        }
-        resourceViewModel.queryData(1, 100, "").observe(getViewLifecycleOwner(), new Observer<List<OperationResource>>() {
+
+
+        resourceViewModel.queryData(1, 20, "").observe(getViewLifecycleOwner(), new Observer<List<OperationResource>>() {
             @Override
             public void onChanged(List<OperationResource> operationResources) {
-                if (Objects.isNull(resourceAdapter)) {
-                    resourceAdapter = new ResourceAdapter(getContext(), binding.list.getId(), operationResources);
-                }
+
+                resourceAdapter = new ResourceAdapter(getContext(), binding.list.getId(), operationResources);
                 binding.list.setAdapter(resourceAdapter);
             }
         });
@@ -105,6 +109,7 @@ public class ResourceFragment extends Fragment implements  SearchView.OnQueryTex
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        resourceViewModel.queryData(1, 20, query);
         return false;
     }
 

@@ -3,6 +3,7 @@ package com.tiger.yunda.entity;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.tiger.yunda.enums.RoleType;
@@ -15,7 +16,6 @@ import lombok.NoArgsConstructor;
 @Entity(tableName = "user_login_info")
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
 public class UserLoginInfo {
     @PrimaryKey
@@ -39,4 +39,16 @@ public class UserLoginInfo {
 
     private String roleName;
 
+    @Ignore
+    public UserLoginInfo(@NonNull String uid, String token, Boolean bindStatus, String account, String deptId, String deptName, RoleType role, String roleId, String roleName) {
+        this.uid = uid;
+        this.token = token;
+        this.bindStatus = bindStatus;
+        this.account = account;
+        this.deptId = deptId;
+        this.deptName = deptName;
+        this.role = role;
+        this.roleId = roleId;
+        this.roleName = roleName;
+    }
 }

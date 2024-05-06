@@ -13,6 +13,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,6 +34,7 @@ import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.data.model.LoggedInUser;
 import com.tiger.yunda.databinding.ActivityMainBinding;
 import com.tiger.yunda.entity.UserLoginInfo;
+import com.tiger.yunda.enums.RoleType;
 import com.tiger.yunda.internet.RetrofitClient;
 import com.tiger.yunda.service.DeviceService;
 import com.tiger.yunda.ui.home.MissionFragment;
@@ -100,7 +102,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (!NetworkUtil.isNetworkAvailable(getApplicationContext())) {
+            Toast.makeText(getApplicationContext(), "网络不可用", Toast.LENGTH_SHORT).show();
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            finish();
+            return;
+        }
         if (Objects.isNull(appDatabase)) {
             appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "yunda-database").allowMainThreadQueries().build();
 
@@ -185,8 +196,10 @@ public class MainActivity extends AppCompatActivity {
             MainActivity.retrofitClient.addHeaders(headers);
             DeviceService deviceService = retrofitClient.create(DeviceService.class);
 
+
             //绑定设备mac 地址
             String ANDROID_ID = Settings.System.getString(getContentResolver(), Settings.System.ANDROID_ID);
+
 
             Map<String, String> body = new HashMap<>();
             body.put("mac", ANDROID_ID);

@@ -59,7 +59,7 @@ public class BreakDownViewModel extends ViewModel {
         List<Map> sortList = new ArrayList<>();
 
         Map<String, String> sorts = new HashMap<>();
-        sorts.put("filed", "createTime");
+        sorts.put("filed", "ReportTime");
         sorts.put("type", "1");
         sortList.add(sorts);
         body.put("sorts", sortList);
@@ -116,6 +116,7 @@ public class BreakDownViewModel extends ViewModel {
                     ErrorResult errorResult = JsonUtil.getObject(errStr, context);
                     Log.e("xiaweihu", "查询故障详情失败: ===========>" + errStr);
                 }
+                countDownLatch.countDown();
             } catch (IOException e) {
                 e.printStackTrace();
             }

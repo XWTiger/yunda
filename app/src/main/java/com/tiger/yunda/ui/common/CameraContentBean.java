@@ -16,11 +16,14 @@ public class CameraContentBean implements Serializable {
 
     private String uri;
 
+    private String filename;
 
-    public CameraContentBean(CameraFileType type, String uri, boolean problem) {
+
+    public CameraContentBean(CameraFileType type, String uri, boolean problem, String filename) {
         this.type = type;
         this.uri = uri;
         this.problem = problem;
+        this.filename = filename;
     }
 
     public CameraFileType getType() {
@@ -45,5 +48,13 @@ public class CameraContentBean implements Serializable {
 
     public void setProblem(boolean problem) {
         this.problem = problem;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 }

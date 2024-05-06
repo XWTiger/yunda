@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center"
     tools:context=".ui.person.PersonFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -24,6 +25,7 @@
             android:textSize="16sp"
             android:text="@string/system_version_title" />
         <TextView
+            android:id="@+id/system_version"
             android:layout_marginLeft="40dp"
             android:textColor="@color/green"
             android:layout_width="wrap_content"
@@ -57,6 +59,87 @@
             android:textColor="@color/white" />
 
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/old_password_layout"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_marginLeft="4dp"
+            android:textColor="@color/green"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="旧密码" />
+        <EditText
+            android:layout_marginLeft="4dp"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:hint="请输入密码"
+            />
 
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/password_layout"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_marginLeft="4dp"
+            android:textColor="@color/green"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="新密码" />
+        <EditText
+            android:id="@+id/new_password"
+            android:layout_marginLeft="4dp"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:hint="请输入密码"
+            />
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/new_password_layout"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_marginLeft="4dp"
+            android:textColor="@color/green"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="新密码" />
+        <EditText
+            android:id="@+id/new_password_again"
+            android:layout_marginLeft="4dp"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:hint="请输入密码"
+            />
+
+    </LinearLayout>
+    <Button
+        android:id="@+id/ok"
+        android:visibility="gone"
+        android:text="确定"
+        android:background="@drawable/button_corner_radius"
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+    </Button>
+    <Button
+        android:layout_marginTop="20dp"
+        android:id="@+id/logout"
+        android:text="退出登录"
+        android:background="@drawable/button_corner_radius"
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

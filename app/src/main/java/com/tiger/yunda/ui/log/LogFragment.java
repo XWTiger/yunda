@@ -24,6 +24,7 @@ import com.tiger.yunda.R;
 import com.tiger.yunda.data.model.WorkLog;
 import com.tiger.yunda.databinding.FragmentLogBinding;
 import com.tiger.yunda.databinding.LogListBinding;
+import com.tiger.yunda.utils.CollectionUtil;
 import com.tiger.yunda.utils.TimeUtil;
 
 import java.util.Date;
@@ -102,9 +103,14 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
 
             logViewModel = new ViewModelProvider(this).get(LogViewModel.class);
             logViewModel.setContext(getContext());
-            logViewModel.getLogs(1, 10, 1, "", "").observe(getViewLifecycleOwner(), new Observer<List<WorkLog>>() {
+            logViewModel.getLogs(1, 10, 0, "", "").observe(getViewLifecycleOwner(), new Observer<List<WorkLog>>() {
                 @Override
                 public void onChanged(List<WorkLog> workLogs) {
+                    if (CollectionUtil.isEmpty(workLogs)) {
+                        fragmentLogBinding.noContent.setVisibility(View.VISIBLE);
+                    } else {
+                        fragmentLogBinding.noContent.setVisibility(View.GONE);
+                    }
                     if (Objects.isNull(logAdapter)) {
                         logAdapter = new LogAdapter(getContext(), fragmentLogBinding.list.getId(), workLogs,getChildFragmentManager());
                         fragmentLogBinding.list.setAdapter(logAdapter);
@@ -116,7 +122,7 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
             });
             fragmentLogBinding.freshList.setOnRefreshListener(this);
             swipeRefreshLayout = fragmentLogBinding.freshList;
-            ViewHolder viewHolder = new ViewHolder(fragmentLogBinding.imageButton3,fragmentLogBinding.imageButton, getContext(), fragmentLogBinding.selectStartTime, fragmentLogBinding.selectEndTime);
+            ViewHolder viewHolder = new ViewHolder(fragmentLogBinding.imageButton3,fragmentLogBinding.imageButton, getContext(), fragmentLogBinding.selectStartTime, fragmentLogBinding.selectEndTime, logViewModel);
         }
         // Inflate the layout for this fragment
         return fragmentLogBinding.getRoot();
@@ -140,13 +146,14 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
 
         private Context context;
 
+        private LogViewModel logViewModel;
 
 
 
         public static final String TIME_ACTION_START = "start";
         public static final String TIME_ACTION_END = "end";
 
-        public ViewHolder(ImageButton startTimeBtn, ImageButton endTimeBtn, Context context, TextView startTextTime , TextView endTextTime) {
+        public ViewHolder(ImageButton startTimeBtn, ImageButton endTimeBtn, Context context, TextView startTextTime , TextView endTextTime, LogViewModel logViewModel) {
             this.startTimeBtn = startTimeBtn;
             this.endTimeBtn = endTimeBtn;
             startTimeBtn.setOnClickListener(this);
@@ -156,6 +163,7 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
             this.startTextTime = startTextTime;
             this.endTextTime = endTextTime;
             this.context = context;
+            this.logViewModel = logViewModel;
 
         }
 
@@ -172,6 +180,9 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                             Date start = new Date(aLong);
                             startTime = start;
                             startTextTime.setText(TimeUtil.getDateYmdFromMs(start));
+                            if (Objects.nonNull(startTime) && Objects.nonNull(endTime)) {
+                                logViewModel.getLogs(1, 10, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
+                            }
                             return null;
                         })
                         .setOnCancel("取消", () -> {
@@ -188,6 +199,9 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                             Date end = new Date(aLong);
                             endTime = end;
                             endTextTime.setText(TimeUtil.getDateYmdFromMs(end));
+                            if (Objects.nonNull(startTime) && Objects.nonNull(endTime)) {
+                                logViewModel.getLogs(1, 10, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
+                            }
                             return null;
                         })
                         .setOnCancel("取消", () -> {

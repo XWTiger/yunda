@@ -1,14 +1,19 @@
 package com.tiger.yunda.data;
 
+import android.content.Context;
 import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
+import android.os.Environment;
 
 import com.tiger.yunda.enums.CameraFileType;
 import com.tiger.yunda.ui.common.CameraContentBean;
 import com.tiger.yunda.ui.common.CameraFragment;
 import com.tiger.yunda.utils.CollectionUtil;
+import com.tiger.yunda.utils.FileUtil;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,7 +61,7 @@ public class BreakDownInfo {
     //false 故障 true 恢复拍照
     private boolean typeOfCameraAction;
 
-    public Map<String, RequestBody>  getBreakFilesUri() {
+    public Map<String, RequestBody>  getBreakFilesUri(Context context) {
 
         Map<String, RequestBody> bodyMap = new HashMap<>();
         if (CollectionUtil.isEmpty(files)) {
@@ -64,19 +69,21 @@ public class BreakDownInfo {
         }
 
         files.forEach(cameraContentBean ->  {
-            String name = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US)
-                    .format(System.currentTimeMillis());
             if (cameraContentBean.getType() == CameraFileType.IMAGE) {
-                File file = new File(cameraContentBean.getUri());
+                File file = null;
+                file = new File(cameraContentBean.getUri());
+
+
                 RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpg"), file);
                 //注意：file就是与服务器对应的key,后面filename是服务器得到的文件名
-                bodyMap.put("file\"; filename=\"" + name +".jpg", requestFile);
+                bodyMap.put("Files\"; filename=\"" + cameraContentBean.getFilename(), requestFile);
             }
             if (cameraContentBean.getType() == CameraFileType.VIDEO) {
-                File file = new File(cameraContentBean.getUri());
-                RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpg"), file);
+                Uri uri = Uri.parse(cameraContentBean.getUri());
+                File file = FileUtil.uri2File(uri, context);
+                RequestBody requestFile = RequestBody.create(MediaType.parse("video/mp4"), file);
                 //注意：file就是与服务器对应的key,后面filename是服务器得到的文件名
-                bodyMap.put("file\"; filename=\"" + name +".mp4", requestFile);
+                bodyMap.put("Files\"; filename=\"" + cameraContentBean.getFilename(), requestFile);
             }
 
         });
@@ -90,22 +97,34 @@ public class BreakDownInfo {
         }
 
         handleFiles.forEach(cameraContentBean ->  {
-            String name = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US)
-                    .format(System.currentTimeMillis());
+
             if (cameraContentBean.getType() == CameraFileType.IMAGE) {
                 File file = new File(cameraContentBean.getUri());
                 RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpg"), file);
                 //注意：file就是与服务器对应的key,后面filename是服务器得到的文件名
-                bodyMap.put("file\"; filename=\"" + name +".jpg", requestFile);
+                bodyMap.put("HandleFiles\"; filename=\"" + cameraContentBean.getFilename() , requestFile);
             }
             if (cameraContentBean.getType() == CameraFileType.VIDEO) {
                 File file = new File(cameraContentBean.getUri());
-                RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpg"), file);
+                RequestBody requestFile = RequestBody.create(MediaType.parse("video/mp4"), file);
                 //注意：file就是与服务器对应的key,后面filename是服务器得到的文件名
-                bodyMap.put("file\"; filename=\"" + name +".mp4", requestFile);
+                bodyMap.put("HandleFiles\"; filename=\"" + cameraContentBean.getFilename() , requestFile);
             }
 
         });
         return bodyMap;
     }
+
+    public void clear() {
+        subtaskId = null;
+        trainLocationId = null;
+        typePosition = 0;
+        desc = null;
+        discretion = false;
+        files.clear();
+        handleDesc = null;
+        handleFiles.clear();
+        typeOfCameraAction = false;
+    }
+
 }

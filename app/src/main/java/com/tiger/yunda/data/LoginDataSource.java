@@ -5,12 +5,15 @@ import android.widget.Toast;
 
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.data.internet.TokenResult;
+import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.data.model.LoggedInUser;
 import com.tiger.yunda.enums.RoleType;
 import com.tiger.yunda.internet.RetrofitClient;
 import com.tiger.yunda.service.LoginService;
+import com.tiger.yunda.ui.home.MissionFragment;
 import com.tiger.yunda.ui.login.LoginActivity;
 import com.tiger.yunda.utils.JWTUtil;
+import com.tiger.yunda.utils.JsonUtil;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -42,7 +45,7 @@ public class LoginDataSource extends Thread {
             thread.join();
 
             if (Objects.isNull(lds.getFakeUser())) {
-                return new Result.Error(new Exception("登录失败"));
+                return new Result.Error(new Exception("用户或密码无效"));
             }
             return new Result.Success<>(lds.getFakeUser());
         } catch (Exception e) {
@@ -62,32 +65,27 @@ public class LoginDataSource extends Thread {
         body.put("password", password);
         Call<TokenResult> resultCall = loginService.login(body);
         try {
-            TokenResult tokenResult = resultCall.execute().body();
-            //http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier
-            JWTUtil.decoder(tokenResult.getToken(), fakeUser);
-            Log.i("xiaweihu", "user info ===========> " + fakeUser.toString());
+            Response<TokenResult> response = resultCall.execute();
+            if (response.isSuccessful()) {
+
+                TokenResult tokenResult = response.body();
+                //http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier
+                JWTUtil.decoder(tokenResult.getToken(), fakeUser);
+                if (fakeUser.getRole() == RoleType.WORKER_LEADER) {
+                    MissionFragment.leader = true;
+                    MissionFragment.masterMission = true;
+                }
+                Log.i("xiaweihu", "user info ===========> " + fakeUser.toString());
+            } else {
+                String errStr = response.errorBody().string();
+                Log.e("xiaweihu", "登录失败失败: ===========>" + errStr);
+                fakeUser = null;
+            }
         } catch (IOException e) {
            e.printStackTrace();
             fakeUser = null;
         }
-        /*resultCall.enqueue(new Callback<TokenResult>() {
-            @Override
-            public void onResponse(Call<TokenResult> call, Response<TokenResult> response) {
 
-                TokenResult tokenResult = response.body();
-                fakeUser.setToken(tokenResult.getToken());
-                fakeUser.setDisplayName(JWTUtil.decoder(tokenResult.getToken()));
-                fakeUser.setDeptId("123");
-                fakeUser.setUserId("1");
-
-            }
-
-            @Override
-            public void onFailure(Call<TokenResult> call, Throwable throwable) {
-                Log.e("xiaweihu", "onFailure: ========> ", throwable.fillInStackTrace());
-                fakeUser = null;
-            }
-        });*/
     }
 
     public void logout() {

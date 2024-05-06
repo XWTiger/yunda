@@ -48,6 +48,7 @@ public class PlaceholderContent {
         if (Objects.isNull(mission) || Objects.isNull(mission.getTrainLocations()) || mission.getTrainLocations().isEmpty()) {
             return;
         }
+        ITEMS.clear();
         mission.getTrainLocations().forEach(trainLocations -> {
             addItem(createPlaceholderItem(trainLocations.getId(), trainLocations.getLocationTypeName(), trainLocations.getLocationType() + "_" + trainLocations.getLocationTypeName(), trainLocations.getState(), trainLocations.getStateText()));
         });

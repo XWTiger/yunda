@@ -74,7 +74,7 @@ public class WorkLog implements Serializable {
          */
         private String locatorCardNo;
         /**
-         * 状态，1:下发中、2:已下发、3:巡检中、4:完成、5:已接收
+         * 状态，1:未处理、2:已处理
          */
         private int state;
         /**
@@ -120,7 +120,7 @@ public class WorkLog implements Serializable {
         /**
          * 人员轨迹参数
          */
-        private String staffLocationSysLinkArgs;
+        private SysLinkArg staffLocationSysLinkArgs;
         private Task task;
         private List<TrainLocations> trainLocations;
         private List<Faults> faults;

@@ -23,7 +23,7 @@
                 android:id="@+id/insp_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text='@{log.task.name + ":  "}'
+                android:text='@{log.inspector + ":  "}'
                 android:textSize="18sp"
                 tools:text="夜班巡检:  "
                 android:textColor="@color/black" />

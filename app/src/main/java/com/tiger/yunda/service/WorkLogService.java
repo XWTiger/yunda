@@ -8,6 +8,7 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface WorkLogService {
@@ -20,5 +21,5 @@ public interface WorkLogService {
 
 
     @POST("/api/PatrolRecord/Get/{id}")
-    Call<WorkLog> queryById(@Query("id") String id);
+    Call<WorkLog> queryById(@Path("id") String id);
 }

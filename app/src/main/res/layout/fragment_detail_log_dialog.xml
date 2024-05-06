@@ -10,7 +10,9 @@
             type="com.tiger.yunda.data.model.WorkLog" />
 
     </data>
-
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <LinearLayout
         android:id="@+id/list"
         android:layout_width="match_parent"
@@ -208,7 +210,7 @@
                 app:layout_constraintTop_toBottomOf="@id/report_state" />
 
             <TextView
-                android:id="@+id/deal_person"
+                android:id="@+id/deal_status"
                 android:layout_width="wrap_content"
 
                 android:layout_height="wrap_content"
@@ -241,15 +243,55 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="司机室广播声音小"
+                android:text="@{log.faults.get(0).desc}"
+                tools:text="双规轮子偏差，手动阀第三方，阿斯顿发斯蒂芬，阿斯adsasdf"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
-            <ImageView
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:src="@drawable/ic_yunda" />
+               <!-- <ImageView
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:src="@drawable/ic_yunda" />
+
+                <ImageView
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:src="@drawable/ic_yunda" />-->
+
+
+
         </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/text_view_boder">
+
+            <TextView
+                android:id="@+id/score_title"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:text="开始巡检时间:  "
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/score_rate"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text='@{log.score + " 分"}'
+                tools:text="9.7 分"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintStart_toEndOf="@id/score_title"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -294,4 +336,5 @@
         </LinearLayout>
 
     </LinearLayout>
+    </ScrollView>
 </layout>

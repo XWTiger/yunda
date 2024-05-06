@@ -68,8 +68,10 @@ public interface InspectionService {
 
     @POST("/api/PatrolFault/Create")
     @Multipart
-    Call<Map<String, String>> createBreakDownRecord(@Part("SubtaskId") String subtaskId, @Part("TrainLocationId") String trainLocationId, @Part("Type") Integer type, @Part("Desc") String desc,
-                                                    @Part("IsDiscretion") Boolean disc, @PartMap Map<String, RequestBody>  Files, @Part("HandleDesc") String handleDesc, @PartMap Map<String, RequestBody> HandleFiles);
+    Call<Map<String, String>> createBreakDownRecord(@PartMap Map<String, RequestBody>  files,  @PartMap Map<String, RequestBody> handleFiles);
+
+    /*Call<Map<String, String>> createBreakDownRecord(@Part("SubtaskId") RequestBody subtaskId, @Part("TrainLocationId") RequestBody trainLocationId, @Part("Type") RequestBody type, @Part("Desc") RequestBody desc,
+                                                    @Part("IsDiscretion") RequestBody disc, @PartMap Map<String, RequestBody> files, @Part("HandleDesc") RequestBody handleDesc, @PartMap Map<String, RequestBody> handleFiles);*/
 
 
     @POST("/api/DataDict/GetNameList/{type}")

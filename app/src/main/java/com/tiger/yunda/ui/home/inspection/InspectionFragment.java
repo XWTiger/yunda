@@ -1,5 +1,6 @@
 package com.tiger.yunda.ui.home.inspection;
 
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.net.Uri;
@@ -14,15 +15,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.tiger.yunda.MainActivity;
+
 import com.tiger.yunda.R;
 import com.tiger.yunda.data.BreakDownInfo;
+import com.tiger.yunda.data.model.BreakRecord;
 import com.tiger.yunda.data.model.ErrorResult;
+import com.tiger.yunda.data.model.PageResult;
 import com.tiger.yunda.databinding.FragmentInspectionBinding;
 import com.tiger.yunda.service.InspectionService;
 import com.tiger.yunda.service.MissionService;
@@ -50,16 +58,24 @@ import retrofit2.Response;
 /**
  * A fragment representing a list of Items.
  */
-public class InspectionFragment extends Fragment {
+public class InspectionFragment extends Fragment implements View.OnClickListener {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
+    private int REQUEST_CODE_PERMISSIONS = 7;
+    private String[] REQUIRED_PERMISSIONS = {
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+    };
     // TODO: Customize parameters
-    private Mission mission;
+    private static Mission mission;
 
     private BreakDownInfo breakDownInfo;
 
     private InspectionService inspectionService;
+
+    private static String locationId;
+
+    private NavController navController;
 
     private final String TV_PAUSE_VALUE = "暂停";
 
@@ -85,6 +101,15 @@ public class InspectionFragment extends Fragment {
         return fragment;
     }
 
+    private boolean allPermissionsGranted() {
+        for (String permission : REQUIRED_PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(getContext(), permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,20 +119,28 @@ public class InspectionFragment extends Fragment {
         if (Objects.isNull(breakDownInfo)) {
             breakDownInfo = new BreakDownInfo();
         }
+        navController = NavHostFragment.findNavController(this);
 
         //查询任务
         if (getArguments() != null) {
-            Mission submission = (Mission) getArguments().getSerializable(ListViewAdapter.MISSION_KEY);
-            queryMissionDetail(submission.getId());
+            if (Objects.isNull(mission)) {
+                Mission tmeMission = (Mission) getArguments().getSerializable(ListViewAdapter.MISSION_KEY);
+                if (Objects.nonNull(tmeMission)) {
+                    mission = tmeMission;
+                }
+            }
+            queryMissionDetail(mission.getId());
         }
 
         setHasOptionsMenu(true);
 
 
     }
+
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        NavController navController = NavHostFragment.findNavController(this);
+        navController = NavHostFragment.findNavController(this);
         navController.popBackStack();
         Log.i("xiaweihu", "onOptionsItemSelected: ========================" + item.getItemId());
         return super.onOptionsItemSelected(item);
@@ -120,6 +153,7 @@ public class InspectionFragment extends Fragment {
         this.inflater = inflater;
         if (Objects.isNull(binding)) {
             binding = com.tiger.yunda.databinding.FragmentInspectionBinding.inflate(inflater, container, false);
+            binding.inspectionFinished.setOnClickListener(this);
         } else {
             binding.inspectionAction.setText(null);
         }
@@ -133,6 +167,10 @@ public class InspectionFragment extends Fragment {
             List<CameraContentBean> files = new ArrayList<>();
             List<CameraContentBean> handleFiles = new ArrayList<>();
             List<CameraContentBean> contentBeans = (List<CameraContentBean>) bundle.getSerializable("contents");
+            if (Objects.isNull(breakDownListDialogFragment)) {
+                breakDownListDialogFragment = BreakDownListDialogFragment.newInstance(2, breakDownInfo);
+                breakDownInfo.setSubtaskId(mission.getId());
+            }
             if (Objects.nonNull(contentBeans) && contentBeans.size() > 0) {
                 contentBeans.forEach(cameraContentBean -> {
                     if (cameraContentBean.isProblem()) {
@@ -143,13 +181,12 @@ public class InspectionFragment extends Fragment {
                 });
                 breakDownInfo.setFiles(files);
                 breakDownInfo.setHandleFiles(handleFiles);
+                breakDownInfo.setSubtaskId(mission.getId());
+                breakDownInfo.setTrainLocationId(locationId);
                 //TODO 确认逻辑是否正确
                 breakDownListDialogFragment.show(getParentFragmentManager(), "breakdownReport");
             }
-            if (Objects.isNull(breakDownListDialogFragment)) {
-                breakDownListDialogFragment = BreakDownListDialogFragment.newInstance(2, breakDownInfo);
-               // breakDownListDialogFragment.show(getParentFragmentManager(), "breakdownReport");
-            }
+
         }
 
         return binding.getRoot();
@@ -165,6 +202,34 @@ public class InspectionFragment extends Fragment {
         return lastSlashIndex != -1 ? filePath.substring(lastSlashIndex + 1) : filePath;
     }
 
+    @Override
+    public void onClick(View v) {
+        //巡检任务完成
+        Call<ResponseBody> responseBodyCall = inspectionService.finishedMission(mission.getId());
+        responseBodyCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getContext(), "完成任务", Toast.LENGTH_SHORT).show();
+                    navController.popBackStack();
+                } else {
+                    try {
+                        String errStr = response.errorBody().string();
+                        ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                        Log.e("xiaweihu", "查询故障列表失败: ===========>" + errStr);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+
+            }
+        });
+    }
+
     public class ViewHolder  implements View.OnClickListener {
         //状态，1:初始、2:已开始、3:已暂停、4:已恢复、5:已结束
         private int TRAIN_LOCATION_STATE_INIT = 1;
@@ -172,6 +237,8 @@ public class InspectionFragment extends Fragment {
         private int TRAIN_LOCATION_STATE_PAUSED = 3;
         private int TRAIN_LOCATION_STATE_COVERED = 4;
         private int TRAIN_LOCATION_STATE_FINISHED = 5;
+        @ColorInt
+        public static final int GREEN       = 0xFF0B9D32;
 
         public LinearLayout linearLayout;
         public LinearLayout listchild;
@@ -240,7 +307,7 @@ public class InspectionFragment extends Fragment {
         //状态，1:初始、2:已开始、3:已暂停、4:已恢复、5:已结束
         public void checkButtonsStateAndControl(int state,Button startBtn,Button pauseBtn, Button finishBtn) {
             ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
-            ColorStateList green = ColorStateList.valueOf(0x0b9d32);
+            ColorStateList green = ColorStateList.valueOf(GREEN);
             if (state == TRAIN_LOCATION_STATE_INIT) {
                 //初始化
                 pauseBtn.setEnabled(false);
@@ -280,8 +347,8 @@ public class InspectionFragment extends Fragment {
                 finishBtn.setBackgroundTintList(green);
             }
 
-            if (state == TRAIN_LOCATION_STATE_PAUSED) {
-                //已暂停
+            if (state == TRAIN_LOCATION_STATE_FINISHED) {
+                //已结束
                 startBtn.setEnabled(false);
                 startBtn.setBackgroundTintList(colorStateList);
                 pauseBtn.setEnabled(false);
@@ -296,6 +363,7 @@ public class InspectionFragment extends Fragment {
         public void onClick(View v) {
             int id = v.getId();
             PlaceholderContent.PlaceholderItem item = mapper.get(v.getTag());
+            breakDownInfo.setTrainLocationId(item.id);
             if (id == R.id.button2) {
                 //开始
                 Log.i("tiger", "onClick: button2 -----------> " + v.getTag());
@@ -340,6 +408,7 @@ public class InspectionFragment extends Fragment {
                 } else {//已恢复
                     params.setAction(1);
                 }
+                locationId = placeholderItem.id;
                 Call<ResponseBody>  responseBodyCall = inspectionService.pauseOrResumeInspection(params);
                 responseBodyCall.enqueue(new Callback<ResponseBody>() {
                     @Override
@@ -354,7 +423,9 @@ public class InspectionFragment extends Fragment {
                                 binding.inspectionAction.setText("暂停巡检: " + item.content);
                                 item.state = TRAIN_LOCATION_STATE_PAUSED;
                                 List<Button> buttons = buttonMapper.get(v.getTag());
-                                checkButtonsStateAndControl(TRAIN_LOCATION_STATE_COVERED, buttons.get(0), buttons.get(1), buttons.get(2));
+                                checkButtonsStateAndControl(TRAIN_LOCATION_STATE_PAUSED, buttons.get(0), buttons.get(1), buttons.get(2));
+                                breakDownInfo.setTrainLocationId(placeholderItem.id);
+                                breakDownInfo.setSubtaskId(mission.getId());
                                 breakDownListDialogFragment = BreakDownListDialogFragment.newInstance(2, breakDownInfo);
                                 breakDownListDialogFragment.show(getParentFragmentManager(), "breakdownReport");
                             }
@@ -390,7 +461,8 @@ public class InspectionFragment extends Fragment {
                             binding.inspectionAction.setText(null);
                             item.state = TRAIN_LOCATION_STATE_FINISHED;
                             List<Button> buttons = buttonMapper.get(v.getTag());
-                            checkButtonsStateAndControl(TRAIN_LOCATION_STATE_COVERED, buttons.get(0), buttons.get(1), buttons.get(2));
+                            checkButtonsStateAndControl(TRAIN_LOCATION_STATE_FINISHED, buttons.get(0), buttons.get(1), buttons.get(2));
+                            Toast.makeText(getContext(),"结束成功", Toast.LENGTH_SHORT).show();
                         } else {
 
                             try {

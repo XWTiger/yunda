@@ -1,16 +1,17 @@
 package com.tiger.yunda.ui.common;
 
-import static android.app.Activity.RESULT_OK;
+import static android.os.Environment.DIRECTORY_PICTURES;
 
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,24 +43,22 @@ import com.tiger.yunda.R;
 import com.tiger.yunda.data.BreakDownInfo;
 import com.tiger.yunda.data.BreakDownType;
 import com.tiger.yunda.data.model.ErrorResult;
-import com.tiger.yunda.databinding.ChipFileBinding;
 import com.tiger.yunda.databinding.FragmentBreakdownListDialogItemBinding;
 import com.tiger.yunda.enums.CameraFileType;
 import com.tiger.yunda.service.InspectionService;
-import com.tiger.yunda.utils.CollectionUtil;
+import com.tiger.yunda.utils.FileUtil;
 import com.tiger.yunda.utils.JsonUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import okhttp3.MultipartBody;
+import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -72,12 +71,13 @@ import retrofit2.Response;
  *     BreakDownListDialogFragment.newInstance(30).show(getSupportFragmentManager(), "dialog");
  * </pre>
  */
-public class BreakDownListDialogFragment extends BottomSheetDialogFragment implements SpinnerCallBack {
+public class BreakDownListDialogFragment extends BottomSheetDialogFragment implements SpinnerCallBack, AdapterView.OnItemSelectedListener {
 
 
     private static final String ARG_ITEM_COUNT = "item_count";
     private FragmentBreakdownListDialogItemBinding binding;
     private List<BreakDownType> breakDownTypes;
+
 
 
     private int CHOOSE_CODE = 3;
@@ -91,7 +91,6 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
     private SpinnerAdapter spinnerAdapter;
     ActivityResultLauncher<PickVisualMediaRequest>  pickMultipleMedia;
     private InspectionService inspectionService;
-
 
 
     public static   BreakDownListDialogFragment newInstance(int itemCount, BreakDownInfo info) {
@@ -128,6 +127,9 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
 
     }
 
+
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -137,14 +139,17 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
         if (Objects.nonNull(viewModel)) {
             viewModel.getTypes().observe(this, new Observer<List<BreakDownType>>() {
                 @Override
-                public void onChanged(List<BreakDownType> breakDownTypes) {
-                    spinnerAdapter = new SpinnerAdapter(breakDownTypes, context);
-                    spinnerAdapter.setData(breakDownTypes);
+                public void onChanged(List<BreakDownType> breakTypes) {
+                    spinnerAdapter = new SpinnerAdapter(breakTypes, context);
                     binding.problemCatalogSelect.setAdapter(spinnerAdapter);
+                    breakDownTypes = breakTypes;
                 }
             });
 
         }
+        binding.progressBar.setVisibility(View.GONE);
+
+        binding.problemCatalogSelect.setOnItemSelectedListener(this);
 
         ViewHolder viewHolder = new ViewHolder(this);
         pickMultipleMedia =
@@ -176,6 +181,16 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
 
     @Override
     public void spinnerChecked(int deliverMissionIndex, int userIndex) {
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        breakDownInfo.setType(breakDownTypes.get(position).getType());
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
 
     }
 
@@ -242,7 +257,9 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
             } else {
                 //回显样式
                 if (Objects.nonNull(breakDownInfo.getTypePosition()) ) {
-                    spinnerAdapter.notifyDataSetChanged();
+                    if (Objects.nonNull(spinnerAdapter)) {
+                        spinnerAdapter.notifyDataSetChanged();
+                    }
                     type.setSelection(breakDownInfo.getTypePosition(), true);
                 }
                 if (Objects.nonNull(breakDownInfo.getDesc()) && breakDownInfo.getDesc() != "") {
@@ -303,7 +320,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
         public void onClick(View v) {
 
             String tag = (String) v.getTag();
-            saveInfo();
+
             if (StringUtils.isNotBlank(tag)) {
                 switch (tag) {
                     case "problem_video":
@@ -380,7 +397,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                         break;
                     case "finished":
                         //提交故障
-
+                        saveInfo();
                         if (StringUtils.isBlank(breakDownInfo.getDesc())) {
                             problemDesc.setError("故障描述不能为空");
                             return;
@@ -392,16 +409,34 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                             return;
                         }
 
-                        if (breakDownInfo.getBreakFilesUri().isEmpty()) {
+                        if (breakDownInfo.getBreakFilesUri(getContext()).isEmpty()) {
                             Toast.makeText(getContext(), "故障文件不能为空", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        Call<Map<String, String>> result = inspectionService.createBreakDownRecord(breakDownInfo.getSubtaskId(), breakDownInfo.getTrainLocationId(), breakDownInfo.getType(), breakDownInfo.getDesc(), breakDownInfo.getDiscretion(), breakDownInfo.getBreakFilesUri(), breakDownInfo.getHandleDesc(), breakDownInfo.getHandleFilesUri());
+                        Map<String, RequestBody> files = breakDownInfo.getBreakFilesUri(getContext());
+                        RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), breakDownInfo.getSubtaskId());
+                        files.put("SubtaskId", requestBody);
+                        RequestBody trainId = RequestBody.create(MediaType.parse("text/plain"), breakDownInfo.getTrainLocationId());
+                        files.put("TrainLocationId", trainId);
+                        RequestBody type = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(breakDownInfo.getType()));
+                        files.put("Type", type);
+                        RequestBody desc = RequestBody.create(MediaType.parse("text/plain"), breakDownInfo.getDesc());
+                        files.put("Desc", desc);
+                        RequestBody IsDiscretion = RequestBody.create(MediaType.parse("text/plain"), (Objects.isNull(breakDownInfo.getDiscretion()) || !breakDownInfo.getDiscretion())? "false" : "true");
+                        files.put("IsDiscretion", IsDiscretion);
+                        binding.progressBar.setVisibility(View.VISIBLE);
+                        finished.setEnabled(false);
+                        ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
+                        finished.setBackgroundTintList(colorStateList);
+
+                        Call<Map<String, String>> result = inspectionService.createBreakDownRecord(files, breakDownInfo.getHandleFilesUri());
                         result.enqueue(new Callback<Map<String, String>>() {
                             @Override
                             public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
                                 if (response.isSuccessful()) {
-                                   dismiss();
+                                    Toast.makeText(context, "创建故障成功", Toast.LENGTH_SHORT).show();
+                                    breakDownInfo.clear();
+                                    dismiss();
                                 } else {
                                     try {
                                         String errStr = response.errorBody().string();
@@ -411,11 +446,15 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                                         e.printStackTrace();
                                     }
                                 }
+                                ColorStateList green = ColorStateList.valueOf(0xFF0B9D32);
+                                binding.progressBar.setVisibility(View.GONE);
+                                finished.setEnabled(true);
+                                finished.setBackgroundTintList(green);
                             }
 
                             @Override
                             public void onFailure(Call<Map<String, String>> call, Throwable throwable) {
-
+                                Log.e("xiaweihu", "onFailure: ==============", throwable);
                             }
                         });
 
@@ -446,12 +485,9 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             if (Objects.nonNull(view)) {
                 Log.i("xiaweihu", "onItemSelected:  ==========>" + (Integer) view.getTag() + "=====" +position);
-                LinearLayout linearLayout = (LinearLayout) view;
-                Integer type = (Integer) linearLayout.getChildAt(0).getTag();
-                breakDownInfo.setType(type);
-                breakDownInfo.setTypePosition(position);
-
             }
+            breakDownInfo.setType(breakDownTypes.get(position).getType());
+            breakDownInfo.setTypePosition(position);
         }
 
         @Override
@@ -461,7 +497,6 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
 
         private void saveInfo() {
             breakDownInfo.setDesc(this.problemDesc.getText().toString());
-            breakDownInfo.setType((Integer) this.type.getTag());
         }
 
         public String getMimeType(ContentResolver contentResolver, Uri fileUri) {
@@ -481,10 +516,12 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                     uris.forEach(uri -> {
                         String type = getMimeType(context.getContentResolver(), uri);
                         CameraContentBean cameraContentBean = null;
+                        String content = FileUtil.getFileStr(uri, context);
+                        String imagePath = String.format("%s/%s",Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES).toPath() + "/Yunda/", content);
                         if (type.equals("jpg")) {
-                          cameraContentBean = new CameraContentBean(CameraFileType.IMAGE, uri.toString(), way);
+                            cameraContentBean = new CameraContentBean(CameraFileType.IMAGE, imagePath, way, content);
                         } else {
-                            cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, uri.toString(), way);
+                            cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, imagePath, way, content);
                         }
                         ccbs.add(cameraContentBean);
                     });
@@ -492,7 +529,6 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                     chipGroup.removeAllViews();
                     AtomicInteger position = new AtomicInteger();
                     breakDownInfo.getFiles().forEach(s -> {
-
                         Chip chip = (Chip) LayoutInflater.from(context).inflate(R.layout.chip_file, null);
                         chip.setText("故障_" + position.get() + "." + (s.getType().equals(CameraFileType.IMAGE)?"jpg":"mp4"));
                         chip.setTag("problem_" + position.get());
@@ -508,12 +544,14 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                     List<CameraContentBean> ccbs = new ArrayList<>();
 
                     uris.forEach(uri -> {
+                        String content = FileUtil.getFileStr(uri, context);
+                        String imagePath = String.format("%s/%s", Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES).toPath() + "/Yunda/", content);
                         String type = getMimeType(context.getContentResolver(), uri);
                         CameraContentBean cameraContentBean = null;
                         if (type.equals("jpg")) {
-                            cameraContentBean = new CameraContentBean(CameraFileType.IMAGE, uri.toString(), way);
+                            cameraContentBean = new CameraContentBean(CameraFileType.IMAGE, imagePath, way, content);
                         } else {
-                            cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, uri.toString(), way);
+                            cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, imagePath, way, content);
                         }
                         ccbs.add(cameraContentBean);
                     });

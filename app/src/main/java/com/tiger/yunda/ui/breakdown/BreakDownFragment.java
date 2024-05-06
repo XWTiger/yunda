@@ -22,6 +22,7 @@ import com.tiger.yunda.R;
 import com.tiger.yunda.data.model.BreakRecord;
 import com.tiger.yunda.databinding.BreakdownRecordeListBinding;
 import com.tiger.yunda.databinding.FragmentBreakDownBinding;
+import com.tiger.yunda.utils.CollectionUtil;
 import com.tiger.yunda.utils.TimeUtil;
 
 import java.util.Date;
@@ -109,6 +110,11 @@ public class BreakDownFragment extends Fragment {
                 .observe(getViewLifecycleOwner(), new Observer<List<BreakRecord>>() {
                     @Override
                     public void onChanged(List<BreakRecord> breakRecords) {
+                        if (CollectionUtil.isEmpty(breakRecords)) {
+                            fragmentBreakDownBinding.noContent.setVisibility(View.VISIBLE);
+                        } else {
+                            fragmentBreakDownBinding.noContent.setVisibility(View.GONE);
+                        }
                         if (Objects.isNull(breakDownListAdapter)) {
                             breakDownListAdapter = new BreakDownListAdapter(getContext(), fragmentBreakDownBinding.list.getId(), breakRecords, getFragmentManager());
                             fragmentBreakDownBinding.list.setAdapter(breakDownListAdapter);

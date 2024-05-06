@@ -82,7 +82,7 @@ public class BreakDownListAdapter extends ArrayAdapter<BreakRecord> {
 
         @Override
         public void onClick(View view) {
-            BreakDownDetailDialogFragment.newInstance(breakRecord).show(manager, "breakdown");
+            BreakDownDetailDialogFragment.newInstance(breakRecord).show(manager, "breakdown2");
         }
     }
 

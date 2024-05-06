@@ -42,32 +42,27 @@ public class LogViewModel extends ViewModel {
 
     public LiveData<List<WorkLog>> getLogs(Integer pageNo, Integer pageSize, Integer deptId, String startTime, String endTime) {
         List<WorkLog> workLogList = new ArrayList<>();
-        /*workLogList.add(WorkLog.builder()
-                        .id("1")
-                        .inspectionUnit("A374CP-A")
-                        .task(new Task("夜班巡检"))
-                        .score("5")
-                .inspectorId(1).positionId(1).duration(23).state(4).faultStateText("无故障").faultState(3).build());
-        workLogList.add(WorkLog.builder()
-                        .id("2")
-                .inspectionUnit("A374CP-B")
-                .task(new Task("白班巡检"))
-                        .score("9.7")
-                .inspectorId(1).positionId(1).duration(23).state(4).faultStateText("无故障").faultState(3).build());*/
 
         Map<String, Object> body = new HashMap<>();
         body.put("page", pageNo);
         body.put("limit", pageSize);
-        Map<String, String> sorts = new HashMap<>();
-        sorts.put("filed", "createTime");
-        sorts.put("type", "1");
-        body.put("sorts", sorts);
+        List<Map> sortsList = new ArrayList<>();
+        Map<String, Object> sorts = new HashMap<>();
+        sorts.put("filed", "IssuTime");
+        sorts.put("type", 1);
+        sortsList.add(sorts);
+        body.put("sorts", sortsList);
         if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
             body.put("startTime", startTime);
             body.put("endTime", endTime);
         }
-        body.put("deptId", deptId);
-        body.put("inspectorId", MainActivity.loggedInUser.getUserId());
+        if (deptId > 0) {
+            body.put("deptId", deptId);
+        } else {
+            body.put("deptId", Integer.valueOf(MainActivity.loggedInUser.getDeptId()));
+        }
+        body.put("faultState", 0);
+        body.put("inspectorId", Integer.valueOf(MainActivity.loggedInUser.getUserId()));
         Call<PageResult<WorkLog>> resultCall = workLogService.queryByPage(body);
         resultCall.enqueue(new Callback<PageResult<WorkLog>>() {
             @Override
@@ -90,7 +85,7 @@ public class LogViewModel extends ViewModel {
 
             @Override
             public void onFailure(Call<PageResult<WorkLog>> call, Throwable throwable) {
-
+                Log.e("xiaweihu", "work detail failed=========: ",  throwable);
             }
         });
 

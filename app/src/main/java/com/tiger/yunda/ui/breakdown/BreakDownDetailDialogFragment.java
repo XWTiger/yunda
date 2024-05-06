@@ -25,6 +25,7 @@ import com.tiger.yunda.data.model.BreakRecord;
 import com.tiger.yunda.data.model.User;
 import com.tiger.yunda.databinding.FragmentBreakDownDetailDialogBinding;
 import com.tiger.yunda.service.MissionService;
+import com.tiger.yunda.ui.common.BreakDownListDialogFragment;
 import com.tiger.yunda.ui.common.SpinnerAdapter;
 import com.tiger.yunda.utils.CollectionUtil;
 import com.tiger.yunda.utils.TimeUtil;
@@ -63,14 +64,16 @@ public class BreakDownDetailDialogFragment extends BottomSheetDialogFragment imp
     private Date startDateTime;
     private Boolean finisehd = true;
 
+    private static volatile BreakDownDetailDialogFragment breakDownListDialogFragment ;
+
 
     // TODO: Customize parameters
     public static BreakDownDetailDialogFragment newInstance(BreakRecord breakRecord) {
-        final BreakDownDetailDialogFragment fragment = new BreakDownDetailDialogFragment();
-        final Bundle args = new Bundle();
+        breakDownListDialogFragment  = new BreakDownDetailDialogFragment();
+        Bundle args = new Bundle();
         args.putSerializable(ARG_ITEM_DETAIL, breakRecord);
-        fragment.setArguments(args);
-        return fragment;
+        breakDownListDialogFragment.setArguments(args);
+        return breakDownListDialogFragment;
     }
 
     @Nullable
@@ -80,8 +83,7 @@ public class BreakDownDetailDialogFragment extends BottomSheetDialogFragment imp
 
         binding = FragmentBreakDownDetailDialogBinding.inflate(inflater, container, false);
         if (Objects.isNull(breakDownViewModel)) {
-            breakDownViewModel = new ViewModelProvider(this).get(BreakDownViewModel.class);
-            breakDownViewModel.setContext(getContext());
+            breakDownViewModel = new BreakDownViewModel(getContext());
         }
         BreakRecord breakRecord = (BreakRecord) getArguments().getSerializable(ARG_ITEM_DETAIL);
         BreakRecord result = breakDownViewModel.getBreakRecordById(breakRecord.getId());
@@ -95,8 +97,8 @@ public class BreakDownDetailDialogFragment extends BottomSheetDialogFragment imp
             attachments.forEach(attachment -> {
                 Uri uri = Uri.parse(attachment.getUrl());
                 ImageView imageView = new ImageView(getContext());
-                imageView.setMaxWidth(200);
-                imageView.setMaxHeight(200);
+                ViewGroup.LayoutParams params  = new ViewGroup.LayoutParams(300, 300);
+                imageView.setLayoutParams(params);
                 binding.contentLayout.addView(imageView);
                 Glide.with(this).load(uri).into(imageView);
             });

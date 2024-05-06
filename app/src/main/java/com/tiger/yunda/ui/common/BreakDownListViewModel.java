@@ -68,7 +68,8 @@ public class BreakDownListViewModel extends ViewModel {
                     if (!CollectionUtil.isEmpty(resultList)) {
                         resultList.forEach(stringObjectMap -> {
                             String text = (String) stringObjectMap.get("text");
-                            Integer type = Integer.parseInt(stringObjectMap.get("value").toString());
+                            Double db = (Double) stringObjectMap.get("value");
+                            Integer type = db.intValue();
                             list.add(BreakDownType.builder()
                                             .type(type)
                                             .name(text)

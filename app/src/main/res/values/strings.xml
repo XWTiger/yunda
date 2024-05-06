@@ -16,7 +16,7 @@
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">用户名或密码应该在1-16位之间</string>
     <string name="invalid_password">密码应该在1-16位之间</string>
-    <string name="login_failed">"登录失败"</string>
+    <string name="login_failed">"登录失败,用户或密码无效"</string>
     <string name="no_missions">暂无任务</string>
 
     <string name="audio">Audio</string>

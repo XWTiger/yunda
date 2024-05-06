@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<paths>
+    <path>
+        <!--增加根目录配置，特别注意：此处的path要为空字符串-->
+        <root-path name="root_path" path="" />
+        <!--需要访问的文件路径，name属性可以自定义，path属性必须写为download，因为我们安装apk时需要访问的是下载apk的文件路径，download实际上是一个常量值-->
+        <external-cache-path name="download" path="download" />
+
+    </path>
+
+</paths>

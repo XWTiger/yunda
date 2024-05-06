@@ -13,10 +13,15 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 
 import com.tiger.yunda.MainActivity;
+import com.tiger.yunda.data.model.BreakRecord;
+import com.tiger.yunda.data.model.ErrorResult;
+import com.tiger.yunda.data.model.PageResult;
 import com.tiger.yunda.data.model.WorkLog;
 import com.tiger.yunda.databinding.LogListBinding;
 import com.tiger.yunda.service.WorkLogService;
+import com.tiger.yunda.utils.JsonUtil;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -103,13 +108,25 @@ public class LogAdapter extends ArrayAdapter<WorkLog> {
             call.enqueue(new Callback<WorkLog>() {
                 @Override
                 public void onResponse(Call<WorkLog> call, Response<WorkLog> response) {
-                    WorkLog workLog = response.body();
-                    LogDialogFragment.newInstance(workLog).show(fragmentManager, WORK_LOG_SHOW);
+
+                    if (response.isSuccessful()) {
+                        WorkLog workLog = response.body();
+                        LogDialogFragment.newInstance(workLog).show(fragmentManager, WORK_LOG_SHOW);
+                    } else {
+                        try {
+                            String errStr = response.errorBody().string();
+                            ErrorResult errorResult = JsonUtil.getObject(errStr, detail.getContext());
+                            Log.e("xiaweihu", "查询作业详情失败: ===========>" + errStr);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                 }
 
                 @Override
                 public void onFailure(Call<WorkLog> call, Throwable throwable) {
-
+                    Log.e("xiaweihu", "query subtask detail failed=======: ", throwable);
                 }
             });
 

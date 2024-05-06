@@ -1,11 +1,14 @@
 package com.tiger.yunda.ui.common;
 
+import static android.os.Environment.DIRECTORY_PICTURES;
+
 import android.Manifest;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.icu.text.SimpleDateFormat;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,6 +46,7 @@ import com.tiger.yunda.R;
 import com.tiger.yunda.data.BreakDownInfo;
 import com.tiger.yunda.databinding.FragmentCameraBinding;
 import com.tiger.yunda.enums.CameraFileType;
+import com.tiger.yunda.utils.FileUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -354,7 +358,9 @@ public class CameraFragment extends Fragment {
                         String msg = "图片保存成功: " + output.getSavedUri().toString();
                         Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
                         Log.d("tiger", msg);
-                        CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.IMAGE,  output.getSavedUri().getPath(), "1".equals(recordType));
+                        String content = FileUtil.getFileStr(output.getSavedUri(), getContext());
+                        String imagePath = String.format("%s/%s", Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES).toPath() + "/Yunda/", content);
+                        CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.IMAGE,  imagePath, "1".equals(recordType), content);
                         contentBeans.add(cameraContentBean);
                         viewholder.setExitButtonEnable(true);
                     }
@@ -387,7 +393,9 @@ public class CameraFragment extends Fragment {
                         if (!((VideoRecordEvent.Finalize) videoRecordEvent).hasError()) {
                             String msg = "Video capture succeeded: " + ((VideoRecordEvent.Finalize) videoRecordEvent).getOutputResults().getOutputUri();
                             Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
-                            CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, ((VideoRecordEvent.Finalize) videoRecordEvent).getOutputResults().getOutputUri().getPath(), "1".equals(recordType));
+                            String content = FileUtil.getFileStr(((VideoRecordEvent.Finalize) videoRecordEvent).getOutputResults().getOutputUri(), getContext());
+                            String imagePath = String.format("%s/%s", Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES).toPath() + "/Yunda/", content);
+                            CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, imagePath, "1".equals(recordType), content);
                             this.contentBeans.add(cameraContentBean);
                             viewholder.setExitButtonEnable(true);
                         } else {

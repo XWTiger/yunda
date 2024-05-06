@@ -14,6 +14,7 @@
        android:queryHint="请输入搜索内容"
         android:background="@drawable/ic_search"
         app:defaultQueryHint="请输入搜索内容"
+        android:theme="@style/AppAutoCompleteTextView"
         android:id="@+id/searchView" />
     <TextView
         android:layout_marginTop="13dp"

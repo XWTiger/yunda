@@ -37,7 +37,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="40dp"
+                android:layout_marginLeft="10dp"
                 android:text="故障分类: "
                 android:textColor="@color/black" />
 
@@ -51,7 +51,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="40dp"
+                android:layout_marginLeft="10dp"
                 android:text="故障状态: "
                 android:textColor="@color/black" />
 
@@ -60,7 +60,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{record.stateText}"
-                android:textColor='@{record.stateText == "未处理" ? @color/red : @color/green}'
+                android:textColor='@{record.state == 1 ? @color/red : @color/green}'
                 tools:text="已处理"
                 />
 
