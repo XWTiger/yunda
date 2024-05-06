@@ -2,6 +2,7 @@ package com.tiger.yunda.ui.home.viewmodel;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.databinding.ObservableField;
 import androidx.lifecycle.LiveData;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,8 +58,10 @@ public class CreateMissionViewModel extends ViewModel {
     }
 
     public LiveData<CreateMission> getCreation() {
-
-
+        if (Objects.isNull(MainActivity.loggedInUser)) {
+            Toast.makeText(context, "未登录，请先登录", Toast.LENGTH_SHORT).show();
+            return creation;
+        }
         CreateMission createMission = CreateMission.builder()
                 .deptId(MainActivity.loggedInUser.getDeptId())
                 .leaderId(MainActivity.loggedInUser.getUserId())

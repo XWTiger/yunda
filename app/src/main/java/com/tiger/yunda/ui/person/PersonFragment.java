@@ -141,37 +141,42 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
             String ANDROID_ID = Settings.System.getString(getActivity().getContentResolver(), Settings.System.ANDROID_ID);
 
 
-            Map<String, String> body = new HashMap<>();
-            body.put("mac", ANDROID_ID);
-            Call<ResponseBody> call = deviceService.unbindMac(body);
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    if (response.isSuccessful()) {
-                        UserLoginInfo userLoginInfo = userLoginInfoDao.getSignedIn();
-                        if (Objects.nonNull(userLoginInfo)) {
-                            userLoginInfoDao.deleteByUid(userLoginInfo.getUid());
+            if (Objects.nonNull(MainActivity.loggedInUser)) {
+                Map<String, String> body = new HashMap<>();
+                body.put("mac", ANDROID_ID);
+                Call<ResponseBody> call = deviceService.unbindMac(body);
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.isSuccessful()) {
+                            UserLoginInfo userLoginInfo = userLoginInfoDao.getSignedIn();
+                            // 删除数据库登录信息
+                            if (Objects.nonNull(userLoginInfo)) {
+                                userLoginInfoDao.deleteByUid(userLoginInfo.getUid());
+                            }
+                        } else {
+                            try {
+                                String errStr = response.errorBody().string();
+                                ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                                Log.e("xiaweihu", "绑定设备失败: ===========>" + errStr);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                         Intent intent = new Intent(getContext(), LoginActivity.class);
                         getActivity().startActivityForResult(intent, MainActivity.LOGIN_INTENT_RESULT_CODE);
-                    } else {
-                        try {
-                            String errStr = response.errorBody().string();
-                            ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
-                            Log.e("xiaweihu", "绑定设备失败: ===========>" + errStr);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
                     }
-                }
 
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable throwable) {
 
-                }
-            });
+                    }
+                });
+            } else {
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                getActivity().startActivityForResult(intent, MainActivity.LOGIN_INTENT_RESULT_CODE);
+            }
 
-            // 删除数据库登录信息
         }
     }
 }

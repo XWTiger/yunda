@@ -4,6 +4,7 @@ import static java.security.AccessController.getContext;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -59,10 +61,14 @@ public class LogViewModel extends ViewModel {
         if (deptId > 0) {
             body.put("deptId", deptId);
         } else {
-            body.put("deptId", Integer.valueOf(MainActivity.loggedInUser.getDeptId()));
+            if (Objects.nonNull(MainActivity.loggedInUser)) {
+                body.put("deptId", Integer.valueOf(MainActivity.loggedInUser.getDeptId()));
+            }
         }
         body.put("faultState", 0);
-        body.put("inspectorId", Integer.valueOf(MainActivity.loggedInUser.getUserId()));
+        if (Objects.nonNull(MainActivity.loggedInUser)) {
+            body.put("inspectorId", Integer.valueOf(MainActivity.loggedInUser.getUserId()));
+        }
         Call<PageResult<WorkLog>> resultCall = workLogService.queryByPage(body);
         resultCall.enqueue(new Callback<PageResult<WorkLog>>() {
             @Override

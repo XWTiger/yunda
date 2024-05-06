@@ -39,6 +39,7 @@ import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.data.model.PageResult;
 import com.tiger.yunda.data.model.Version;
 import com.tiger.yunda.entity.ResourceLocationEntity;
+import com.tiger.yunda.internet.AuthInterceptor;
 import com.tiger.yunda.internet.RetrofitClient;
 import com.tiger.yunda.service.LoginService;
 import com.tiger.yunda.service.MissionService;
@@ -97,6 +98,10 @@ public class LoginActivity extends AppCompatActivity {
 
         if (Objects.isNull(loginService)) {
             loginService = MainActivity.retrofitClient.create(LoginService.class);
+        }
+        //重置登录标识
+        if (AuthInterceptor.loginFlag.get() > 0) {
+            AuthInterceptor.loginFlag.getAndDecrement();
         }
 
         /*if (!allPermissionsGranted()) {
@@ -197,6 +202,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
 
 
 

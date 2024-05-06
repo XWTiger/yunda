@@ -106,7 +106,7 @@ public class BreakDownFragment extends Fragment {
             viewHolder = new ViewHolder(fragmentBreakDownBinding.selectStartTime, fragmentBreakDownBinding.selectEndTime, getContext(), new BreakDownViewModel(getContext()));
             viewHolder.setSwipeRefreshLayout(fragmentBreakDownBinding.freshList);
         }
-        viewHolder.getBreakDownViewModel().getBreakRecords(1, 100, null, null, Integer.valueOf(MainActivity.loggedInUser.getDeptId()))
+        viewHolder.getBreakDownViewModel().getBreakRecords(1, 100, null, null, Objects.isNull(MainActivity.loggedInUser) ? null : Integer.valueOf(MainActivity.loggedInUser.getDeptId()))
                 .observe(getViewLifecycleOwner(), new Observer<List<BreakRecord>>() {
                     @Override
                     public void onChanged(List<BreakRecord> breakRecords) {

@@ -88,7 +88,7 @@ public class DownLoadUtil {
                 }
             }
         };
-        context.getApplicationContext().registerReceiver(receiver, filter);
+        context.getApplicationContext().registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED);
         return myDownloadReference;
     }
 

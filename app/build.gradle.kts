@@ -10,7 +10,7 @@ android {
         applicationId = "com.tiger.yunda"
         minSdk = 30
         targetSdk = 34
-        versionCode = 1
+        versionCode = 10000
         versionName = "1.0"
 
 

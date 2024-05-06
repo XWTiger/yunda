@@ -192,7 +192,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                 public void onClick(View v) {
                     // 接受事件
                     Log.d("tiger", "onClick: ======================= ");
-                    if (MainActivity.loggedInUser.getRole() == RoleType.WORKER) {
+                    if (Objects.isNull(MainActivity.loggedInUser) || MainActivity.loggedInUser.getRole() == RoleType.WORKER) {
                         AppCompatActivity ac = (AppCompatActivity) activity;
                         ActionBar actionBar = ac.getSupportActionBar();
                         if (actionBar != null) {

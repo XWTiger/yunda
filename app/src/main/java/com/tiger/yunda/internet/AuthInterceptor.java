@@ -16,7 +16,7 @@ public class AuthInterceptor implements Interceptor {
     private Context context;
     private MainActivity mainActivity;
 
-    private AtomicInteger loginFlag = new AtomicInteger(0);
+    public static AtomicInteger loginFlag = new AtomicInteger(0);
 
 
     public AuthInterceptor(Context context, MainActivity mainActivity) {
@@ -40,7 +40,9 @@ public class AuthInterceptor implements Interceptor {
             }
         }
         if (response.isSuccessful()) {
-            loginFlag.getAndDecrement();
+            if (loginFlag.get() > 0) {
+                loginFlag.getAndDecrement();
+            }
         }
 
         return response;

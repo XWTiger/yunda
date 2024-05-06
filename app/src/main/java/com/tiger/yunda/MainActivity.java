@@ -63,7 +63,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
     public static int LOGIN_INTENT_RESULT_CODE = 9;
-    public static String SYSTEM_VERSION = "V0.0.1";
+
     public static String TOKEN_STR_KEY = "token";
 
     public static String TOKEN_FLAG = "login_token";
