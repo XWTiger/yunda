@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
@@ -63,6 +64,16 @@ public class OpenFileUtil {
 
     // Android获取一个用于打开APK文件的intent
     public static Intent getApkFileIntent(Context context, File file) {
+        boolean isInstallPermission = context.getPackageManager().canRequestPackageInstalls();
+        if(!isInstallPermission){
+            //权限没有打开则提示用户去手动打开
+            openInstallPermission(context);
+        }
+
+        /**
+         * 跳转到设置-允许安装未知来源-页面
+         */
+
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         //判读版本是否在7.0以上
@@ -76,6 +87,25 @@ public class OpenFileUtil {
         }
         return intent;
     }
+
+    public static void openInstallPermission(Context context) {
+        Intent intent = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES
+                    ,Uri.parse("package:" + context.getPackageName()));
+        }else {
+            intent = new Intent(Settings.ACTION_SECURITY_SETTINGS
+                    ,Uri.parse("package:" + context.getPackageName()));
+
+        }
+
+       context.startActivity(intent);
+    }
+
+
+
+
+
 
     // Android获取一个用于打开VIDEO文件的intent
     public static Intent getVideoFileIntent(Context context, File file) {

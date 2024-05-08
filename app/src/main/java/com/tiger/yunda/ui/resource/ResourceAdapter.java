@@ -1,9 +1,12 @@
 package com.tiger.yunda.ui.resource;
 
+import static android.os.Environment.DIRECTORY_DOWNLOADS;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,20 +83,14 @@ public class ResourceAdapter extends ArrayAdapter<OperationResource> implements 
                     .setMessage("本地没有相关文档确定要下载吗？")
                     .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            Long refId = DownLoadUtil.downLoad(operationResource.getFilePath(), context, operationResource.getFileName() + operationResource.getExt());
-                            if (refId >= 0) {
-                                String url = DownLoadUtil.getFileUriString(refId, context);
-                                if (StringUtils.isNotBlank(url)) {
-                                    ResourceLocationEntity resourceLocationEntity = ResourceLocationEntity.builder()
-                                            .id(operationResource.getId())
-                                            .ext(operationResource.getExt())
-                                            .contentType(operationResource.getContentType())
-                                            .fileName(operationResource.getFileName())
-                                            .filePath(operationResource.getFilePath())
-                                            .location(url).build();
-                                    resourceLocationDao.insert(resourceLocationEntity);
-                                }
-                            }
+                            ResourceLocationEntity resourceLocationEntity = ResourceLocationEntity.builder()
+                                    .id(operationResource.getId())
+                                    .ext(operationResource.getExt())
+                                    .contentType(operationResource.getContentType())
+                                    .fileName(operationResource.getFileName())
+                                    .filePath(operationResource.getFilePath())
+                                   .build();
+                            Long refId = DownLoadUtil.downLoadAndSave(operationResource.getFilePath(), context, operationResource.getFileName() + operationResource.getExt(), resourceLocationEntity, resourceLocationDao);
                             dialog.dismiss();
                         }
                     })

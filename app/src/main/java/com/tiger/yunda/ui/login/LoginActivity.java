@@ -76,6 +76,7 @@ public class LoginActivity extends AppCompatActivity {
             android.Manifest.permission.RECORD_AUDIO,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.MANAGE_EXTERNAL_STORAGE,
             Manifest.permission.INTERNET,
             Manifest.permission.READ_MEDIA_IMAGES,
             Manifest.permission.READ_MEDIA_VIDEO,
@@ -84,6 +85,7 @@ public class LoginActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.CHANGE_WIFI_MULTICAST_STATE,
+            Manifest.permission.REQUEST_INSTALL_PACKAGES
     };
 
     @Override

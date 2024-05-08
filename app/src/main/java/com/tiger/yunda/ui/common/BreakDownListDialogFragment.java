@@ -365,7 +365,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                             breakDownInfo.getHandleFiles().clear();
                         }
                         AlertDialog.Builder builderRecover = new AlertDialog.Builder(context);
-                        builderRecover.setTitle("故障资料")
+                        builderRecover.setTitle("恢复资料")
                                 .setMessage("请选择文件或者拍照")
                                 .setPositiveButton("已有图像", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {

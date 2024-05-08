@@ -73,11 +73,6 @@ public class FileUtil {
             // 假设你的Uri是指向媒体库的数字ID
             int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
             String filePath = cursor.getString(columnIndex);
-            int mimeIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.MIME_TYPE);
-            String mimeType = cursor.getString(mimeIndex);
-            int documentIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DOCUMENT_ID);
-            String docId = cursor.getString(documentIndex);
-
           /*  int rindex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.RELATIVE_PATH);
             String relative = cursor.getString(rindex);*/
 

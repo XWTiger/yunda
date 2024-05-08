@@ -74,7 +74,12 @@ public class MainActivity extends AppCompatActivity {
 
     public static  AppDatabase appDatabase;
 
-
+    private String[] REQUIRED_PERMISSIONS = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.MANAGE_EXTERNAL_STORAGE,
+            Manifest.permission.REQUEST_INSTALL_PACKAGES
+    };
 
 
     public static RetrofitClient retrofitClient;
@@ -102,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestPermissions(REQUIRED_PERMISSIONS, 10);
         if (!NetworkUtil.isNetworkAvailable(getApplicationContext())) {
             Toast.makeText(getApplicationContext(), "网络不可用", Toast.LENGTH_SHORT).show();
             try {

@@ -40,6 +40,7 @@ import com.tiger.yunda.ui.common.CameraContentBean;
 import com.tiger.yunda.ui.home.ListViewAdapter;
 import com.tiger.yunda.ui.home.Mission;
 import com.tiger.yunda.ui.home.inspection.placeholder.PlaceholderContent;
+import com.tiger.yunda.utils.CollectionUtil;
 import com.tiger.yunda.utils.JsonUtil;
 
 import java.io.IOException;
@@ -69,7 +70,7 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
     // TODO: Customize parameters
     private static Mission mission;
 
-    private BreakDownInfo breakDownInfo;
+    private static BreakDownInfo breakDownInfo;
 
     private InspectionService inspectionService;
 
@@ -101,14 +102,7 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
         return fragment;
     }
 
-    private boolean allPermissionsGranted() {
-        for (String permission : REQUIRED_PERMISSIONS) {
-            if (ContextCompat.checkSelfPermission(getContext(), permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-        return true;
-    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -179,8 +173,16 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
                         handleFiles.add(cameraContentBean);
                     }
                 });
-                breakDownInfo.setFiles(files);
-                breakDownInfo.setHandleFiles(handleFiles);
+                if (Objects.nonNull(breakDownInfo) && !CollectionUtil.isEmpty(breakDownInfo.getFiles())) {
+                    breakDownInfo.getFiles().addAll(files);
+                } else {
+                    breakDownInfo.setFiles(files);
+                }
+                if (Objects.nonNull(breakDownInfo) && !CollectionUtil.isEmpty(breakDownInfo.getHandleFiles())) {
+                    breakDownInfo.getHandleFiles().addAll(handleFiles);
+                } else {
+                    breakDownInfo.setHandleFiles(handleFiles);
+                }
                 breakDownInfo.setSubtaskId(mission.getId());
                 breakDownInfo.setTrainLocationId(locationId);
                 //TODO 确认逻辑是否正确
