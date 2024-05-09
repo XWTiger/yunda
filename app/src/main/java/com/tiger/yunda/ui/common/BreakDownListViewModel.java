@@ -80,7 +80,7 @@ public class BreakDownListViewModel extends ViewModel {
                 } else {
                     try {
                         String errStr = response.errorBody().string();
-                        Log.e("xiaweihu", "查询故障列表失败: ===========>" + errStr);
+                        Log.e("xiaweihu", "查询故障字典列表失败: ===========>" + errStr);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

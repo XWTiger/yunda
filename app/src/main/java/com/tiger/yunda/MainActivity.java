@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.Theme_Yunda);
         this.requestPermissions(REQUIRED_PERMISSIONS, 10);
         if (!NetworkUtil.isNetworkAvailable(getApplicationContext())) {
             Toast.makeText(getApplicationContext(), "网络不可用", Toast.LENGTH_SHORT).show();
@@ -254,4 +255,5 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
 }

@@ -175,7 +175,9 @@ public class BreakDownDetailDialogFragment extends BottomSheetDialogFragment imp
                 if (finisehd) {
                     dismiss();
                 } else {
-
+                    //添加未处理逻辑 提交编辑的信息
+                    //判断处理时间
+                    // 故障处理人
                 }
                 break;
         }

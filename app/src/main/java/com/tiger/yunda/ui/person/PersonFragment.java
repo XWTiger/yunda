@@ -1,13 +1,12 @@
 package com.tiger.yunda.ui.person;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,11 +17,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.tiger.yunda.MainActivity;
-import com.tiger.yunda.R;
 import com.tiger.yunda.dao.UserLoginInfoDao;
 import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.databinding.FragmentPersonBinding;
 import com.tiger.yunda.entity.UserLoginInfo;
+import com.tiger.yunda.internet.AuthInterceptor;
 import com.tiger.yunda.service.DeviceService;
 import com.tiger.yunda.ui.login.LoginActivity;
 import com.tiger.yunda.utils.JsonUtil;
@@ -148,6 +147,9 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
             String ANDROID_ID = Settings.System.getString(getActivity().getContentResolver(), Settings.System.ANDROID_ID);
 
 
+            if (AuthInterceptor.loginFlag.get() >= 1) {
+                AuthInterceptor.loginFlag.getAndDecrement();
+            }
             if (Objects.nonNull(MainActivity.loggedInUser)) {
                 Map<String, String> body = new HashMap<>();
                 body.put("mac", ANDROID_ID);
@@ -156,11 +158,7 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         if (response.isSuccessful()) {
-                            UserLoginInfo userLoginInfo = userLoginInfoDao.getSignedIn();
-                            // 删除数据库登录信息
-                            if (Objects.nonNull(userLoginInfo)) {
-                                userLoginInfoDao.deleteByUid(userLoginInfo.getUid());
-                            }
+
                         } else {
                             try {
                                 String errStr = response.errorBody().string();
@@ -169,6 +167,12 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
+                        }
+                        UserLoginInfo userLoginInfo = userLoginInfoDao.getSignedIn();
+                        MainActivity.loggedInUser = null;
+                        // 删除数据库登录信息
+                        if (Objects.nonNull(userLoginInfo)) {
+                            userLoginInfoDao.deleteByUid(userLoginInfo.getUid());
                         }
                         Intent intent = new Intent(getContext(), LoginActivity.class);
                         getActivity().startActivityForResult(intent, MainActivity.LOGIN_INTENT_RESULT_CODE);
@@ -183,7 +187,9 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
                 Intent intent = new Intent(getContext(), LoginActivity.class);
                 getActivity().startActivityForResult(intent, MainActivity.LOGIN_INTENT_RESULT_CODE);
             }
-
+            SharedPreferences sharedPreferences = getContext().getSharedPreferences(MainActivity.TOKEN_FLAG, Context.MODE_PRIVATE);
+            sharedPreferences.edit().remove(MainActivity.TOKEN_STR_KEY);
+            MainActivity.retrofitClient.clearHeaders();
         }
     }
 }

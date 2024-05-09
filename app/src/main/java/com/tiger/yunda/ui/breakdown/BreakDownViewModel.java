@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -67,7 +68,9 @@ public class BreakDownViewModel extends ViewModel {
             body.put("startTime", startTime);
             body.put("endTime", endTime);
         }
-        body.put("deptId", deptId);
+        if (Objects.nonNull(deptId) && deptId > 0) {
+            body.put("deptId", deptId);
+        }
 
         List<BreakRecord> breakRecordList = new ArrayList<>();
         Call<PageResult<BreakRecord>> resultCall = breakDownService.queryBreakRecordList(body);

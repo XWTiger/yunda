@@ -125,14 +125,14 @@ public class BreakDownFragment extends Fragment {
                         } else {
                             fragmentBreakDownBinding.noContent.setVisibility(View.GONE);
                         }
-                        if (Objects.isNull(breakDownListAdapter)) {
+                       /* if (Objects.isNull(breakDownListAdapter)) {*/
                             breakDownListAdapter = new BreakDownListAdapter(getContext(), fragmentBreakDownBinding.list.getId(), breakRecords, getFragmentManager());
                             fragmentBreakDownBinding.list.setAdapter(breakDownListAdapter);
                             fragmentBreakDownBinding.list.setOnScrollListener(viewHolder);
-                        } else {
+                       /* } else {
                             breakDownListAdapter.setBreakRecords(breakRecords);
                             breakDownListAdapter.notifyDataSetChanged();
-                        }
+                        }*/
                     }
                 });
         fragmentBreakDownBinding.imageButton3.setOnClickListener(viewHolder);
@@ -221,7 +221,7 @@ public class BreakDownFragment extends Fragment {
                 if (view.getLastVisiblePosition() >= view.getCount() - 1) {
                     // 加载更多数据
 
-                    breakDownViewModel.getBreakRecords(1, 100, TimeUtil.getSTrFromMs(startDateTime), TimeUtil.getSTrFromMs(endDateTime), Integer.valueOf(MainActivity.loggedInUser.getDeptId()));
+                    breakDownViewModel.getBreakRecords(1, 100, Objects.nonNull(startDateTime)?TimeUtil.getSTrFromMs(startDateTime):null, Objects.nonNull(endDateTime)?TimeUtil.getSTrFromMs(endDateTime):null,  Objects.nonNull(MainActivity.loggedInUser)?Integer.valueOf(MainActivity.loggedInUser.getDeptId()): 0);
                 }
             }
         }
@@ -241,7 +241,7 @@ public class BreakDownFragment extends Fragment {
 
         @Override
         public void onRefresh() {
-            breakDownViewModel.getBreakRecords(1, 100, TimeUtil.getSTrFromMs(startDateTime), TimeUtil.getSTrFromMs(endDateTime), Integer.valueOf(MainActivity.loggedInUser.getDeptId()));
+            breakDownViewModel.getBreakRecords(1, 100,  Objects.nonNull(startDateTime)?TimeUtil.getSTrFromMs(startDateTime):null, Objects.nonNull(endDateTime)?TimeUtil.getSTrFromMs(endDateTime):null, Objects.nonNull(MainActivity.loggedInUser)?Integer.valueOf(MainActivity.loggedInUser.getDeptId()): 0);
             swipeRefreshLayout.setRefreshing(false);
         }
 

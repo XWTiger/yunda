@@ -218,7 +218,7 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
                     try {
                         String errStr = response.errorBody().string();
                         ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
-                        Log.e("xiaweihu", "查询故障列表失败: ===========>" + errStr);
+                        Log.e("xiaweihu", "完成任务失败: ===========>" + errStr);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

@@ -117,13 +117,14 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                     } else {
                         fragmentLogBinding.noContent.setVisibility(View.GONE);
                     }
-                    if (Objects.isNull(logAdapter)) {
+                   /* if (Objects.isNull(logAdapter)) {*/
                         logAdapter = new LogAdapter(getContext(), fragmentLogBinding.list.getId(), workLogs,getChildFragmentManager());
+                        logAdapter.setWorkLogList(workLogs);
                         fragmentLogBinding.list.setAdapter(logAdapter);
-                    } else {
+                 /*   } else {
                         logAdapter.setWorkLogList(workLogs);
                         logAdapter.notifyDataSetChanged();
-                    }
+                    }*/
                 }
             });
             fragmentLogBinding.freshList.setOnRefreshListener(this);
@@ -136,7 +137,7 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
 
     @Override
     public void onRefresh() {
-        logViewModel.getLogs(1, 10, 1, "", "");
+        logViewModel.getLogs(1, 10,  Objects.nonNull(MainActivity.loggedInUser)?Integer.valueOf(MainActivity.loggedInUser.getDeptId()): 0, "", "");
         swipeRefreshLayout.setRefreshing(false);
     }
 

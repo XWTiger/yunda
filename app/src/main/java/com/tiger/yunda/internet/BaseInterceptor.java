@@ -36,4 +36,9 @@ public class BaseInterceptor implements Interceptor {
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
+
+    public void clearHeader() {
+
+    }
+
 }
