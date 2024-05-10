@@ -41,7 +41,7 @@ public class DownLoadUtil {
     public static Long downLoad(String downloadUrl, Context context, String fileName) {
 
         //String imagePath = String.format("%s/%s",Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).toPath(), "Yunda.apk");
-        String imagePath = String.format("%s/%s",context.getFilesDir().toPath(), fileName);
+        String imagePath = String.format("%s/%s",context.getExternalFilesDir(DIRECTORY_DOWNLOADS).toPath(), fileName);
        /* Intent intent1 = OpenFileUtil.openFile(context, imagePath);
         if (Objects.nonNull(intent1)) {
             context.startActivity(intent1);

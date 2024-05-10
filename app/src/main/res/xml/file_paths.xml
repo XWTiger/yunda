@@ -11,7 +11,7 @@
         path="."/>
     <!--需要访问的文件路径，name属性可以自定义，path属性必须写为download，因为我们安装apk时需要访问的是下载apk的文件路径，download实际上是一个常量值-->
         <external-cache-path name="download" path="download" />
-       <!-- <external-files-path name="external_app_file" path="." />-->
-    <files-path path="." name="apk" />
+        <external-files-path name="external_app_file" path="download" />
+    <!--<files-path path="." name="apk" />-->
 
 </paths>
