@@ -111,6 +111,10 @@ dependencies {
     implementation("androidx.room:room-paging:$room_version")
     implementation ("com.github.bumptech.glide:glide:4.12.0")
 
+    //pdf
+    implementation("com.github.barteksc:android-pdf-viewer:3.2.0-beta.1")
+    
+
 
 
 

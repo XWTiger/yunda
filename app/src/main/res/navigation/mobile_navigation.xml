@@ -34,7 +34,7 @@
         android:name="com.tiger.yunda.ui.resource.ResourceFragment"
         android:label="@string/title_resource"
         tools:layout="@layout/fragment_resource" />
-
+        <action android:id="@+id/to_pdf_view" app:destination="@id/pdf_view" app:popUpToInclusive="true"/>
     <fragment
         android:id="@+id/navigation_person"
         android:name="com.tiger.yunda.ui.person.PersonFragment"
@@ -84,10 +84,18 @@
          <action android:id="@+id/to_inspection_mission" app:destination="@id/inspection_mission"  app:popUpToInclusive="true" />
     </fragment>
 
+    <fragment android:id="@+id/pdf_view"
+        android:name="com.tiger.yunda.ui.resource.PDFFragment"
+        tools:layout="@layout/fragment_pdf"
+        android:label="浏览"
+        >
+
+    </fragment>
     <dialog android:id="@+id/problem_dialog"
         android:name="com.tiger.yunda.ui.common.BreakDownListDialogFragment"
         android:label="问题上报"
         tools:layout="@layout/fragment_breakdown_list_dialog_item">
       <!--  <action android:id="@+id/dialog_to_camera" app:destination="@id/inspection_camera"/>-->
     </dialog>
+
 </navigation>

@@ -35,6 +35,11 @@ public class ResourceViewModel extends ViewModel {
 
     private Context context;
 
+    private Integer page = 1;
+    private Integer pageSize = 20;
+
+    private int count = 0;
+
     public ResourceViewModel(Context context) {
         mText = new MutableLiveData<>();
         resourceService = MainActivity.retrofitClient.create(ResourceService.class);
@@ -67,6 +72,8 @@ public class ResourceViewModel extends ViewModel {
         Map<String, Object> body = new HashMap<>();
         body.put("page", pageNo);
         body.put("limit", pageSize);//createTime
+        page = pageNo;
+        pageSize = pageSize;
         if (StringUtils.isNotBlank(search)) {
             body.put("search", search);
         } else {
@@ -78,6 +85,7 @@ public class ResourceViewModel extends ViewModel {
             public void onResponse(Call<PageResult<OperationResource>> call, Response<PageResult<OperationResource>> response) {
                 if (response.isSuccessful()) {
                     PageResult<OperationResource> resourceList = response.body();
+                    count = resourceList.getCount();
                     mText.setValue(resourceList.getData());
                 } else {
                     String errStr = null;
@@ -99,6 +107,12 @@ public class ResourceViewModel extends ViewModel {
 
         return mText;
 
+    }
+
+    public void queryNext() {
+        if (page * pageSize <= count) {
+
+        }
     }
 
 }

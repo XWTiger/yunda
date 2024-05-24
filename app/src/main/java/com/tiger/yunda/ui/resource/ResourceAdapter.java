@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
@@ -37,12 +40,14 @@ public class ResourceAdapter extends ArrayAdapter<OperationResource> implements 
 
     private ResourceLocationDao resourceLocationDao;
     private Context context;
+    private NavController navController;
 
-    public ResourceAdapter(@NonNull Context context, int resource,  @NonNull List<OperationResource> objects) {
+    public ResourceAdapter(@NonNull Context context, int resource, @NonNull List<OperationResource> objects, NavController navController) {
         super(context, resource, objects);
         operationResources = objects;
         this.context = context;
         resourceLocationDao = MainActivity.appDatabase.resourceLocationDao();
+        this.navController = navController;
     }
 
     public List<OperationResource> getOperationResources() {
@@ -76,8 +81,8 @@ public class ResourceAdapter extends ArrayAdapter<OperationResource> implements 
     public void onClick(View v) {
         Integer position = (Integer) v.getTag();
         OperationResource operationResource = operationResources.get(position);
-        ResourceLocationEntity rle = resourceLocationDao.getById(operationResource.getId());
-        if (Objects.isNull(rle)) {
+       /* ResourceLocationEntity rle = resourceLocationDao.getById(operationResource.getId());*/
+       /* if (Objects.isNull(rle)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("系统提示")
                     .setMessage("本地没有相关文档确定要下载吗？")
@@ -101,13 +106,22 @@ public class ResourceAdapter extends ArrayAdapter<OperationResource> implements 
                         }
                     })
                     .show();
-        } else {
+        } else {*/
 
-            Intent intent1 = OpenFileUtil.openFile(context, URLDecoder.decode(rle.getLocation()));;
+           /* Intent intent1 = OpenFileUtil.openFile(context, URLDecoder.decode(rle.getLocation()));;
             if (Objects.nonNull(intent1)) {
                 context.startActivity(intent1);
-            }
+            }*/
+      /*  }*/
+        if (".pdf".equals(operationResource.getExt())) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(PDFFragment.PDF_URL, operationResource.getFilePath());
+            navController.navigate(R.id.to_pdf_view, bundle);
+        } else {
+            Toast.makeText(context, "暂不支持除pdf以外的格式", Toast.LENGTH_SHORT).show();
         }
+
+
 
     }
 
