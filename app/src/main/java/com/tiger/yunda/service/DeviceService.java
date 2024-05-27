@@ -1,5 +1,7 @@
 package com.tiger.yunda.service;
 
+import com.tiger.yunda.data.ResetPassword;
+
 import java.util.Map;
 
 import okhttp3.ResponseBody;
@@ -11,13 +13,17 @@ public interface DeviceService {
 
     /**
      * 绑定设备
+     *
      * @param body
      * @return
      */
     @POST("/api/Pad/BindDevice")
-    Call<ResponseBody> bindMac(@Body  Map<String, String> body);
+    Call<ResponseBody> bindMac(@Body Map<String, String> body);
 
 
     @POST("/api/Pad/UnbindDevice")
-    Call<ResponseBody> unbindMac(@Body  Map<String, String> body);
+    Call<ResponseBody> unbindMac(@Body Map<String, String> body);
+
+    @POST("api/User/UpdatePassword")
+    Call<ResponseBody> updatePassword(@Body ResetPassword body);
 }

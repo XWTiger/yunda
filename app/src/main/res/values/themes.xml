@@ -21,9 +21,9 @@
 
 
     <style name="Theme.Yunda.Pendding"  parent="Theme.Yunda" >
-      <!--  <item name="android:windowBackground">@drawable/login_ico </item>
+        <item name="android:windowBackground">@drawable/splash </item>
         <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowFullscreen">false</item>-->
+        <item name="android:windowFullscreen">false</item>
         <item name="background">@drawable/ic_yunda </item>
     </style>
 

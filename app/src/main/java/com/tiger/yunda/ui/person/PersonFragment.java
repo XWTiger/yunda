@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,13 +19,18 @@ import androidx.fragment.app.Fragment;
 
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.dao.UserLoginInfoDao;
+import com.tiger.yunda.data.ResetPassword;
 import com.tiger.yunda.data.model.ErrorResult;
+import com.tiger.yunda.data.model.PageResult;
+import com.tiger.yunda.data.model.WorkLog;
 import com.tiger.yunda.databinding.FragmentPersonBinding;
 import com.tiger.yunda.entity.UserLoginInfo;
 import com.tiger.yunda.internet.AuthInterceptor;
 import com.tiger.yunda.service.DeviceService;
 import com.tiger.yunda.ui.login.LoginActivity;
 import com.tiger.yunda.utils.JsonUtil;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -117,6 +123,8 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
         fragmentPersonBinding.button2.setOnClickListener(this);
         fragmentPersonBinding.logout.setTag(TAG_LOGOUT);
         fragmentPersonBinding.logout.setOnClickListener(this);
+        fragmentPersonBinding.ok.setTag(TAG_RESET_OK);
+        fragmentPersonBinding.ok.setOnClickListener(this);
         return fragmentPersonBinding.getRoot();
     }
 
@@ -139,6 +147,66 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
 
         if (TAG_RESET_OK.equals(tag)) {
             //重置密码提交
+            String old = fragmentPersonBinding.oldPassword.getText().toString();
+            if (StringUtils.isBlank(old)) {
+                fragmentPersonBinding.oldPassword.setError("密码不能为空");
+                return;
+            } else {
+                fragmentPersonBinding.oldPassword.setError(null);
+            }
+
+            String newP = fragmentPersonBinding.newPassword.getText().toString();
+            if (StringUtils.isBlank(newP)) {
+                fragmentPersonBinding.newPassword.setError("密码不能为空");
+                return;
+            } else {
+                fragmentPersonBinding.newPassword.setError(null);
+            }
+
+            String newPa = fragmentPersonBinding.newPassword.getText().toString();
+            if (StringUtils.isBlank(newPa)) {
+                fragmentPersonBinding.newPasswordAgain.setError("密码不能为空");
+                return;
+            } else {
+                fragmentPersonBinding.newPasswordAgain.setError(null);
+            }
+            if (!newP.equals(newPa)) {
+                fragmentPersonBinding.newPasswordAgain.setError("两次新密码不一致");
+            } else {
+                fragmentPersonBinding.newPasswordAgain.setError(null);
+            }
+            ResetPassword resetPassword = ResetPassword.builder()
+                    .id(Integer.parseInt(MainActivity.loggedInUser.getUserId()))
+                    .newPwd(newPa)
+                    .oldPwd(old)
+                    .build();
+            Call<ResponseBody> responseBodyCall = deviceService.updatePassword(resetPassword);
+            responseBodyCall.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(getContext(), "修改密码成功", Toast.LENGTH_SHORT).show();
+                        fragmentPersonBinding.oldPasswordLayout.setVisibility(View.GONE);
+                        fragmentPersonBinding.passwordLayout.setVisibility(View.GONE);
+                        fragmentPersonBinding.newPasswordLayout.setVisibility(View.GONE);
+                        fragmentPersonBinding.ok.setVisibility(View.GONE);
+                    } else {
+                        String errStr = null;
+                        try {
+                            errStr = response.errorBody().string();
+                            Log.e("xiaweihu", "修改密码失败: ===========>" + errStr);
+                            ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                    Log.e("xiaweihu", "修改密码失败: ===========>" , throwable);
+                }
+            });
         }
 
         if (TAG_LOGOUT.equals(tag)) {
@@ -147,8 +215,8 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
             String ANDROID_ID = Settings.System.getString(getActivity().getContentResolver(), Settings.System.ANDROID_ID);
 
 
-            if (AuthInterceptor.loginFlag.get() >= 1) {
-                AuthInterceptor.loginFlag.getAndDecrement();
+            if (AuthInterceptor.loginFlag.get() <= 0) {
+                AuthInterceptor.loginFlag.getAndIncrement();
             }
             if (Objects.nonNull(MainActivity.loggedInUser)) {
                 Map<String, String> body = new HashMap<>();
