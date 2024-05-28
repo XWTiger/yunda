@@ -147,7 +147,9 @@ public class RetrofitClient {
     }
 
     public void clearHeaders() {
-        baseInterceptor.getHeaders().clear();
+        if (Objects.nonNull(baseInterceptor.getHeaders())) {
+            baseInterceptor.getHeaders().clear();
+        }
     }
 
 
