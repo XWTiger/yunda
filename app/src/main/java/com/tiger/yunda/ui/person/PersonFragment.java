@@ -1,5 +1,6 @@
 package com.tiger.yunda.ui.person;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,6 +8,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +35,8 @@ import com.tiger.yunda.utils.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -63,6 +67,12 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
     private DeviceService deviceService;
 
     private UserLoginInfoDao userLoginInfoDao;
+    private String androidId;
+
+    private String[] REQUIRED_PERMISSIONS = {
+            Manifest.permission.READ_PHONE_STATE
+    };
+
 
     public PersonFragment() {
         // Required empty public constructor
@@ -91,6 +101,10 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         deviceService = MainActivity.retrofitClient.create(DeviceService.class);
         userLoginInfoDao = MainActivity.appDatabase.userLoginInfoDao();
+        this.requestPermissions(REQUIRED_PERMISSIONS, 10);
+        androidId = Settings.System.getString(getActivity().getContentResolver(), Settings.System.ANDROID_ID);
+
+
     }
 
     @Override
@@ -125,6 +139,7 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
         fragmentPersonBinding.logout.setOnClickListener(this);
         fragmentPersonBinding.ok.setTag(TAG_RESET_OK);
         fragmentPersonBinding.ok.setOnClickListener(this);
+        fragmentPersonBinding.androidId.setText(androidId);
         return fragmentPersonBinding.getRoot();
     }
 
@@ -212,15 +227,13 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
         if (TAG_LOGOUT.equals(tag)) {
             // 解绑设备
             //绑定设备mac 地址
-            String ANDROID_ID = Settings.System.getString(getActivity().getContentResolver(), Settings.System.ANDROID_ID);
-
 
             if (AuthInterceptor.loginFlag.get() <= 0) {
                 AuthInterceptor.loginFlag.getAndIncrement();
             }
             if (Objects.nonNull(MainActivity.loggedInUser)) {
                 Map<String, String> body = new HashMap<>();
-                body.put("mac", ANDROID_ID);
+                body.put("mac", androidId);
                 Call<ResponseBody> call = deviceService.unbindMac(body);
                 call.enqueue(new Callback<ResponseBody>() {
                     @Override

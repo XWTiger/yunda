@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     public static  AppDatabase appDatabase;
 
     private String[] REQUIRED_PERMISSIONS = {
+            Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.MANAGE_EXTERNAL_STORAGE,
