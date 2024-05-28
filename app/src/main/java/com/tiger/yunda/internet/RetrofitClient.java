@@ -36,7 +36,7 @@ public class RetrofitClient {
     private BaseInterceptor baseInterceptor;
 
     //http://ip:port/10.1.8.105:9291
-    private static final String BASE_URL = "http://120.26.110.91:9291";
+    private static final String BASE_URL = "http://10.60.0.190:9291";
 
     //内网环境
     //private static final String BASE_URL = "http://10.1.8.105:9291";
@@ -114,7 +114,7 @@ public class RetrofitClient {
     public static RetrofitClient getInstance(Context context, String url, Map<String, String> headers) {
 
         if (retrofitClient == null) {
-            synchronized (retrofitClient) {
+            synchronized (BASE_URL) {
                 if (context != null) {
                     mContext = context;
                 }

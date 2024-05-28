@@ -231,6 +231,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         if (Objects.nonNull(missionFlag) && missionFlag.get() ==  1) {
             checkUpdate();
+            missionViewModel.updateService();
             missionViewModel.getData(1, 30, null, null, masterMission);
             missionFlag.getAndIncrement();
             if (masterMission) {

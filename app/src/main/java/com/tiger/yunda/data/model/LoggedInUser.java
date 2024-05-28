@@ -42,5 +42,7 @@ public class LoggedInUser implements Serializable {
 
     private String account;
 
+    private String serviceUrl;
+
 
 }

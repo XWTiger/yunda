@@ -333,4 +333,8 @@ public class MissionViewModel extends ViewModel {
     public void setContext(Context context) {
         this.context = context;
     }
+
+    public void updateService() {
+        missionService = MainActivity.retrofitClient.create(MissionService.class);
+    }
 }

@@ -35,6 +35,7 @@ import com.tiger.yunda.data.model.LoggedInUser;
 import com.tiger.yunda.databinding.ActivityMainBinding;
 import com.tiger.yunda.entity.UserLoginInfo;
 import com.tiger.yunda.enums.RoleType;
+import com.tiger.yunda.internet.AuthInterceptor;
 import com.tiger.yunda.internet.RetrofitClient;
 import com.tiger.yunda.service.DeviceService;
 import com.tiger.yunda.ui.home.MissionFragment;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static String TOKEN_FLAG = "login_token";
 
+    public static String SERVICE_ADDR_FLAG = "service_addr";
     private ActivityMainBinding binding;
 
     public static LoggedInUser loggedInUser;
@@ -120,18 +122,24 @@ public class MainActivity extends AppCompatActivity {
             finish();
             return;
         }
+
         if (Objects.isNull(appDatabase)) {
             appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "yunda-database").allowMainThreadQueries().build();
 
         }
 
-        if (Objects.isNull(retrofitClient)) {
-            retrofitClient = RetrofitClient.getInstance(getApplicationContext());
-            retrofitClient.setMainActivity(this);
-        }
+
         //从缓存中获取 token 并放在header
         SharedPreferences sharedPreferences =  getApplicationContext().getSharedPreferences(TOKEN_FLAG, Context.MODE_PRIVATE);
         String token = sharedPreferences.getString(TOKEN_STR_KEY, "");
+        String serviceAddr = sharedPreferences.getString(SERVICE_ADDR_FLAG, "");
+        if (Objects.isNull(retrofitClient) && StringUtils.isNotBlank(serviceAddr)) {
+            retrofitClient = RetrofitClient.getInstance(getApplicationContext(), "http://" + serviceAddr , new HashMap<>());
+            retrofitClient.setMainActivity(this);
+        } else {
+            retrofitClient = RetrofitClient.getInstance(getApplicationContext());
+            retrofitClient.setMainActivity(this);
+        }
         if (StringUtils.isNotBlank(token)) {
             Map<String, String> headers = new HashMap<>();
             headers.put("Authorization", "Bearer " + token);
@@ -153,6 +161,13 @@ public class MainActivity extends AppCompatActivity {
                 loggedInUser.setRoleId(userLoginInfo.getRoleId());
                 loggedInUser.setRoleName(userLoginInfo.getRoleName());
             }
+        }
+
+        if (Objects.isNull(loggedInUser)) {
+            AuthInterceptor.loginFlag.getAndIncrement();
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            this.startActivityForResult(intent, MainActivity.LOGIN_INTENT_RESULT_CODE);
         }
 
 
@@ -190,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -198,11 +214,18 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences sharedPreferences =  getApplicationContext().getSharedPreferences(TOKEN_FLAG, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(TOKEN_STR_KEY, loggedInUser.getToken());
+            editor.apply();
             Log.i("xiaweihu", "login result =============> " + loggedInUser.getDisplayName());
+            retrofitClient = RetrofitClient.getInstance(getApplicationContext(), "http://" + LoginActivity.baseUrl , new HashMap<>());
+            retrofitClient.setMainActivity(this);
             Map<String, String> headers = new HashMap<>();
             headers.put("Authorization", "Bearer " + loggedInUser.getToken());
             MainActivity.retrofitClient.addHeaders(headers);
             DeviceService deviceService = retrofitClient.create(DeviceService.class);
+            if (AuthInterceptor.loginFlag.get() >= 1) {
+                AuthInterceptor.loginFlag.getAndDecrement();
+            }
+            MissionFragment.missionFlag.getAndDecrement();
 
 
             //绑定设备mac 地址
@@ -256,5 +279,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+
 
 }

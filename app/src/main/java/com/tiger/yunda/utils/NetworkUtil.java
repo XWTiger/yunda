@@ -101,7 +101,7 @@ public class NetworkUtil {
                 NetworkInfo networkinfo = connectivity.getActiveNetworkInfo();
                 if (networkinfo != null) {
                     if (networkinfo.isAvailable() && networkinfo.isConnected()) {
-                        if (!connectionNetwork())
+                        if (!connectionNetwork("http://www.baidu.com"))
                             return NET_CNNT_BAIDU_TIMEOUT;
                         else
                             return NET_CNNT_BAIDU_OK;
@@ -121,16 +121,17 @@ public class NetworkUtil {
      *
      * @return
      */
-    static private boolean connectionNetwork() {
+    static public boolean connectionNetwork(String url) {
         boolean result = false;
         HttpURLConnection httpUrl = null;
         try {
-            httpUrl = (HttpURLConnection) new URL("http://www.baidu.com")
+            httpUrl = (HttpURLConnection) new URL(url)
                     .openConnection();
             httpUrl.setConnectTimeout(TIMEOUT);
             httpUrl.connect();
             result = true;
         } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             if (null != httpUrl) {
                 httpUrl.disconnect();

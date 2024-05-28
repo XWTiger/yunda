@@ -10,8 +10,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -20,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -56,8 +59,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -71,6 +78,10 @@ public class LoginActivity extends AppCompatActivity {
     private LoginService loginService;
 
     public static String LOGIN_RESULT_KEY = "loginResult";
+
+    public static RetrofitClient retrofitClient;
+
+    public static String baseUrl = "";
     private String[] REQUIRED_PERMISSIONS = {
             android.Manifest.permission.CAMERA,
             android.Manifest.permission.RECORD_AUDIO,
@@ -98,6 +109,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
+        String androidId = Settings.System.getString(getContentResolver(), Settings.System.ANDROID_ID);
         if (Objects.isNull(loginService)) {
             loginService = MainActivity.retrofitClient.create(LoginService.class);
         }
@@ -111,8 +123,15 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }*/
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        binding.deviceId.setText(androidId);
         setContentView(binding.getRoot());
-
+        SharedPreferences addSp =  getApplicationContext().getSharedPreferences(MainActivity.TOKEN_FLAG, Context.MODE_PRIVATE);
+        String serviceAddr = addSp.getString(MainActivity.SERVICE_ADDR_FLAG, "");
+        if (StringUtils.isNotBlank(serviceAddr)) {
+            binding.serviceAddr.setText(serviceAddr);
+        } else {
+            binding.serviceAddr.setText("10.60.0.190:9291");
+        }
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
@@ -198,6 +217,39 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String url = "http://" + binding.serviceAddr.getText().toString() + "/hub/Notification/negotiate?negotiateVersion=1";
+                CountDownLatch countDownLatch = new CountDownLatch(1);
+                AtomicBoolean flag = new AtomicBoolean(false);
+                MainActivity.threadPoolExecutor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!NetworkUtil.connectionNetwork(url)) {
+                            flag.set(false);
+                        } else {
+                            flag.set(true);
+                        }
+                        countDownLatch.countDown();
+                    }
+                });
+                try {
+                    countDownLatch.await();
+                    if (!flag.get()) {
+                        binding.serviceAddr.setError("服务器无法连接");
+                        binding.serviceAddr.setFocusedByDefault(true);
+                        Toast.makeText(getApplicationContext(), "服务器无法连接", Toast.LENGTH_SHORT).show();
+                        return;
+                    } else {
+                        binding.serviceAddr.setError(null);
+                        baseUrl = binding.serviceAddr.getText().toString();
+                    }
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                retrofitClient = RetrofitClient.getInstance(getApplicationContext(), "http://" + binding.serviceAddr.getText().toString(), new HashMap<>());
+                SharedPreferences sharedPreferences =  getApplicationContext().getSharedPreferences(MainActivity.TOKEN_FLAG, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(MainActivity.SERVICE_ADDR_FLAG, binding.serviceAddr.getText().toString());
+                editor.apply();
                 loadingProgressBar.setVisibility(View.VISIBLE);
                 loginViewModel.login(usernameEditText.getText().toString(),
                         passwordEditText.getText().toString());

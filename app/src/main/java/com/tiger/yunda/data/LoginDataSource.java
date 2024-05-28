@@ -34,11 +34,12 @@ public class LoginDataSource extends Thread {
     private LoggedInUser fakeUser;
     public Result<LoggedInUser> login(String username, String password) {
 
+
         try {
             LoginDataSource lds = new LoginDataSource();
             lds.setUsername(username);
             lds.setPassword(password);
-            lds.setLoginService(MainActivity.retrofitClient.create(LoginService.class));
+            lds.setLoginService(LoginActivity.retrofitClient.create(LoginService.class));
             Thread thread = lds;
 
             thread.start();
