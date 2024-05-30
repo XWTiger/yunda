@@ -117,11 +117,9 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
 
         //查询任务
         if (getArguments() != null) {
-            if (Objects.isNull(mission)) {
-                Mission tmeMission = (Mission) getArguments().getSerializable(ListViewAdapter.MISSION_KEY);
-                if (Objects.nonNull(tmeMission)) {
-                    mission = tmeMission;
-                }
+            Mission tmeMission = (Mission) getArguments().getSerializable(ListViewAdapter.MISSION_KEY);
+            if (Objects.nonNull(tmeMission)) {
+                mission = tmeMission;
             }
             queryMissionDetail(mission.getId());
         }

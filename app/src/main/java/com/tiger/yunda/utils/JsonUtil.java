@@ -4,6 +4,9 @@ import android.content.Context;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.view.Gravity;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -11,12 +14,24 @@ import com.google.gson.GsonBuilder;
 import com.tiger.yunda.R;
 import com.tiger.yunda.data.model.ErrorResult;
 
+import java.util.Objects;
+
 public class JsonUtil {
 
     public static ErrorResult getObject(String errMsg, Context context) {
         Gson gson = new GsonBuilder().create();
         ErrorResult errorResult = gson.fromJson(errMsg, ErrorResult.class);
-        Toast.makeText(context, errorResult.getTitle(), Toast.LENGTH_SHORT).show();
+        if (Objects.nonNull(errorResult)) {
+            Toast toast = Toast.makeText(context, errorResult.getTitle(), Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0); //居中显示
+            LinearLayout linearLayout = (LinearLayout) toast.getView();
+            if (Objects.nonNull(linearLayout)) {
+                TextView messageTextView = (TextView) linearLayout.getChildAt(0);
+                messageTextView.setTextSize(18);//设置toast字体大小
+            }
+            toast.show();
+        }
+
         return errorResult;
     }
 

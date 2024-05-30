@@ -58,9 +58,11 @@ public class MissionViewModel extends ViewModel {
     }
 
     public LiveData<MissionResult> getData(int page, int pageSize, String startTime, String endTime, Boolean masterMission) {
-        if (Objects.isNull(missionService)) {
+        if (Objects.isNull(missionService) && MissionFragment.missionFlag.get() == 0) {
             resultMutableLiveData.setValue(new MissionResult(0, new ArrayList<>()));
             return resultMutableLiveData;
+        } else {
+            missionService = MainActivity.retrofitClient.create(MissionService.class);
         }
 
 

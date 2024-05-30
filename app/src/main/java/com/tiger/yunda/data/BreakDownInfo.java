@@ -79,8 +79,10 @@ public class BreakDownInfo {
                 bodyMap.put("Files\"; filename=\"" + cameraContentBean.getFilename(), requestFile);
             }
             if (cameraContentBean.getType() == CameraFileType.VIDEO) {
-                Uri uri = Uri.parse(cameraContentBean.getUri());
-                File file = FileUtil.uri2File(uri, context);
+                File file = null;
+                file = new File(cameraContentBean.getUri());
+                //Uri uri = Uri.parse(cameraContentBean.getUri());
+                //File file = FileUtil.uri2File(uri, context);
                 RequestBody requestFile = RequestBody.create(MediaType.parse("video/mp4"), file);
                 //注意：file就是与服务器对应的key,后面filename是服务器得到的文件名
                 bodyMap.put("Files\"; filename=\"" + cameraContentBean.getFilename(), requestFile);

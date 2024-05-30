@@ -37,7 +37,14 @@ public class FileUtil {
     }
 
 
-    public static File uri2File(Uri uri, Context context) {
+    /**
+     * vie
+     * @param uri
+     * @param context
+     * @param video
+     * @return
+     */
+    public static File uri2File(Uri uri, Context context, boolean video) {
         context.getFilesDir();
         ContentResolver contentResolver = context.getContentResolver();
         String img_path;
@@ -48,11 +55,8 @@ public class FileUtil {
         if (actualimagecursor == null) {
             img_path = uri.getPath();
         } else {
-            int actual_image_column_index = actualimagecursor
-                    .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            int idIndex = actualimagecursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
+
             int mimeTypeIndex = actualimagecursor.getColumnIndexOrThrow(MediaStore.Images.Media.MIME_TYPE);
-            int displayNameIndex = actualimagecursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME);
             actualimagecursor.moveToFirst();
             img_path = actualimagecursor
                     .getString(mimeTypeIndex);
