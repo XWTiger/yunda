@@ -70,7 +70,7 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
     // TODO: Customize parameters
     private static Mission mission;
 
-    private static BreakDownInfo breakDownInfo;
+    public static BreakDownInfo breakDownInfo;
 
     private InspectionService inspectionService;
 
@@ -164,6 +164,7 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
                 breakDownInfo.setSubtaskId(mission.getId());
             }
             if (Objects.nonNull(contentBeans) && contentBeans.size() > 0) {
+                breakDownInfo.setTypePosition(contentBeans.get(0).getBreakTypePosition());
                 contentBeans.forEach(cameraContentBean -> {
                     if (cameraContentBean.isProblem()) {
                         files.add(cameraContentBean);

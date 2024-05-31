@@ -19,11 +19,30 @@ public class CameraContentBean implements Serializable {
     private String filename;
 
 
+
+    private int breakTypePosition;
+
+    public CameraContentBean(CameraFileType type,  String uri, boolean problem, String filename, int breakTypePosition) {
+        this.type = type;
+        this.problem = problem;
+        this.uri = uri;
+        this.filename = filename;
+        this.breakTypePosition = breakTypePosition;
+    }
+
     public CameraContentBean(CameraFileType type, String uri, boolean problem, String filename) {
         this.type = type;
         this.uri = uri;
         this.problem = problem;
         this.filename = filename;
+    }
+
+    public int getBreakTypePosition() {
+        return breakTypePosition;
+    }
+
+    public void setBreakTypePosition(int breakTypePosition) {
+        this.breakTypePosition = breakTypePosition;
     }
 
     public CameraFileType getType() {

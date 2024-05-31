@@ -89,6 +89,8 @@ public class CameraFragment extends Fragment {
 
     private String recordType;
 
+    private int breakTypePosition;
+
 
 
     ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
@@ -144,7 +146,10 @@ public class CameraFragment extends Fragment {
             startCamera();
         }
         Bundle bundle = getArguments();
-        recordType = (String) bundle.get("type");
+        String recordContent = (String) bundle.get("type");
+        String[] flag = recordContent.split("_");
+        recordType = flag[0];
+        breakTypePosition = Integer.parseInt(flag[1]);
         cameraExecutor = Executors.newFixedThreadPool(2);
         return fragmentCameraBinding.getRoot();
     }
@@ -360,7 +365,7 @@ public class CameraFragment extends Fragment {
                         Log.d("tiger", msg);
                         String content = FileUtil.getFileStr(output.getSavedUri(), getContext());
                         String imagePath = String.format("%s/%s", Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES).toPath() + "/Yunda/", content);
-                        CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.IMAGE,  imagePath, "1".equals(recordType), content);
+                        CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.IMAGE,  imagePath, "1".equals(recordType), content, breakTypePosition);
                         contentBeans.add(cameraContentBean);
                         viewholder.setExitButtonEnable(true);
                     }
@@ -395,7 +400,7 @@ public class CameraFragment extends Fragment {
                             Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
                             String content = FileUtil.getFileStr(((VideoRecordEvent.Finalize) videoRecordEvent).getOutputResults().getOutputUri(), getContext());
                             String imagePath = String.format("%s/%s", Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES).toPath() + "/Yunda/", content);
-                            CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, imagePath, "1".equals(recordType), content);
+                            CameraContentBean cameraContentBean = new CameraContentBean(CameraFileType.VIDEO, imagePath, "1".equals(recordType), content, breakTypePosition);
                             this.contentBeans.add(cameraContentBean);
                             viewholder.setExitButtonEnable(true);
                         } else {

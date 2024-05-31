@@ -82,6 +82,8 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     public static Boolean masterMission = false;
 
+    public static String needUpdatePath = null;
+
 
 
     @Override
@@ -387,6 +389,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         info = manager.getPackageInfo(getActivity().getPackageName(), 0);
                         long versionCode = info.getLongVersionCode();
                         if (versionCode < Long.parseLong(version.getVersionNumber())) {
+                            needUpdatePath = version.getFilePath();
                             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                             builder.setTitle("更新")
                                     .setMessage("当前版本：" +info.versionName + "\n存在新版本: " + version.getVersionNo())

@@ -29,6 +29,7 @@ import com.tiger.yunda.databinding.FragmentPersonBinding;
 import com.tiger.yunda.entity.UserLoginInfo;
 import com.tiger.yunda.internet.AuthInterceptor;
 import com.tiger.yunda.service.DeviceService;
+import com.tiger.yunda.ui.home.MissionFragment;
 import com.tiger.yunda.ui.login.LoginActivity;
 import com.tiger.yunda.utils.JsonUtil;
 
@@ -132,6 +133,9 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
             fragmentPersonBinding.systemVersion.setText(version);
         } catch (PackageManager.NameNotFoundException e) {
            e.printStackTrace();
+        }
+        if (StringUtils.isNotBlank(MissionFragment.needUpdatePath)) {
+            fragmentPersonBinding.buttonUpdate.setVisibility(View.VISIBLE);
         }
         fragmentPersonBinding.button2.setTag(TAG_RESET);
         fragmentPersonBinding.button2.setOnClickListener(this);

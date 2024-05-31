@@ -32,6 +32,16 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:text="@string/system_version" />
+
+        <Button
+            android:id="@+id/button_update"
+            android:layout_width="70dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="40dp"
+            android:background="@drawable/button_corner_radius"
+            android:text="更新"
+            android:textColor="@color/white"
+            android:visibility="gone" />
     </LinearLayout>
     <LinearLayout
         android:layout_marginTop="20dp"

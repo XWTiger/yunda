@@ -46,6 +46,7 @@ import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.databinding.FragmentBreakdownListDialogItemBinding;
 import com.tiger.yunda.enums.CameraFileType;
 import com.tiger.yunda.service.InspectionService;
+import com.tiger.yunda.ui.home.inspection.InspectionFragment;
 import com.tiger.yunda.utils.FileUtil;
 import com.tiger.yunda.utils.JsonUtil;
 
@@ -142,6 +143,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                 public void onChanged(List<BreakDownType> breakTypes) {
                     spinnerAdapter = new SpinnerAdapter(breakTypes, context);
                     binding.problemCatalogSelect.setAdapter(spinnerAdapter);
+                    binding.problemCatalogSelect.setSelection(breakDownInfo.getTypePosition());
                     breakDownTypes = breakTypes;
                 }
             });
@@ -150,7 +152,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
         binding.progressBar.setVisibility(View.GONE);
 
         binding.problemCatalogSelect.setOnItemSelectedListener(this);
-
+        Objects.requireNonNull(getDialog()).setCanceledOnTouchOutside(false);
         ViewHolder viewHolder = new ViewHolder(this);
         pickMultipleMedia =
                 registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(4), uris -> {
@@ -218,7 +220,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
         private LinearLayout problemRecoverLayout;
 
 
-
+        private Button cancel;
         BreakDownListDialogFragment breakDownListDialogFragment;
 
         private List<CameraContentBean> removeProblem = new ArrayList<>();
@@ -245,7 +247,9 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
             addRecoverButton = binding.imageButton2; //添加恢复视频或照片
             addRecoverButton.setTag("recover_problem");
             addRecoverButton.setOnClickListener(this);
-
+            cancel = binding.inspectionCancle;
+            cancel.setTag("cancel");
+            cancel.setOnClickListener(this);
             this.breakDownListDialogFragment = breakDownListDialogFragment;
             recoverLayout = binding.recoverLayout;
             problemRecoverLayout = binding.problemRecoverVedio;
@@ -257,10 +261,12 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
             } else {
                 //回显样式
                 if (Objects.nonNull(breakDownInfo.getTypePosition()) ) {
-                    if (Objects.nonNull(spinnerAdapter)) {
+                   /* type.setAdapter(spinnerAdapter);*/
+                    type.setSelection(breakDownInfo.getTypePosition());
+                  /*  if (Objects.nonNull(spinnerAdapter)) {
                         spinnerAdapter.notifyDataSetChanged();
-                    }
-                    type.setSelection(breakDownInfo.getTypePosition(), true);
+                    }*/
+
                 }
                 if (Objects.nonNull(breakDownInfo.getDesc()) && breakDownInfo.getDesc() != "") {
                     problemDesc.setText(breakDownInfo.getDesc());
@@ -274,6 +280,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                         Chip chip =  (Chip) LayoutInflater.from(context).inflate(R.layout.chip_file, null);;
                         chip.setText("故障." + (s.getType().equals(CameraFileType.IMAGE)?"jpg":"mp4"));
                         chip.setTag("problem_" + position.get());
+                        chip.setOnClickListener(this);
                         chipGroup.addView(chip);
                         position.getAndIncrement();
                     });
@@ -289,6 +296,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                             Chip chip = (Chip) LayoutInflater.from(context).inflate(R.layout.chip_file, null);;
                             chip.setText("恢复." + (s.getType().equals(CameraFileType.IMAGE)?"jpg":"mp4"));
                             chip.setTag("recover_" + position.get());
+                            chip.setOnClickListener(this);
                             recoverChipGroup.addView(chip);
                             position.getAndIncrement();
                         });
@@ -352,7 +360,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                                             breakDownListDialogFragment.dismiss();
                                         }
                                         Bundle bundle = new Bundle();
-                                        bundle.putString("type", "1");
+                                        bundle.putString("type", "1_" + type.getSelectedItemPosition());
                                         NavHostFragment.findNavController(breakDownListDialogFragment).navigate(R.id.dialog_to_camera, bundle);
                                         dialog.dismiss();
                                     }
@@ -388,7 +396,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                                             breakDownListDialogFragment.dismiss();
                                         }
                                         Bundle bundle = new Bundle();
-                                        bundle.putString("type", "0");
+                                        bundle.putString("type", "0_" + type.getSelectedItemPosition());
                                         NavHostFragment.findNavController(breakDownListDialogFragment).navigate(R.id.dialog_to_camera, bundle);
                                         dialog.dismiss();
                                     }
@@ -436,6 +444,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                                 if (response.isSuccessful()) {
                                     Toast.makeText(context, "创建故障成功", Toast.LENGTH_SHORT).show();
                                     breakDownInfo.clear();
+                                    InspectionFragment.breakDownInfo = null;
                                     dismiss();
                                 } else {
                                     try {
@@ -458,6 +467,11 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                             }
                         });
 
+                        break;
+                    case "cancel":
+                        breakDownInfo.clear();
+                        dismiss();
+                        InspectionFragment.breakDownInfo = null;
                         break;
                     default: //文件chip 选择
                         if (tag.startsWith("problem_")) { //删除故障图片或视频
