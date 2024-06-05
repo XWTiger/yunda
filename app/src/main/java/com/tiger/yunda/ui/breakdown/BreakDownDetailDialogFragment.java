@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -99,13 +100,27 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
             attachments.forEach(attachment -> {
                 Uri uri = Uri.parse(attachment.getUrl());
                 ImageView imageView = new ImageView(getContext());
+
                 ViewGroup.LayoutParams params  = new ViewGroup.LayoutParams(300, 300);
                 imageView.setLayoutParams(params);
                 if (".mp4".equals(attachment.getExt())) {
                     imageView.setTag("video_" + index.get() );
+                  /*  ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) params;
+                    marginParams.height = 32;
+                    marginParams.width = 32;
+                    marginParams.leftMargin = 134;
+
+                    ImageButton imageButton = new ImageButton(getContext());
+                    imageButton.setLayoutParams(marginParams);
+                    imageButton.setTag("video_" + index.get());
+                    imageButton.setOnClickListener(this);
+                    imageButton.setImageResource(R.drawable.ic_video_play);*/
+
                 } else {
                     imageView.setTag("img_" + index.get());
                 }
+
+                imageView.setTooltipText("点击查看详情");
                 imageView.setOnClickListener(this);
                 binding.contentLayout.addView(imageView);
                 Glide.with(this).load(uri).into(imageView);
@@ -202,7 +217,7 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                 Bundle vbundle = new Bundle();
                 vbundle.putString(VideoFragment.VIDEO_URL_FLAG, breakRecordGlobal.getAttachments().get(Integer.parseInt(array[1])).getUrl());
                 vbundle.putString(VideoFragment.VIDEO_TITLE, "故障视频");
-                navHostController.navigate(R.id.to_video_view);
+                navHostController.navigate(R.id.to_video_view, vbundle);
                 break;
             case "img":
                 Bundle bundle = new Bundle();
