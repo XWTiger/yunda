@@ -14,7 +14,7 @@
         android:color = "@color/green"
         >
         <action android:id="@+id/to_accept_mission" app:destination="@id/deliver_mission"/>
-        <action android:id="@+id/to_inspection_mission" app:destination="@id/inspection_mission"/>
+        <action android:id="@+id/to_inspection_mission" app:destination="@id/inspection_mission" app:popUpToInclusive="true"/>
         <action android:id="@+id/to_create_mission" app:destination="@id/create_mission"/>
     </fragment>
 
@@ -22,7 +22,10 @@
         android:id="@+id/navigation_breakdown"
         android:name="com.tiger.yunda.ui.breakdown.BreakDownFragment"
         android:label="@string/title_breakdown"
-        tools:layout="@layout/fragment_break_down" />
+        tools:layout="@layout/fragment_break_down" >
+
+            <action android:id="@+id/to_dialog" app:popUpToInclusive="true" app:destination="@id/break_record_dia"/>
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_log"
@@ -91,11 +94,30 @@
         >
 
     </fragment>
+
+    <fragment android:id="@+id/video_view"
+        android:name="com.tiger.yunda.ui.breakdown.VideoFragment"
+        android:label="视频"
+        >
+    </fragment>
+    <fragment android:id="@+id/image_view"
+        android:name="com.tiger.yunda.ui.breakdown.ImageFragment"
+        android:label="视频"
+        >
+    </fragment>
+
     <dialog android:id="@+id/problem_dialog"
         android:name="com.tiger.yunda.ui.common.BreakDownListDialogFragment"
         android:label="问题上报"
         tools:layout="@layout/fragment_breakdown_list_dialog_item">
       <!--  <action android:id="@+id/dialog_to_camera" app:destination="@id/inspection_camera"/>-->
     </dialog>
+    <fragment android:id="@+id/break_record_dia"
+        android:name="com.tiger.yunda.ui.breakdown.BreakDownDetailDialogFragment"
+        android:label="故障详情"
+        >
+        <action android:id="@+id/to_video_view" app:popUpToInclusive="true" app:destination="@id/video_view"/>
+        <action android:id="@+id/to_img_view" app:popUpToInclusive="true" app:destination="@id/image_view"/>
+    </fragment>
 
 </navigation>

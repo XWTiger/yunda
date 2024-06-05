@@ -1,6 +1,7 @@
 package com.tiger.yunda.ui.breakdown;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +11,11 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.tiger.yunda.R;
 import com.tiger.yunda.data.model.BreakRecord;
 import com.tiger.yunda.databinding.BreakdownRecordeListBinding;
 
@@ -27,9 +31,12 @@ public class BreakDownListAdapter extends ArrayAdapter<BreakRecord> {
 
     private FragmentManager manager;
 
-    public BreakDownListAdapter(@NonNull Context context, int resource, @NonNull List<BreakRecord> objects, FragmentManager fragmentManager) {
+    private NavController navController;
+
+    public BreakDownListAdapter(@NonNull Context context, int resource, @NonNull List<BreakRecord> objects, FragmentManager fragmentManager, NavController nav) {
         super(context, resource, objects);
         this.breakRecords = objects;
+        this.navController = nav;
         manager = fragmentManager;
 
     }
@@ -42,7 +49,7 @@ public class BreakDownListAdapter extends ArrayAdapter<BreakRecord> {
             breakdownRecordeListBinding = BreakdownRecordeListBinding.inflate(LayoutInflater.from(getContext()), parent, false);
             breakdownRecordeListBinding.setRecord(breakRecords.get(position));
             convertView = breakdownRecordeListBinding.getRoot();
-            ViewHolder viewHolder = new ViewHolder(convertView, breakRecords.get(position), manager);
+            ViewHolder viewHolder = new ViewHolder(convertView, breakRecords.get(position), manager, navController);
             viewHolder.setDetailBtn(breakdownRecordeListBinding.problemDetailButton);
             breakdownRecordeListBinding.problemDetailButton.setTag(breakRecords.get(position).getId());
 
@@ -65,10 +72,12 @@ public class BreakDownListAdapter extends ArrayAdapter<BreakRecord> {
         private Button detailBtn;
         private BreakRecord breakRecord;
         private FragmentManager manager;
-        public ViewHolder(@NonNull View itemView, BreakRecord breakRecord, FragmentManager manager) {
+        private NavController navController;
+        public ViewHolder(@NonNull View itemView, BreakRecord breakRecord, FragmentManager manager, NavController navController) {
             super(itemView);
             this.breakRecord = breakRecord;
             this.manager = manager;
+            this.navController = navController;
         }
 
         public Button getDetailBtn() {
@@ -82,7 +91,10 @@ public class BreakDownListAdapter extends ArrayAdapter<BreakRecord> {
 
         @Override
         public void onClick(View view) {
-            BreakDownDetailDialogFragment.newInstance(breakRecord).show(manager, "breakdown2");
+            Bundle args = new Bundle();
+            args.putSerializable(BreakDownDetailDialogFragment.ARG_ITEM_DETAIL, breakRecord);
+            navController.navigate(R.id.break_record_dia, args);
+           // BreakDownDetailDialogFragment.newInstance(breakRecord).show(manager, "breakdown2");
         }
     }
 

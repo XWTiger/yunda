@@ -172,15 +172,18 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
                         handleFiles.add(cameraContentBean);
                     }
                 });
-                if (Objects.nonNull(breakDownInfo) && !CollectionUtil.isEmpty(breakDownInfo.getFiles())) {
-                    breakDownInfo.getFiles().addAll(files);
+                if (contentBeans.get(0).isProblem()) {
+                    if (Objects.nonNull(breakDownInfo) && !CollectionUtil.isEmpty(breakDownInfo.getFiles())) {
+                        breakDownInfo.getFiles().addAll(files);
+                    } else {
+                        breakDownInfo.setFiles(files);
+                    }
                 } else {
-                    breakDownInfo.setFiles(files);
-                }
-                if (Objects.nonNull(breakDownInfo) && !CollectionUtil.isEmpty(breakDownInfo.getHandleFiles())) {
-                    breakDownInfo.getHandleFiles().addAll(handleFiles);
-                } else {
-                    breakDownInfo.setHandleFiles(handleFiles);
+                    if (Objects.nonNull(breakDownInfo) && !CollectionUtil.isEmpty(breakDownInfo.getHandleFiles())) {
+                        breakDownInfo.getHandleFiles().addAll(handleFiles);
+                    } else {
+                        breakDownInfo.setHandleFiles(handleFiles);
+                    }
                 }
                 breakDownInfo.setSubtaskId(mission.getId());
                 breakDownInfo.setTrainLocationId(locationId);

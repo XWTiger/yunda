@@ -436,7 +436,9 @@ public class CameraFragment extends Fragment {
         super.onDestroy();
         imageCapture = null;
         videoCapture = null;
-        cameraExecutor.shutdown();
+        if (Objects.nonNull(cameraExecutor)) {
+            cameraExecutor.shutdown();
+        }
     }
 
     public List<CameraContentBean> getContentBeans() {

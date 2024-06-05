@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.loper7.date_time_picker.DateTimeConfig;
 import com.loper7.date_time_picker.dialog.CardDatePickerDialog;
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
@@ -30,6 +31,7 @@ import com.tiger.yunda.databinding.LogListBinding;
 import com.tiger.yunda.utils.CollectionUtil;
 import com.tiger.yunda.utils.TimeUtil;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -129,7 +131,7 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
             });
             fragmentLogBinding.freshList.setOnRefreshListener(this);
             swipeRefreshLayout = fragmentLogBinding.freshList;
-            ViewHolder viewHolder = new ViewHolder(fragmentLogBinding.imageButton3,fragmentLogBinding.imageButton, getContext(), fragmentLogBinding.selectStartTime, fragmentLogBinding.selectEndTime, logViewModel);
+            ViewHolder viewHolder = new ViewHolder(fragmentLogBinding.imageButton3, getContext(), fragmentLogBinding.selectStartTime,  logViewModel);
         }
         // Inflate the layout for this fragment
         return fragmentLogBinding.getRoot();
@@ -160,15 +162,14 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
         public static final String TIME_ACTION_START = "start";
         public static final String TIME_ACTION_END = "end";
 
-        public ViewHolder(ImageButton startTimeBtn, ImageButton endTimeBtn, Context context, TextView startTextTime , TextView endTextTime, LogViewModel logViewModel) {
+        public ViewHolder(ImageButton startTimeBtn, Context context, TextView startTextTime , LogViewModel logViewModel) {
             this.startTimeBtn = startTimeBtn;
-            this.endTimeBtn = endTimeBtn;
+
             startTimeBtn.setOnClickListener(this);
             startTimeBtn.setTag(TIME_ACTION_START);
-            endTimeBtn.setOnClickListener(this);
-            endTimeBtn.setTag(TIME_ACTION_END);
+
             this.startTextTime = startTextTime;
-            this.endTextTime = endTextTime;
+            //this.endTextTime = endTextTime;
             this.context = context;
             this.logViewModel = logViewModel;
 
@@ -182,11 +183,18 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                 new CardDatePickerDialog.Builder(context)
                         .setTitle("请选择开始时间")
                         .setLabelText("年","月","日","时","分", "秒")
+                        .setDisplayType(Arrays.asList(
+                                DateTimeConfig.YEAR,//显示年
+                                DateTimeConfig.MONTH,//显示月
+                                DateTimeConfig.DAY,//显示日
+                                DateTimeConfig.HOUR,//显示时
+                                DateTimeConfig.MIN))//显示分
                         .setOnChoose("选择", aLong -> {
                             //aLong  = millisecond
                             Date start = new Date(aLong);
-                            startTime = start;
+                            startTime = TimeUtil.getStartOfDay(start);
                             startTextTime.setText(TimeUtil.getDateYmdFromMs(start));
+                            endTime = TimeUtil.getEndOfDay(start);
                             if (Objects.nonNull(startTime) && Objects.nonNull(endTime)) {
                                 logViewModel.getLogs(1, 10, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
                             }

@@ -10,8 +10,8 @@ android {
         applicationId = "com.tiger.yunda"
         minSdk = 30
         targetSdk = 34
-        versionCode = 10006
-        versionName = "1.0.0.0.6"
+        versionCode = 10007
+        versionName = "1.0.0.0.7"
 
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -113,6 +113,9 @@ dependencies {
 
     //pdf
     implementation("com.github.barteksc:android-pdf-viewer:3.2.0-beta.1")
+
+    //video
+    implementation("com.gitee.zhangmengxiong:MXVideo:1.9.4")
     
 
 

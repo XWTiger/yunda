@@ -292,9 +292,9 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                         recoverChipGroup.removeAllViews();
 
                         AtomicInteger position = new AtomicInteger();
-                        breakDownInfo.getFiles().forEach(s -> {
+                        breakDownInfo.getHandleFiles().forEach(s -> {
                             Chip chip = (Chip) LayoutInflater.from(context).inflate(R.layout.chip_file, null);;
-                            chip.setText("恢复." + (s.getType().equals(CameraFileType.IMAGE)?"jpg":"mp4"));
+                            chip.setText("恢复." + (s.getType().equals(CameraFileType.VIDEO)?"mp4":"jpg"));
                             chip.setTag("recover_" + position.get());
                             chip.setOnClickListener(this);
                             recoverChipGroup.addView(chip);
@@ -444,7 +444,12 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                                 if (response.isSuccessful()) {
                                     Toast.makeText(context, "创建故障成功", Toast.LENGTH_SHORT).show();
                                     breakDownInfo.clear();
-                                    InspectionFragment.breakDownInfo = null;
+                                    if (Objects.nonNull(InspectionFragment.breakDownInfo)) {
+                                        InspectionFragment.breakDownInfo.clear();
+                                    } else {
+                                        InspectionFragment.breakDownInfo = new BreakDownInfo();
+                                    }
+
                                     dismiss();
                                 } else {
                                     try {
@@ -471,7 +476,11 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                     case "cancel":
                         breakDownInfo.clear();
                         dismiss();
-                        InspectionFragment.breakDownInfo = null;
+                        if (Objects.nonNull(InspectionFragment.breakDownInfo)) {
+                            InspectionFragment.breakDownInfo.clear();
+                        } else {
+                            InspectionFragment.breakDownInfo = new BreakDownInfo();
+                        }
                         break;
                     default: //文件chip 选择
                         if (tag.startsWith("problem_")) { //删除故障图片或视频

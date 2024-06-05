@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.databinding.BindingAdapter;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
@@ -42,6 +43,40 @@ public class TimeUtil {
         String month = dateParts[1];
         String day = dateParts[2];
         return year + "年" + month + "月" + day + "日";
+    }
+
+    public static Date getStartOfDay(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = "";
+        if (Objects.isNull(date)) {
+            Date now = new Date();
+            formattedDate = sdf.format(now);
+        }
+        formattedDate = sdf.format(date);
+        String dateStr = formattedDate + " 00:00:00";
+        SimpleDateFormat sdfStar = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+           return sdfStar.parse(dateStr);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Date getEndOfDay(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = "";
+        if (Objects.isNull(date)) {
+            Date now = new Date();
+            formattedDate = sdf.format(now);
+        }
+        formattedDate = sdf.format(date);
+        String dateStr = formattedDate + " 23:59:59";
+        SimpleDateFormat sdfStar = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            return sdfStar.parse(dateStr);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

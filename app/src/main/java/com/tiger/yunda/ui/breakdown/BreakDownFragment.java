@@ -9,6 +9,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.text.Html;
@@ -23,6 +25,7 @@ import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.loper7.date_time_picker.DateTimeConfig;
 import com.loper7.date_time_picker.dialog.CardDatePickerDialog;
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
@@ -32,6 +35,7 @@ import com.tiger.yunda.databinding.FragmentBreakDownBinding;
 import com.tiger.yunda.utils.CollectionUtil;
 import com.tiger.yunda.utils.TimeUtil;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -113,9 +117,10 @@ public class BreakDownFragment extends Fragment {
 
 
         if (Objects.isNull(viewHolder)) {
-            viewHolder = new ViewHolder(fragmentBreakDownBinding.selectStartTime, fragmentBreakDownBinding.selectEndTime, getContext(), new BreakDownViewModel(getContext()));
+            viewHolder = new ViewHolder(fragmentBreakDownBinding.selectStartTime, getContext(), new BreakDownViewModel(getContext()));
             viewHolder.setSwipeRefreshLayout(fragmentBreakDownBinding.freshList);
         }
+        NavController navController = NavHostFragment.findNavController(this);
         viewHolder.getBreakDownViewModel().getBreakRecords(1, 100, null, null, Objects.isNull(MainActivity.loggedInUser) ? null : Integer.valueOf(MainActivity.loggedInUser.getDeptId()))
                 .observe(getViewLifecycleOwner(), new Observer<List<BreakRecord>>() {
                     @Override
@@ -125,8 +130,9 @@ public class BreakDownFragment extends Fragment {
                         } else {
                             fragmentBreakDownBinding.noContent.setVisibility(View.GONE);
                         }
+
                        /* if (Objects.isNull(breakDownListAdapter)) {*/
-                            breakDownListAdapter = new BreakDownListAdapter(getContext(), fragmentBreakDownBinding.list.getId(), breakRecords, getFragmentManager());
+                            breakDownListAdapter = new BreakDownListAdapter(getContext(), fragmentBreakDownBinding.list.getId(), breakRecords, getFragmentManager(), navController);
                             fragmentBreakDownBinding.list.setAdapter(breakDownListAdapter);
                             fragmentBreakDownBinding.list.setOnScrollListener(viewHolder);
                        /* } else {
@@ -137,8 +143,6 @@ public class BreakDownFragment extends Fragment {
                 });
         fragmentBreakDownBinding.imageButton3.setOnClickListener(viewHolder);
         fragmentBreakDownBinding.imageButton3.setTag(TIME_ACTION_START);
-        fragmentBreakDownBinding.imageButton.setTag(TIME_ACTION_END);
-        fragmentBreakDownBinding.imageButton.setOnClickListener(viewHolder);
         fragmentBreakDownBinding.freshList.setOnRefreshListener(viewHolder);
         return fragmentBreakDownBinding.getRoot();
     }
@@ -163,9 +167,9 @@ public class BreakDownFragment extends Fragment {
         private Date startDateTime;
         private Date endDateTime;
 
-        public ViewHolder(TextView startTime, TextView endTime, Context context, BreakDownViewModel breakDownViewModel) {
+        public ViewHolder(TextView startTime,  Context context, BreakDownViewModel breakDownViewModel) {
             this.startTime = startTime;
-            this.endTime = endTime;
+         /*   this.endTime = endTime;*/
             this.context = context;
             this.breakDownViewModel = breakDownViewModel;
         }
@@ -178,11 +182,18 @@ public class BreakDownFragment extends Fragment {
                 new CardDatePickerDialog.Builder(context)
                         .setTitle("请选择开始时间")
                         .setLabelText("年","月","日","时","分", "秒")
+                        .setDisplayType(Arrays.asList(
+                                DateTimeConfig.YEAR,//显示年
+                                DateTimeConfig.MONTH,//显示月
+                                DateTimeConfig.DAY,//显示日
+                                DateTimeConfig.HOUR,//显示时
+                                DateTimeConfig.MIN))//显示分
                         .setOnChoose("选择", aLong -> {
                             //aLong  = millisecond
                             Date start = new Date(aLong);
-                            startDateTime = start;
+                            startDateTime = TimeUtil.getStartOfDay(start);
                             startTime.setText(TimeUtil.getDateYmdFromMs(start));
+                            endDateTime = TimeUtil.getEndOfDay(start);
                             if (Objects.nonNull(startDateTime) && Objects.nonNull(endDateTime)) {
                                 breakDownViewModel.getBreakRecords(1, 100, TimeUtil.getSTrFromMs(startDateTime), TimeUtil.getSTrFromMs(endDateTime), Integer.valueOf(MainActivity.loggedInUser.getDeptId()));
                             }
