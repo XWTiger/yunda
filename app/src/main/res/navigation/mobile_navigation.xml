@@ -102,7 +102,7 @@
     </fragment>
     <fragment android:id="@+id/image_view"
         android:name="com.tiger.yunda.ui.breakdown.ImageFragment"
-        android:label="视频"
+        android:label="图片"
         >
     </fragment>
 

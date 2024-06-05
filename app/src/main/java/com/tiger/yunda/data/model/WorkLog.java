@@ -8,9 +8,13 @@ import androidx.databinding.BindingAdapter;
 import androidx.databinding.BindingMethod;
 import androidx.databinding.BindingMethods;
 
+import com.tiger.yunda.data.BreakDownType;
 import com.tiger.yunda.ui.home.TrainLocations;
+import com.tiger.yunda.utils.CollectionUtil;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -128,5 +132,19 @@ public class WorkLog implements Serializable {
 
 
 
+        public List<BreakDownType> getSpinnerTypes() {
+                List<BreakDownType> list = new ArrayList<>();
+                if (!CollectionUtil.isEmpty(trainLocations)) {
+                        trainLocations.forEach(e -> {
+                                BreakDownType breakDownType = new BreakDownType();
+                                breakDownType.setType(e.getLocationType());
+                                breakDownType.setName(e.getLocationTypeName());
+                                list.add(breakDownType);
+                        });
+                } else {
+                        return list;
+                }
+                return list;
+        }
 
 }

@@ -50,4 +50,16 @@ public class CreateMission  implements Serializable {
             trainNoStr.set(trainNoStr.get() + "," + name);
         }
     }
+
+    public void subOneTrain() {
+        String content = trainNoStr.get();
+        if (content.length() > 0 && !content.contains(",")) {
+            trainNoStr.set(null);
+        }
+        if (content.length() > 0 && content.contains(",")) {
+            int start = content.lastIndexOf(",");
+            content = content.substring(0,start);
+            trainNoStr.set(content);
+        }
+    }
 }

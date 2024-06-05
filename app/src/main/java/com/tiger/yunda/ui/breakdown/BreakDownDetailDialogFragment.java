@@ -103,27 +103,19 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
 
                 ViewGroup.LayoutParams params  = new ViewGroup.LayoutParams(300, 300);
                 imageView.setLayoutParams(params);
-                if (".mp4".equals(attachment.getExt())) {
-                    imageView.setTag("video_" + index.get() );
-                  /*  ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) params;
-                    marginParams.height = 32;
-                    marginParams.width = 32;
-                    marginParams.leftMargin = 134;
 
-                    ImageButton imageButton = new ImageButton(getContext());
-                    imageButton.setLayoutParams(marginParams);
-                    imageButton.setTag("video_" + index.get());
-                    imageButton.setOnClickListener(this);
-                    imageButton.setImageResource(R.drawable.ic_video_play);*/
-
-                } else {
-                    imageView.setTag("img_" + index.get());
-                }
-
-                imageView.setTooltipText("点击查看详情");
                 imageView.setOnClickListener(this);
                 binding.contentLayout.addView(imageView);
-                Glide.with(this).load(uri).into(imageView);
+                if (".mp4".equals(attachment.getExt())) {
+                    imageView.setTag("video_" + index.get() );
+                    imageView.setImageResource(R.drawable.ic_video_p2);
+                } else {
+                    imageView.setTag("img_" + index.get());
+                    Glide.with(this).load(uri).into(imageView);
+                }
+
+
+
                 index.getAndIncrement();
             });
 
@@ -222,7 +214,7 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
             case "img":
                 Bundle bundle = new Bundle();
                 bundle.putString(ImageFragment.IMAGE_URL, breakRecordGlobal.getAttachments().get(Integer.parseInt(array[1])).getUrl());
-                navHostController.navigate(R.id.to_img_view);
+                navHostController.navigate(R.id.to_img_view,bundle);
                 break;
         }
 

@@ -50,6 +50,8 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
     private static final String END_TIME_TAG = "end_time";
 
     private static final String ACTION_TRAIN_ADD = "train_add";
+
+    private static final String ACTION_TRAIN_SUB = "train_sub";
     private static final String ACTION_FINISHED = "finished";
 
     private String mParam1;
@@ -113,6 +115,9 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
         dateTimePicker.setTag(END_TIME_TAG);
         binding.trainNoAdd.setOnClickListener(this);
         binding.trainNoAdd.setTag(ACTION_TRAIN_ADD);
+        binding.trainNoSub.setTag(ACTION_TRAIN_SUB);
+        binding.trainNoSub.setOnClickListener(this);
+        binding.trainNoSub.setVisibility(View.INVISIBLE);
         binding.trainNoText.setVisibility(View.INVISIBLE);
         binding.finishedCreation.setTag(ACTION_FINISHED);
         binding.finishedCreation.setOnClickListener(this);
@@ -162,6 +167,15 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
             trainListDialogFragment = TrainListDialogFragment.newInstance(trainList);
             trainListDialogFragment.setCreateMissionFragment(this);
             trainListDialogFragment.show(getFragmentManager(), "select_train");
+            if (StringUtils.isNotBlank(binding.trainNoText.getText().toString())) {
+                binding.trainNoSub.setVisibility(View.VISIBLE);
+            } else {
+                binding.trainNoSub.setVisibility(View.INVISIBLE);
+            }
+        }
+        if (ACTION_TRAIN_SUB.equals(tag)) {
+            CreateMission createMission =  binding.getCreation();
+            createMission.subOneTrain();
         }
 
         if (ACTION_FINISHED.equals(tag)) {

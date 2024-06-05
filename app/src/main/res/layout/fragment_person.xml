@@ -16,6 +16,58 @@
             android:src="@drawable/system_version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="设备id" />
+        <TextView
+            android:layout_marginLeft="4dp"
+            android:textColor="@color/green"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="设备编号" />
+        <TextView
+            android:id="@+id/android_id"
+            android:layout_marginLeft="40dp"
+            android:textColor="@color/green"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:src="@drawable/ic_person"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="系统版本" />
+        <TextView
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="4dp"
+            android:textColor="@color/green"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="登录用户" />
+        <TextView
+            android:id="@+id/system_user"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="40dp"
+            android:textColor="@color/green"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="一剑仙" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:src="@drawable/system_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:contentDescription="系统版本" />
         <TextView
             android:layout_marginLeft="4dp"
@@ -43,31 +95,7 @@
             android:textColor="@color/white"
             android:visibility="gone" />
     </LinearLayout>
-    <LinearLayout
-        android:layout_marginTop="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <ImageView
-            android:src="@drawable/system_version"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="设备id" />
-        <TextView
-            android:layout_marginLeft="4dp"
-            android:textColor="@color/green"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:text="设备编号" />
-        <TextView
-            android:id="@+id/android_id"
-            android:layout_marginLeft="40dp"
-            android:textColor="@color/green"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:text="" />
-    </LinearLayout>
+
     <LinearLayout
         android:layout_marginTop="10dp"
         android:layout_width="wrap_content"

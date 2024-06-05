@@ -9,6 +9,7 @@
             name="log"
             type="com.tiger.yunda.data.model.WorkLog" />
 
+
     </data>
     <ScrollView
         android:layout_width="match_parent"
@@ -243,7 +244,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{log.faults.get(0).desc}"
+                android:text='@{log.faults != null &amp;&amp; log.faults.size()>0 ? log.faults.get(0).desc : ""}'
                 tools:text="双规轮子偏差，手动阀第三方，阿斯顿发斯蒂芬，阿斯adsasdf"
                 android:textColor="@color/black"
                 android:textSize="16sp" />

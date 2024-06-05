@@ -1,5 +1,6 @@
 package com.tiger.yunda.ui.log;
 
+import android.app.Dialog;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -12,25 +13,42 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
 import com.tiger.yunda.data.model.BreakRecord;
+import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.data.model.Faults;
 import com.tiger.yunda.data.model.WorkLog;
 import com.tiger.yunda.databinding.FragmentDetailLogDialogItemBinding;
 import com.tiger.yunda.databinding.FragmentDetailLogDialogBinding;
 import com.tiger.yunda.enums.RoleType;
+import com.tiger.yunda.service.WorkLogService;
+import com.tiger.yunda.ui.common.SpinnerAdapter;
 import com.tiger.yunda.ui.home.TrainLocations;
 import com.tiger.yunda.utils.CollectionUtil;
+import com.tiger.yunda.utils.JsonUtil;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * <p>A fragment that shows a list of items as a modal bottom sheet.</p>
@@ -45,6 +63,7 @@ public class LogDialogFragment extends BottomSheetDialogFragment implements View
     private static final String ARG_ITEM_DETAIL = "wroker_detail";
     private FragmentDetailLogDialogBinding binding;
     private static WorkLog workLog;
+    private WorkLogService workLogService;
 
     // TODO: Customize parameters
     public static LogDialogFragment newInstance(WorkLog workLog) {
@@ -52,6 +71,7 @@ public class LogDialogFragment extends BottomSheetDialogFragment implements View
         final Bundle args = new Bundle();
         args.putSerializable(ARG_ITEM_DETAIL, workLog);
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -71,6 +91,9 @@ public class LogDialogFragment extends BottomSheetDialogFragment implements View
                              @Nullable Bundle savedInstanceState) {
 
         binding = FragmentDetailLogDialogBinding.inflate(inflater, container, false);
+        if (Objects.isNull(workLogService)) {
+            workLogService = MainActivity.retrofitClient.create(WorkLogService.class);
+        }
         if (Objects.nonNull(workLog)) {
             binding.setLog(workLog);
             if (CollectionUtil.isEmpty(workLog.getTrainLocations())) {
@@ -109,6 +132,10 @@ public class LogDialogFragment extends BottomSheetDialogFragment implements View
                 });
             }
         }
+        binding.btnEdit.setTag("edit");
+        binding.btnYes.setTag("yes");
+        binding.btnReject.setTag("reject");
+        binding.btnCancle.setTag("cancel");
         binding.btnYes.setOnClickListener(this);
         binding.btnEdit.setOnClickListener(this);
         binding.btnReject.setOnClickListener(this);
@@ -138,7 +165,73 @@ public class LogDialogFragment extends BottomSheetDialogFragment implements View
 
     @Override
     public void onClick(View v) {
-        dismiss();
+        String tag = v.getTag().toString();
+        if ("edit".equals(tag)) {
+
+        }
+        if ("yes".equals(tag)) {
+            dismiss();
+        }
+
+        if ("reject".equals(tag)) {
+            // 创建一个Dialog
+            Dialog dialog = new Dialog(getContext());
+            dialog.setContentView(R.layout.dialog_reject_layout); // 设置自定义布局
+            dialog.setTitle("申述");
+
+            // 找到布局中的EditText
+            EditText input = dialog.findViewById(R.id.reject_reason);
+            Spinner spinner = dialog.findViewById(R.id.reject_location);
+            SpinnerAdapter spinnerAdapter = new SpinnerAdapter(workLog.getSpinnerTypes(),getContext());
+            spinner.setAdapter(spinnerAdapter);
+            int position = spinner.getSelectedItemPosition();
+            // 创建按钮来确认输入
+            Button confirmButton = dialog.findViewById(R.id.reject_finished);
+            Button cancel = dialog.findViewById(R.id.reject_cancel);
+            dialog.show(); // 显示对话框
+            confirmButton.setOnClickListener(ele -> {
+                String inputText = input.getText().toString();
+                // 处理输入的文本
+                Map<String, Object> params = new HashMap<>();
+                params.put("trainLocationId", workLog.getTrainLocations().get(position).getId());
+                params.put("reason", inputText);
+                workLogService.reject(params).enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText( getContext(), "提交成功", Toast.LENGTH_SHORT).show();
+                            // 关闭对话框
+                            dialog.dismiss();
+                        } else {
+                            try {
+                                String errStr = response.errorBody().string();
+                                ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                                Log.e("xiaweihu", "查询作业详情失败: ===========>" + errStr);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                        Log.e("xiaweihu", "提交申诉失败详情失败: ===========>", throwable);
+                    }
+                });
+
+
+            });
+
+            cancel.setOnClickListener( ele -> {
+                dialog.dismiss();
+            });
+
+
+        }
+        if ("cancel".equals(tag)) {
+            dismiss();
+        }
     }
 
     private class ViewHolder extends RecyclerView.ViewHolder {

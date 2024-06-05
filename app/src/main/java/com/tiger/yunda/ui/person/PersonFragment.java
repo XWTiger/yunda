@@ -137,6 +137,7 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
         if (StringUtils.isNotBlank(MissionFragment.needUpdatePath)) {
             fragmentPersonBinding.buttonUpdate.setVisibility(View.VISIBLE);
         }
+        fragmentPersonBinding.systemUser.setText(MainActivity.loggedInUser.getDisplayName());
         fragmentPersonBinding.button2.setTag(TAG_RESET);
         fragmentPersonBinding.button2.setOnClickListener(this);
         fragmentPersonBinding.logout.setTag(TAG_LOGOUT);
