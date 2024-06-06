@@ -15,9 +15,14 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.loper7.date_time_picker.DateTimeConfig;
 import com.loper7.date_time_picker.DateTimePicker;
+import com.loper7.date_time_picker.dialog.CardDatePickerDialog;
+import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
 import com.tiger.yunda.data.model.CreateMission;
 import com.tiger.yunda.data.model.Train;
@@ -28,6 +33,8 @@ import com.tiger.yunda.utils.TimeUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -59,9 +66,15 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
 
     private TrainListDialogFragment trainListDialogFragment;
     private FragmentCreateMissionBinding binding;
-    private DateTimePicker dateTimePicker;
+    //private DateTimePicker dateTimePicker;
 
-    private DateTimePicker dateTimePickerEnd;
+    //private DateTimePicker dateTimePickerEnd;
+
+    private ImageButton startTimeButton;
+    private TextView startTimeTV;
+
+    private ImageButton endTimeButton;
+    private TextView endTimeTV;
 
     private List<Train> trainList;
 
@@ -109,10 +122,12 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentCreateMissionBinding.inflate(inflater, container, false);
-        dateTimePicker = binding.picker;
-        dateTimePicker.setTag(START_TIME_TAG);
-        dateTimePickerEnd = binding.pickerEn;
-        dateTimePicker.setTag(END_TIME_TAG);
+        startTimeButton = binding.selectStartTime;
+        startTimeButton.setTag(START_TIME_TAG);
+        startTimeTV = binding.textStartTime;
+        endTimeButton = binding.selectFinishedTime;
+        endTimeButton.setTag(END_TIME_TAG);
+        endTimeTV = binding.textFinishedTime;
         binding.trainNoAdd.setOnClickListener(this);
         binding.trainNoAdd.setTag(ACTION_TRAIN_ADD);
         binding.trainNoSub.setTag(ACTION_TRAIN_SUB);
@@ -136,16 +151,59 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
                 trainList = trains;
             }
         });
-        dateTimePickerEnd.setOnDateTimeChangedListener(aLong -> {
-             endTime = TimeUtil.getDateStringFromMs(aLong);
-            Log.i("xiaweihu", "invoke: =========>" + endTime);
-
-            return null;
+        startTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new CardDatePickerDialog.Builder(getContext())
+                        .setTitle("请选择开始时间")
+                        .setLabelText("年","月","日","时","分", "秒")
+                        .setDisplayType(Arrays.asList(
+                                DateTimeConfig.YEAR,//显示年
+                                DateTimeConfig.MONTH,//显示月
+                                DateTimeConfig.DAY,//显示日
+                                DateTimeConfig.HOUR,//显示时
+                                DateTimeConfig.MIN))//显示分
+                        .setOnChoose("选择", aLong -> {
+                            //aLong  = millisecond
+                            Date start = new Date(aLong);
+                            startTime = TimeUtil.getDateStringFromMs(aLong);
+                            startTimeTV.setText(startTime);
+                            startTimeTV.setVisibility(View.VISIBLE);
+                            return null;
+                        })
+                        .setOnCancel("取消", () -> {
+                            return null;
+                        })
+                        .build().show();
+            }
         });
-        dateTimePicker.setOnDateTimeChangedListener(aLong -> {
-             startTime = TimeUtil.getDateStringFromMs(aLong);
-            Log.i("xiaweihu", "invoke: =========>" + startTime);
-            return null;
+
+
+        endTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new CardDatePickerDialog.Builder(getContext())
+                        .setTitle("请选择结束时间")
+                        .setLabelText("年","月","日","时","分", "秒")
+                        .setDisplayType(Arrays.asList(
+                                DateTimeConfig.YEAR,//显示年
+                                DateTimeConfig.MONTH,//显示月
+                                DateTimeConfig.DAY,//显示日
+                                DateTimeConfig.HOUR,//显示时
+                                DateTimeConfig.MIN))//显示分
+                        .setOnChoose("选择", aLong -> {
+                            //aLong  = millisecond
+                            Date start = new Date(aLong);
+                            endTime = TimeUtil.getDateStringFromMs(aLong);
+                            endTimeTV.setText(endTime);
+                            endTimeTV.setVisibility(View.VISIBLE);
+                            return null;
+                        })
+                        .setOnCancel("取消", () -> {
+                            return null;
+                        })
+                        .build().show();
+            }
         });
 
         /* return inflater.inflate(R.layout.fragment_create_mission, container, false);*/

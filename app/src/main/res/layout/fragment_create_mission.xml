@@ -81,7 +81,20 @@
             android:text="计划开始时间:"
             android:textColor="@color/black" />
 
-        <com.loper7.date_time_picker.DateTimePicker
+        <TextView
+            android:id="@+id/text_start_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="80dp"
+            android:visibility="gone"
+            android:text="2024年06月06日21时41分"
+            android:textColor="@color/black" />
+        <ImageButton
+            android:id="@+id/select_start_time"
+            android:src="@drawable/ic_add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+       <!-- <com.loper7.date_time_picker.DateTimePicker
             android:id="@+id/picker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -92,7 +105,7 @@
             app:dt_showLabel="true"
             app:dt_textBold="true"
             app:dt_textColor="#666666"
-            app:dt_themeColor="@color/colorPrimary" />
+            app:dt_themeColor="@color/colorPrimary" />-->
 
         <TextView
             android:layout_width="wrap_content"
@@ -100,8 +113,20 @@
             android:layout_marginLeft="5dp"
             android:text="计划结束时间:"
             android:textColor="@color/black" />
-
-        <com.loper7.date_time_picker.DateTimePicker
+        <TextView
+            android:id="@+id/text_finished_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginLeft="80dp"
+            android:text="2024年06月06日21时41分"
+            android:textColor="@color/black" />
+        <ImageButton
+            android:id="@+id/select_finished_time"
+            android:src="@drawable/ic_add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+       <!-- <com.loper7.date_time_picker.DateTimePicker
             android:id="@+id/picker_en"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -112,7 +137,7 @@
             app:dt_showLabel="true"
             app:dt_textBold="true"
             app:dt_textColor="#666666"
-            app:dt_themeColor="@color/colorPrimary" />
+            app:dt_themeColor="@color/colorPrimary" />-->
 
         <TextView
             android:layout_width="wrap_content"

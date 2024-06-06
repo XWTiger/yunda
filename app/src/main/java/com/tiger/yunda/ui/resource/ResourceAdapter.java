@@ -69,6 +69,8 @@ public class ResourceAdapter extends ArrayAdapter<OperationResource> implements 
             BooksListBinding  binding = BooksListBinding.inflate(LayoutInflater.from(getContext()), parent, false);
             binding.contentLayout.setOnClickListener(this);
             binding.contentLayout.setTag(position);
+            binding.book.setOnClickListener(this);
+            binding.book.setTag(position);
             convertView = binding.getRoot();
             binding.setResource(operationResources.get(position));
         }
