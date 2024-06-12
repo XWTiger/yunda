@@ -2,38 +2,58 @@ package com.tiger.yunda.ui.breakdown;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
-import androidx.navigation.NavHostController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.bumptech.glide.Glide;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.loper7.date_time_picker.dialog.CardDatePickerDialog;
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
 import com.tiger.yunda.data.model.Attachments;
 import com.tiger.yunda.data.model.BreakRecord;
+import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.data.model.User;
 import com.tiger.yunda.databinding.FragmentBreakDownDetailDialogBinding;
+import com.tiger.yunda.service.BreakDownService;
 import com.tiger.yunda.ui.common.SpinnerAdapter;
 import com.tiger.yunda.utils.CollectionUtil;
+import com.tiger.yunda.utils.FileUtil;
+import com.tiger.yunda.utils.JsonUtil;
 import com.tiger.yunda.utils.TimeUtil;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * <p>A fragment that shows a list of items as a modal bottom sheet.</p>
@@ -56,12 +76,21 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
 
     private List<User> userList;
 
+    ActivityResultLauncher<PickVisualMediaRequest> pickMultipleMedia;
+
     private User selectedUser;
 
     private Date startDateTime;
     private Boolean finisehd = true;
 
     private BreakRecord breakRecordGlobal;
+
+    private ChipGroup chipGroup;
+
+    private List<Uri> handleFiles;
+    private BreakDownService breakDownService;
+
+
 
     private static volatile BreakDownDetailDialogFragment breakDownListDialogFragment ;
 
@@ -123,11 +152,14 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
         }
         breakDownViewModel.getUsers(MainActivity.loggedInUser.getDeptId()).observe(getViewLifecycleOwner(), users -> {
             SpinnerAdapter spinnerAdapter = new SpinnerAdapter(CollectionUtil.covertUserToSpinnerObj(users), getContext());
-            binding.spinnerPerson.setAdapter(spinnerAdapter);
-            binding.spinnerPerson.setOnItemSelectedListener(this);
+           /* binding.spinnerPerson.setAdapter(spinnerAdapter);
+            binding.spinnerPerson.setOnItemSelectedListener(this);*/
             userList = users;
         });
 
+        if (Objects.isNull(breakDownService)) {
+            breakDownService = MainActivity.retrofitClient.create(BreakDownService.class);
+        }
 
         binding.setDetail(breakRecord);
         binding.addDealtime.setTag("check_time");
@@ -138,11 +170,55 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
         binding.btnCancle.setOnClickListener(this);
         binding.btnYes.setTag("ok");
         binding.btnYes.setOnClickListener(this);
+        binding.imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openFilePicker();
+            }
+        });
         if (breakRecord.getState() == BREAK_DEAL_FINISHED) {
             binding.btnEdit.setVisibility(View.INVISIBLE);
         } else {
             finisehd = false;
         }
+
+        chipGroup = binding.fileGroup;
+
+        pickMultipleMedia =
+                registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(4), uris -> {
+                    // Callback is invoked after the user selects media items or closes the
+                    // photo picker.
+                    if (!uris.isEmpty()) {
+                        Log.d("PhotoPicker", "Number of items selected: " + uris.size());
+                        AtomicInteger index;
+                        if (Objects.isNull(handleFiles)) {
+                            handleFiles = new ArrayList<>();
+                            index  = new AtomicInteger();
+                        } else {
+                            index = new AtomicInteger(handleFiles.size());
+                        }
+
+                        uris.forEach(uri -> {
+                            Chip chip = (Chip) LayoutInflater.from(getContext()).inflate(R.layout.chip_file, null);
+                            chip.setText("恢复_" + index);
+                            chip.setTag(index.get());
+                            chip.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    int ind = (int) v.getTag();
+                                    handleFiles.remove(ind);
+                                    chipGroup.removeView(v);
+                                }
+                            });
+                            handleFiles.add(uri);
+                            chipGroup.addView(chip);
+                            index.getAndIncrement();
+                        });
+                    } else {
+                        Log.d("PhotoPicker", "No media selected");
+                    }
+                });
+
         return binding.getRoot();
 
     }
@@ -156,6 +232,16 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    public void openFilePicker() {
+        // For this example, launch the photo picker and let the user choose images
+        // and videos. If you want the user to select a specific type of media file,
+        // use the overloaded versions of launch(), as shown in the section about how
+        // to select a single media item.
+        pickMultipleMedia.launch(new PickVisualMediaRequest.Builder()
+                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageAndVideo.INSTANCE)
+                .build());
     }
 
 
@@ -172,6 +258,7 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
             cation = "video";
         }
         switch (cation) {
+
             case "check_time":
                 new CardDatePickerDialog.Builder(v.getContext())
                         .setTitle("请选择处理时间时间")
@@ -191,7 +278,8 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
             case "edit":
                 binding.addDealtime.setVisibility(View.VISIBLE);
                 binding.dealPerson.setVisibility(View.GONE);
-                binding.spinnerPerson.setVisibility(View.VISIBLE);
+                binding.addDesc.setVisibility(View.VISIBLE);
+                binding.addResolveFiles.setVisibility(View.VISIBLE);
                 break;
             case "cancel":
                 navHostController.popBackStack();
@@ -203,6 +291,55 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                     //添加未处理逻辑 提交编辑的信息
                     //判断处理时间
                     // 故障处理人
+                    String describe = binding.desc.getText().toString();
+                    if (StringUtils.isBlank(describe)) {
+                        Toast.makeText(getContext(), "描述不能为空", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    Map<String, RequestBody> params = new HashMap<>();
+                    RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), breakRecordGlobal.getId());
+                    params.put("id", requestBody);
+                    RequestBody desc = RequestBody.create(MediaType.parse("text/plain"), breakRecordGlobal.getId());
+                    params.put("HandleDesc", desc);
+
+                    if (!CollectionUtil.isEmpty(handleFiles)) {
+                        handleFiles.forEach( ele -> {
+                          /*  String path = ele.getEncodedPath();
+                            //File file = FileUtil.uri2File( ele, getContext(), false);
+                            path = Uri.decode(path);*/
+                            File file = FileUtil.getFileFromUri(ele, getContext());
+                            RequestBody requestFile = RequestBody.create(MediaType.parse("file/octet-stream"), file);
+                            //注意：file就是与服务器对应的key,后面filename是服务器得到的文件名
+                            params.put("HandleFiles\"; filename=\"" + FileUtil.getFileStr(ele, getContext()), requestFile);
+                        });
+
+                    }
+                    binding.progressBar.setVisibility(View.VISIBLE);
+                    Call<RequestBody> call = breakDownService.handleProblem(params);
+                    call.enqueue(new Callback<RequestBody>() {
+                        @Override
+                        public void onResponse(Call<RequestBody> call, Response<RequestBody> response) {
+                            if (response.isSuccessful()) {
+                                Toast.makeText(getContext(), "提交成功", Toast.LENGTH_SHORT).show();
+                                binding.progressBar.setVisibility(View.GONE);
+                                navHostController.popBackStack();
+                            } else {
+                                try {
+                                    String errStr = response.errorBody().string();
+                                    ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                                    Log.e("xiaweihu", "处理故障失败: ===========>" + errStr);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<RequestBody> call, Throwable throwable) {
+                            Log.e("xiaweihu", "处理故障失败: ===========>", throwable);
+                        }
+                    });
                 }
                 break;
             case "video":

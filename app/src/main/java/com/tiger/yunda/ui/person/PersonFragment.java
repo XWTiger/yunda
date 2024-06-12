@@ -244,7 +244,14 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         if (response.isSuccessful()) {
-
+                            UserLoginInfo userLoginInfo = userLoginInfoDao.getSignedIn();
+                            MainActivity.loggedInUser = null;
+                            // 删除数据库登录信息
+                            if (Objects.nonNull(userLoginInfo)) {
+                                userLoginInfoDao.deleteByUid(userLoginInfo.getUid());
+                            }
+                            Intent intent = new Intent(getContext(), LoginActivity.class);
+                            getActivity().startActivityForResult(intent, MainActivity.LOGIN_INTENT_RESULT_CODE);
                         } else {
                             try {
                                 String errStr = response.errorBody().string();
@@ -254,14 +261,7 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
                                 e.printStackTrace();
                             }
                         }
-                        UserLoginInfo userLoginInfo = userLoginInfoDao.getSignedIn();
-                        MainActivity.loggedInUser = null;
-                        // 删除数据库登录信息
-                        if (Objects.nonNull(userLoginInfo)) {
-                            userLoginInfoDao.deleteByUid(userLoginInfo.getUid());
-                        }
-                        Intent intent = new Intent(getContext(), LoginActivity.class);
-                        getActivity().startActivityForResult(intent, MainActivity.LOGIN_INTENT_RESULT_CODE);
+
                     }
 
                     @Override
@@ -275,6 +275,7 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
             }
             SharedPreferences sharedPreferences = getContext().getSharedPreferences(MainActivity.TOKEN_FLAG, Context.MODE_PRIVATE);
             sharedPreferences.edit().remove(MainActivity.TOKEN_STR_KEY);
+            sharedPreferences.edit().apply();
             MainActivity.retrofitClient.clearHeaders();
         }
     }

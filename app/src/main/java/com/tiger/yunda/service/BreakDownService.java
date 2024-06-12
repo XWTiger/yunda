@@ -7,9 +7,12 @@ import com.tiger.yunda.data.model.User;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PartMap;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -40,4 +43,8 @@ public interface BreakDownService {
      */
     @POST("/api/User/LoadByDept")
     Call<List<User>> queryUsers(@Query("deptid") String deptId);
+
+    @POST("/api/PatrolFault/Handle")
+    @Multipart
+    Call<RequestBody> handleProblem(@PartMap Map<String, RequestBody>  params);
 }

@@ -9,6 +9,9 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class FileUtil {
 
@@ -63,6 +66,45 @@ public class FileUtil {
         }
         File file = new File(img_path);
         return file;
+    }
+
+    public static File getFileFromUri(Uri uri, Context context) {
+        // 如果Uri是file://形式的，直接转换
+        if (uri.getScheme().equals("file")) {
+            String path = uri.getEncodedPath();
+            if (path != null) {
+                path = Uri.decode(path);
+                File file = new File(path);
+                // 使用file对象
+                return file;
+            }
+        }
+// 如果Uri是content://形式的，需要将其转换为文件
+        else if (uri.getScheme().equals("content")) {
+            try {
+                // 创建临时文件
+                File file = new File(context.getCacheDir(), getFileStr(uri, context));
+                InputStream inputStream = context.getContentResolver().openInputStream(uri);
+                FileOutputStream outputStream = new FileOutputStream(file);
+
+                byte[] buffer = new byte[1024];
+                int read = inputStream.read(buffer);
+                while (read != -1) {
+                    outputStream.write(buffer, 0, read);
+                    read = inputStream.read(buffer);
+                }
+
+                inputStream.close();
+                outputStream.close();
+
+                // 使用file对象
+                return file;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return null;
     }
 
 

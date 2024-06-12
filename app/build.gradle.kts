@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.tiger.yunda"
-        minSdk = 30
+        minSdk = 28
         targetSdk = 34
         versionCode = 10008
         versionName = "1.0.0.0.8"

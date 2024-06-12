@@ -41,6 +41,7 @@ import com.tiger.yunda.service.DeviceService;
 import com.tiger.yunda.ui.home.MissionFragment;
 import com.tiger.yunda.ui.home.MissionResult;
 import com.tiger.yunda.ui.login.LoginActivity;
+import com.tiger.yunda.utils.JWTUtil;
 import com.tiger.yunda.utils.JsonUtil;
 import com.tiger.yunda.utils.NetworkUtil;
 
@@ -143,6 +144,8 @@ public class MainActivity extends AppCompatActivity {
         if (StringUtils.isNotBlank(token)) {
             Map<String, String> headers = new HashMap<>();
             headers.put("Authorization", "Bearer " + token);
+            loggedInUser = new LoggedInUser();
+            JWTUtil.decoder(token, loggedInUser);
             retrofitClient.addHeaders(headers);
         }  else {
             //从数据库里面拿
@@ -163,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if (Objects.isNull(loggedInUser)) {
+        if (Objects.isNull(loggedInUser) && StringUtils.isBlank(token)) {
             AuthInterceptor.loginFlag.getAndIncrement();
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
