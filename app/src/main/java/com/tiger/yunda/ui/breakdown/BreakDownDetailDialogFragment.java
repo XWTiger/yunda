@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -221,7 +222,7 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                         Log.d("PhotoPicker", "No media selected");
                     }
                 });
-
+        setHasOptionsMenu(true);
         return binding.getRoot();
 
     }
@@ -396,5 +397,12 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
     public void onNothingSelected(AdapterView<?> parent) {
         Toast.makeText(getContext(), "需要选择一个处理人", Toast.LENGTH_SHORT).show();
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        NavController navController = NavHostFragment.findNavController(this);
+        navController.popBackStack();
+        return super.onOptionsItemSelected(item);
     }
 }
