@@ -140,6 +140,7 @@ public class RetrofitClient {
         if (Objects.isNull(header)) {
             header = headers;
         } else {
+            header.clear();
             header.putAll(headers);
         }
         baseInterceptor.setHeaders(header);

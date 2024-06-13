@@ -18,6 +18,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.dao.UserLoginInfoDao;
@@ -70,6 +72,7 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
     private UserLoginInfoDao userLoginInfoDao;
     private String androidId;
 
+    private NavController navController;
     private String[] REQUIRED_PERMISSIONS = {
             Manifest.permission.READ_PHONE_STATE
     };
@@ -121,6 +124,9 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
             actionBar.setDisplayShowCustomEnabled(false);
             actionBar.setDisplayShowTitleEnabled(true);
         }
+        if (Objects.isNull(navController)) {
+            navController = NavHostFragment.findNavController(this);
+        }
         if (Objects.isNull(fragmentPersonBinding)) {
             fragmentPersonBinding = FragmentPersonBinding.inflate(inflater);
         }
@@ -145,7 +151,16 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
         fragmentPersonBinding.ok.setTag(TAG_RESET_OK);
         fragmentPersonBinding.ok.setOnClickListener(this);
         fragmentPersonBinding.androidId.setText(androidId);
+
         return fragmentPersonBinding.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (Objects.nonNull(fragmentPersonBinding)) {
+            fragmentPersonBinding.systemUser.setText(MainActivity.loggedInUser.getDisplayName());
+        }
     }
 
     @Override
@@ -250,6 +265,7 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
                             if (Objects.nonNull(userLoginInfo)) {
                                 userLoginInfoDao.deleteByUid(userLoginInfo.getUid());
                             }
+
                             Intent intent = new Intent(getContext(), LoginActivity.class);
                             getActivity().startActivityForResult(intent, MainActivity.LOGIN_INTENT_RESULT_CODE);
                         } else {
@@ -266,7 +282,7 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable throwable) {
-
+                        Log.e("xiaweihu", "绑定设备失败: ===========>", throwable);
                     }
                 });
             } else {

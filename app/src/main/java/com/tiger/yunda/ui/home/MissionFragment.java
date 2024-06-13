@@ -96,7 +96,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         ActionBar actionBar = activity.getSupportActionBar();
         this.customHeaderBar(actionBar);
-        if (Objects.nonNull(MainActivity.loggedInUser) && MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
+        if (Objects.nonNull(MainActivity.loggedInUser) && MainActivity.loggedInUser.getRole().name().equals(RoleType.WORKER_LEADER.name())) {
             leader = true;
             masterMission = true;
             if (masterMission) {
@@ -111,7 +111,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        if (Objects.nonNull(MainActivity.loggedInUser) && MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
+        if (Objects.nonNull(MainActivity.loggedInUser) && MainActivity.loggedInUser.getRole().name().equals(RoleType.WORKER_LEADER.name())) {
             leader = true;
             masterMission = true;
         }

@@ -156,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
                 headers.put("Authorization", "Bearer " + userLoginInfo.token);
                 retrofitClient.addHeaders(headers);
                 loggedInUser = new LoggedInUser();
+                JWTUtil.decoder(userLoginInfo.getToken(), loggedInUser);
                 loggedInUser.setUserId(userLoginInfo.getUid());
                 loggedInUser.setAccount(userLoginInfo.getAccount());
                 loggedInUser.setDeptId(userLoginInfo.getDeptId());
@@ -163,6 +164,13 @@ public class MainActivity extends AppCompatActivity {
                 loggedInUser.setRole(userLoginInfo.getRole());
                 loggedInUser.setRoleId(userLoginInfo.getRoleId());
                 loggedInUser.setRoleName(userLoginInfo.getRoleName());
+                if (loggedInUser.getRole() == RoleType.WORKER_LEADER) {
+                    MissionFragment.leader = true;
+                    MissionFragment.masterMission = true;
+                } else {
+                    MissionFragment.leader = false;
+                    MissionFragment.masterMission = false;
+                }
             }
         }
 
@@ -229,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
                 AuthInterceptor.loginFlag.getAndDecrement();
             }
             MissionFragment.missionFlag.getAndDecrement();
+
 
 
             //绑定设备mac 地址

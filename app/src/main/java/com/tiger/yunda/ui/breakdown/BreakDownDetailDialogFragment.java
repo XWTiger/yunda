@@ -35,6 +35,7 @@ import com.tiger.yunda.ui.common.SpinnerAdapter;
 import com.tiger.yunda.utils.CollectionUtil;
 import com.tiger.yunda.utils.FileUtil;
 import com.tiger.yunda.utils.JsonUtil;
+import com.tiger.yunda.utils.OpenFileUtil;
 import com.tiger.yunda.utils.TimeUtil;
 
 import org.apache.commons.lang3.StringUtils;
@@ -309,13 +310,21 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                             //File file = FileUtil.uri2File( ele, getContext(), false);
                             path = Uri.decode(path);*/
                             File file = FileUtil.getFileFromUri(ele, getContext());
-                            RequestBody requestFile = RequestBody.create(MediaType.parse("file/octet-stream"), file);
+                            String filename = FileUtil.getFileStr(ele, getContext());
+                            RequestBody requestFile;
+                            if (OpenFileUtil.isVideo(filename)) {
+                                requestFile = RequestBody.create(MediaType.parse("image/" + OpenFileUtil.getFileExtension(filename)), file);
+                            } else {
+                                requestFile = RequestBody.create(MediaType.parse("video/" + OpenFileUtil.getFileExtension(filename)), file);
+                            }
+
                             //注意：file就是与服务器对应的key,后面filename是服务器得到的文件名
-                            params.put("HandleFiles\"; filename=\"" + FileUtil.getFileStr(ele, getContext()), requestFile);
+                            params.put("HandleFiles\"; filename=\"" + filename, requestFile);
                         });
 
                     }
                     binding.progressBar.setVisibility(View.VISIBLE);
+                    binding.btnYes.setEnabled(false);
                     Call<RequestBody> call = breakDownService.handleProblem(params);
                     call.enqueue(new Callback<RequestBody>() {
                         @Override
