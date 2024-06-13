@@ -133,7 +133,8 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         navController = NavHostFragment.findNavController(this);
-        navController.popBackStack();
+        //navController.popBackStack();
+        navController.navigate(R.id.to_navigation_mission);
         Log.i("xiaweihu", "onOptionsItemSelected: ========================" + item.getItemId());
         return super.onOptionsItemSelected(item);
     }
@@ -215,7 +216,7 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "完成任务", Toast.LENGTH_SHORT).show();
-                    navController.popBackStack();
+                    navController.navigate(R.id.to_navigation_mission);
                 } else {
                     try {
                         String errStr = response.errorBody().string();

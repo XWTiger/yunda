@@ -317,7 +317,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                 this.problemRecoverLayout.setVisibility(View.VISIBLE);
             } else {
                 this.recoverLayout.setVisibility(View.INVISIBLE);
-                this.problemRecoverLayout.setVisibility(View.INVISIBLE);
+                this.problemRecoverLayout.setVisibility(View.GONE);
                 this.recoverChipGroup.removeAllViews();
             }
             breakDownInfo.setDiscretion(isChecked);
@@ -333,9 +333,9 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                 switch (tag) {
                     case "problem_video":
                         removeProblem.clear();
-                        if (Objects.nonNull(breakDownInfo.getFiles())) {
+                       /* if (Objects.nonNull(breakDownInfo.getFiles())) {
                             breakDownInfo.getFiles().clear();
-                        }
+                        }*/
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setTitle("故障资料")
                                 .setMessage("请选择文件或者拍照")
@@ -369,9 +369,9 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                         break;
                     case "recover_problem":
                         removeRecover.clear();
-                        if (Objects.nonNull(breakDownInfo.getHandleFiles())) {
+                        /*if (Objects.nonNull(breakDownInfo.getHandleFiles())) {
                             breakDownInfo.getHandleFiles().clear();
-                        }
+                        }*/
                         AlertDialog.Builder builderRecover = new AlertDialog.Builder(context);
                         builderRecover.setTitle("恢复资料")
                                 .setMessage("请选择文件或者拍照")
@@ -583,7 +583,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                     });
                     breakDownInfo.setHandleFiles(ccbs);
                     AtomicInteger position = new AtomicInteger();
-                    breakDownInfo.getFiles().forEach(s -> {
+                    breakDownInfo.getHandleFiles().forEach(s -> {
                         Chip chip = (Chip) LayoutInflater.from(context).inflate(R.layout.chip_file, null);
                         chip.setText("恢复_" + position.get() + "." + (s.getType().equals(CameraFileType.IMAGE)?"jpg":"mp4"));
                         chip.setTag("recover_" + position.get());

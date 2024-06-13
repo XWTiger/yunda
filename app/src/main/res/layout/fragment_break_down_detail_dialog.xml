@@ -146,7 +146,7 @@
                     app:layout_constraintVertical_bias="1.0"
                     tools:text="泥人张" />
 
-               <!-- <Spinner
+                <Spinner
                     android:id="@+id/spinner_person"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -155,7 +155,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/textView2"
                     app:layout_constraintStart_toEndOf="@+id/textView2"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="1.0" />-->
+                    app:layout_constraintVertical_bias="1.0" />
 
                 <TextView
                     android:id="@+id/textView3"
@@ -234,7 +234,7 @@
                     app:layout_constraintStart_toEndOf="@id/report_deal_time"
                     tools:text="2024-04-22 20:26:22" />
 
-                <ImageButton
+              <!--  <ImageButton
                     android:id="@+id/add_dealtime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -242,7 +242,7 @@
                     android:src="@drawable/ic_add"
                     android:visibility="gone"
                     app:layout_constraintStart_toEndOf="@id/deal_time"
-                    app:layout_constraintTop_toBottomOf="@id/deal_time" />
+                    app:layout_constraintTop_toBottomOf="@id/deal_time" />-->
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <LinearLayout
@@ -350,10 +350,11 @@
                 android:visibility="gone"
                 android:id="@+id/progressBar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="20dp">
                 <ProgressBar
                     android:id="@+id/progressBar2"
                     style="?android:attr/progressBarStyleHorizontal"
+                    android:indeterminate="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </LinearLayout>

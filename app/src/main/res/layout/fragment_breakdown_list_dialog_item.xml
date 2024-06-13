@@ -205,7 +205,7 @@
     </LinearLayout>
     <LinearLayout
         android:id="@+id/problem_recover_vedio"
-        android:visibility="invisible"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <ImageButton
@@ -242,7 +242,7 @@
             android:id="@+id/inspection_cancle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+
             android:text="取消"
             app:layout_constraintTop_toBottomOf="@+id/inspection_list"
             tools:layout_editor_absoluteX="161dp" />
@@ -251,7 +251,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:layout_marginTop="20dp"
+
             android:backgroundTint="@color/green"
             android:text="提交"
             android:textColor="@color/white"

@@ -59,7 +59,7 @@
         tools:layout="@layout/fragment_inspection">
        <!-- -->
        <action android:id="@+id/to_inspection_report" app:destination="@id/problem_dialog"/>
-        <action android:id="@+id/dialog_to_camera" app:destination="@id/inspection_camera"/>
+        <action android:id="@+id/dialog_to_camera" app:destination="@id/inspection_camera"  />
         <action android:id="@+id/to_navigation_mission" app:destination="@id/navigation_mission"/>
     </fragment>
 

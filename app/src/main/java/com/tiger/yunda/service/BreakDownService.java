@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Multipart;
@@ -46,5 +47,5 @@ public interface BreakDownService {
 
     @POST("/api/PatrolFault/Handle")
     @Multipart
-    Call<RequestBody> handleProblem(@PartMap Map<String, RequestBody>  params);
+    Call<ResponseBody> handleProblem(@PartMap Map<String, RequestBody>  params);
 }

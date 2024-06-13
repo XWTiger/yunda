@@ -30,6 +30,7 @@ import com.tiger.yunda.data.model.BreakRecord;
 import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.data.model.User;
 import com.tiger.yunda.databinding.FragmentBreakDownDetailDialogBinding;
+import com.tiger.yunda.enums.CameraFileType;
 import com.tiger.yunda.service.BreakDownService;
 import com.tiger.yunda.ui.common.SpinnerAdapter;
 import com.tiger.yunda.utils.CollectionUtil;
@@ -52,6 +53,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -153,8 +155,8 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
         }
         breakDownViewModel.getUsers(MainActivity.loggedInUser.getDeptId()).observe(getViewLifecycleOwner(), users -> {
             SpinnerAdapter spinnerAdapter = new SpinnerAdapter(CollectionUtil.covertUserToSpinnerObj(users), getContext());
-           /* binding.spinnerPerson.setAdapter(spinnerAdapter);
-            binding.spinnerPerson.setOnItemSelectedListener(this);*/
+            binding.spinnerPerson.setAdapter(spinnerAdapter);
+            binding.spinnerPerson.setOnItemSelectedListener(this);
             userList = users;
         });
 
@@ -163,8 +165,8 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
         }
 
         binding.setDetail(breakRecord);
-        binding.addDealtime.setTag("check_time");
-        binding.addDealtime.setOnClickListener(this);
+        /*binding.addDealtime.setTag("check_time");
+        binding.addDealtime.setOnClickListener(this);*/
         binding.btnEdit.setTag("edit");
         binding.btnEdit.setOnClickListener(this);
         binding.btnCancle.setTag("cancel");
@@ -268,7 +270,7 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                             //aLong  = millisecond
                             Date start = new Date(aLong);
                             startDateTime = start;
-                            binding.dealTime.setText(TimeUtil.getSTrFromMs(start));
+                           // binding.dealTime.setText(TimeUtil.getSTrFromMs(start));
                             return null;
                         })
                         .setOnCancel("取消", () -> {
@@ -277,10 +279,11 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                         .build().show();
                 break;
             case "edit":
-                binding.addDealtime.setVisibility(View.VISIBLE);
+                //binding.addDealtime.setVisibility(View.VISIBLE);
                 binding.dealPerson.setVisibility(View.GONE);
                 binding.addDesc.setVisibility(View.VISIBLE);
                 binding.addResolveFiles.setVisibility(View.VISIBLE);
+                binding.spinnerPerson.setVisibility(View.VISIBLE);
                 break;
             case "cancel":
                 navHostController.popBackStack();
@@ -297,12 +300,14 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                         Toast.makeText(getContext(), "描述不能为空", Toast.LENGTH_SHORT).show();
                         return;
                     }
-
+                    int pindex = binding.spinnerPerson.getSelectedItemPosition();
+                    User user = userList.get(pindex);
                     Map<String, RequestBody> params = new HashMap<>();
                     RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), breakRecordGlobal.getId());
                     params.put("id", requestBody);
                     RequestBody desc = RequestBody.create(MediaType.parse("text/plain"), breakRecordGlobal.getId());
                     params.put("HandleDesc", desc);
+                    params.put("HandleUserId", RequestBody.create(MediaType.parse("text/plain"), String.valueOf(user.getValue())));
 
                     if (!CollectionUtil.isEmpty(handleFiles)) {
                         handleFiles.forEach( ele -> {
@@ -312,23 +317,38 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                             File file = FileUtil.getFileFromUri(ele, getContext());
                             String filename = FileUtil.getFileStr(ele, getContext());
                             RequestBody requestFile;
+
+
+                           /* if (cameraContentBean.getType() == CameraFileType.IMAGE) {
+                                File file = new File(cameraContentBean.getUri());
+                                RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpg"), file);
+                                //注意：file就是与服务器对应的key,后面filename是服务器得到的文件名
+                                bodyMap.put("HandleFiles\"; filename=\"" + cameraContentBean.getFilename() , requestFile);
+                            }
+                            if (cameraContentBean.getType() == CameraFileType.VIDEO) {
+                                File file = new File(cameraContentBean.getUri());
+                                RequestBody requestFile = RequestBody.create(MediaType.parse("video/mp4"), file);
+                                //注意：file就是与服务器对应的key,后面filename是服务器得到的文件名
+                                bodyMap.put("HandleFiles\"; filename=\"" + cameraContentBean.getFilename() , requestFile);
+                            }*/
+
                             if (OpenFileUtil.isVideo(filename)) {
-                                requestFile = RequestBody.create(MediaType.parse("image/" + OpenFileUtil.getFileExtension(filename)), file);
-                            } else {
                                 requestFile = RequestBody.create(MediaType.parse("video/" + OpenFileUtil.getFileExtension(filename)), file);
+                            } else {
+                                requestFile = RequestBody.create(MediaType.parse("image/" + OpenFileUtil.getFileExtension(filename)), file);
                             }
 
                             //注意：file就是与服务器对应的key,后面filename是服务器得到的文件名
-                            params.put("HandleFiles\"; filename=\"" + filename, requestFile);
+                            params.put("handleFiles\"; filename=\"" + filename, requestFile);
                         });
 
                     }
                     binding.progressBar.setVisibility(View.VISIBLE);
                     binding.btnYes.setEnabled(false);
-                    Call<RequestBody> call = breakDownService.handleProblem(params);
-                    call.enqueue(new Callback<RequestBody>() {
+                    Call<ResponseBody> call = breakDownService.handleProblem(params);
+                    call.enqueue(new Callback<ResponseBody>() {
                         @Override
-                        public void onResponse(Call<RequestBody> call, Response<RequestBody> response) {
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                             if (response.isSuccessful()) {
                                 Toast.makeText(getContext(), "提交成功", Toast.LENGTH_SHORT).show();
                                 binding.progressBar.setVisibility(View.GONE);
@@ -345,7 +365,7 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                         }
 
                         @Override
-                        public void onFailure(Call<RequestBody> call, Throwable throwable) {
+                        public void onFailure(Call<ResponseBody> call, Throwable throwable) {
                             Log.e("xiaweihu", "处理故障失败: ===========>", throwable);
                         }
                     });
