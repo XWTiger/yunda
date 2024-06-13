@@ -540,7 +540,9 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                         String type = getMimeType(context.getContentResolver(), uri);
                         CameraContentBean cameraContentBean = null;
                         String content = FileUtil.getFileStr(uri, context);
-                        String imagePath = String.format("%s/%s",Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES).toPath() + "/Yunda/", content);
+                        String imagePath = FileUtil.getFileFromUri(uri, getContext()).getPath();
+
+                        //String imagePath = String.format("%s/%s",Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES).toPath() + "/Yunda/", content);
                         if (type.equals("jpg")) {
                             cameraContentBean = new CameraContentBean(CameraFileType.IMAGE, imagePath, way, content);
                         } else {
@@ -568,7 +570,8 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
 
                     uris.forEach(uri -> {
                         String content = FileUtil.getFileStr(uri, context);
-                        String imagePath = String.format("%s/%s", Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES).toPath() + "/Yunda/", content);
+                        String imagePath = FileUtil.getFileFromUri(uri, getContext()).getPath();
+                        //String imagePath = String.format("%s/%s", Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES).toPath() + "/Yunda/", content);
                         String type = getMimeType(context.getContentResolver(), uri);
                         CameraContentBean cameraContentBean = null;
                         if (type.equals("jpg")) {
