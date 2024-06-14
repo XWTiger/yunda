@@ -306,7 +306,7 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                     Map<String, RequestBody> params = new HashMap<>();
                     RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain"), breakRecordGlobal.getId());
                     params.put("id", requestBody);
-                    RequestBody desc = RequestBody.create(MediaType.parse("text/plain"), breakRecordGlobal.getId());
+                    RequestBody desc = RequestBody.create(MediaType.parse("text/plain"), describe);
                     params.put("HandleDesc", desc);
                     params.put("HandleUserId", RequestBody.create(MediaType.parse("text/plain"), String.valueOf(user.getValue())));
 
