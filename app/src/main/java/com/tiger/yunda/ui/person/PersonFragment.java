@@ -30,6 +30,7 @@ import com.tiger.yunda.data.model.WorkLog;
 import com.tiger.yunda.databinding.FragmentPersonBinding;
 import com.tiger.yunda.entity.UserLoginInfo;
 import com.tiger.yunda.internet.AuthInterceptor;
+import com.tiger.yunda.internet.BaseInterceptor;
 import com.tiger.yunda.service.DeviceService;
 import com.tiger.yunda.ui.home.MissionFragment;
 import com.tiger.yunda.ui.login.LoginActivity;
@@ -161,6 +162,12 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
         if (Objects.nonNull(fragmentPersonBinding)) {
             fragmentPersonBinding.systemUser.setText(MainActivity.loggedInUser.getDisplayName());
         }
+        if (Objects.nonNull(MainActivity.loggedInUser) ) {
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Authorization", "Bearer " + MainActivity.loggedInUser.getToken());
+            MainActivity.retrofitClient.addHeaders(headers);
+        }
+
     }
 
     @Override
@@ -292,7 +299,7 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
             SharedPreferences sharedPreferences = getContext().getSharedPreferences(MainActivity.TOKEN_FLAG, Context.MODE_PRIVATE);
             sharedPreferences.edit().remove(MainActivity.TOKEN_STR_KEY);
             sharedPreferences.edit().apply();
-            MainActivity.retrofitClient.clearHeaders();
+            //MainActivity.retrofitClient.clearHeaders();
         }
     }
 }

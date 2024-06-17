@@ -139,11 +139,11 @@ public class RetrofitClient {
         Map<String, String> header = baseInterceptor.getHeaders();
         if (Objects.isNull(header)) {
             header = headers;
+            baseInterceptor.setHeaders(header);
         } else {
             header.clear();
             header.putAll(headers);
         }
-        baseInterceptor.setHeaders(header);
 
     }
 

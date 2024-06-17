@@ -10,8 +10,8 @@ android {
         applicationId = "com.tiger.yunda"
         minSdk = 29
         targetSdk = 34
-        versionCode = 10009
-        versionName = "1.0.0.0.9"
+        versionCode = 10010
+        versionName = "1.0.0.1.0"
 
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

@@ -446,6 +446,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                                     breakDownInfo.clear();
                                     if (Objects.nonNull(InspectionFragment.breakDownInfo)) {
                                         InspectionFragment.breakDownInfo.clear();
+                                        problemDesc.setText(null);
                                     } else {
                                         InspectionFragment.breakDownInfo = new BreakDownInfo();
                                     }
@@ -475,6 +476,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
                         break;
                     case "cancel":
                         breakDownInfo.clear();
+                        problemDesc.setText(null);
                         dismiss();
                         if (Objects.nonNull(InspectionFragment.breakDownInfo)) {
                             InspectionFragment.breakDownInfo.clear();
