@@ -73,6 +73,11 @@ public class WorkLog implements Serializable {
          * 评分
          */
         private String score;
+
+        /**
+         * 评价得分
+         */
+        private String appealScore;
         /**
          * 定位卡号
          */
@@ -81,6 +86,7 @@ public class WorkLog implements Serializable {
          * 状态，1:未处理、2:已处理
          */
         private int state;
+
         /**
          * 状态，1:下发中、2:已下发、3:巡检中、4:完成、5:已接收
          */

@@ -4,6 +4,9 @@ import android.app.Dialog;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 
@@ -19,11 +22,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
 import com.tiger.yunda.data.model.BreakRecord;
@@ -37,14 +43,23 @@ import com.tiger.yunda.service.WorkLogService;
 import com.tiger.yunda.ui.common.SpinnerAdapter;
 import com.tiger.yunda.ui.home.TrainLocations;
 import com.tiger.yunda.utils.CollectionUtil;
+import com.tiger.yunda.utils.FileUtil;
 import com.tiger.yunda.utils.JsonUtil;
+import com.tiger.yunda.utils.OpenFileUtil;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -64,6 +79,13 @@ public class LogDialogFragment extends BottomSheetDialogFragment implements View
     private FragmentDetailLogDialogBinding binding;
     private static WorkLog workLog;
     private WorkLogService workLogService;
+
+    private List<Uri> handleFiles;
+
+    private ChipGroup chipGroup;
+
+    private List<Integer> deleteList;
+    private ActivityResultLauncher<PickVisualMediaRequest> pickMultipleMedia;
 
     // TODO: Customize parameters
     public static LogDialogFragment newInstance(WorkLog workLog) {
@@ -146,6 +168,45 @@ public class LogDialogFragment extends BottomSheetDialogFragment implements View
             binding.btnYes.setVisibility(View.GONE);
             binding.btnEdit.setVisibility(View.GONE);
         }
+
+        pickMultipleMedia =
+                registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(4), uris -> {
+                    // Callback is invoked after the user selects media items or closes the
+                    // photo picker.
+                    if (!uris.isEmpty()) {
+                        Log.d("PhotoPicker", "Number of items selected: " + uris.size());
+                        AtomicInteger index;
+                        if (Objects.isNull(handleFiles)) {
+                            handleFiles = new ArrayList<>();
+                            deleteList = new ArrayList<>();
+                            index  = new AtomicInteger();
+                        } else {
+                            index = new AtomicInteger(handleFiles.size());
+                        }
+
+                        uris.forEach(uri -> {
+                            Chip chip = (Chip) LayoutInflater.from(getContext()).inflate(R.layout.chip_file, null);
+                            chip.setText("恢复_" + index);
+                            chip.setTag(index.get());
+                            chip.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    int ind = (int) v.getTag();
+                                    //handleFiles.remove(ind);
+                                    deleteList.set(ind, 0);
+                                    chipGroup.removeView(v);
+
+                                }
+                            });
+                            handleFiles.add(uri);
+                            deleteList.add(1);
+                            chipGroup.addView(chip);
+                            index.getAndIncrement();
+                        });
+                    } else {
+                        Log.d("PhotoPicker", "No media selected");
+                    }
+                });
         return binding.getRoot();
 
     }
@@ -163,11 +224,78 @@ public class LogDialogFragment extends BottomSheetDialogFragment implements View
         binding = null;
     }
 
+    public void openFilePicker() {
+        // For this example, launch the photo picker and let the user choose images
+        // and videos. If you want the user to select a specific type of media file,
+        // use the overloaded versions of launch(), as shown in the section about how
+        // to select a single media item.
+        pickMultipleMedia.launch(new PickVisualMediaRequest.Builder()
+                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageAndVideo.INSTANCE)
+                .build());
+    }
+
     @Override
     public void onClick(View v) {
         String tag = v.getTag().toString();
         if ("edit".equals(tag)) {
+            Dialog dialog = new Dialog(getContext());
+            dialog.setContentView(R.layout.dialog_change_score_layout); // 设置自定义布局
+            dialog.setTitle("修改评分");
 
+            // 找到布局中的EditText
+            EditText input = dialog.findViewById(R.id.change_num);
+            Button confirmButton = dialog.findViewById(R.id.change_finished);
+            Button cancel = dialog.findViewById(R.id.change_cancel);
+            confirmButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String num = input.getText().toString();
+                    Map<String, Object> params = new HashMap<>();
+                    if (StringUtils.isBlank(num)) {
+                        input.setError("分数不能为空");
+                        Toast.makeText(getContext(), "分数不能为空" ,Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if (Double.parseDouble(num) < 0 || Double.parseDouble(num) > 10) {
+                        input.setError("分数在0-10之间");
+                        Toast.makeText(getContext(), "分数在0-10之间" ,Toast.LENGTH_SHORT).show();
+                        return;
+                    } else {
+                        input.setError(null);
+                    }
+                    params.put("id",  workLog.getId());
+                    params.put("score", num);
+                    workLogService.changeScore(params).enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            if (response.isSuccessful()) {
+                                Toast.makeText( getContext(), "提交成功", Toast.LENGTH_SHORT).show();
+                                // 关闭对话框
+                                dialog.dismiss();
+                                dismiss();
+                            } else {
+                                try {
+                                    String errStr = response.errorBody().string();
+                                    ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                                    Log.e("xiaweihu", "修改分数失败: ===========>" + errStr);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                            Log.e("xiaweihu", "修改分数失败: ===========>", throwable);
+                        }
+                    });
+                }
+            });
+
+            cancel.setOnClickListener( ele -> {
+                dialog.dismiss();
+            });
+            dialog.show();
         }
         if ("yes".equals(tag)) {
             dismiss();
@@ -181,20 +309,58 @@ public class LogDialogFragment extends BottomSheetDialogFragment implements View
 
             // 找到布局中的EditText
             EditText input = dialog.findViewById(R.id.reject_reason);
-            Spinner spinner = dialog.findViewById(R.id.reject_location);
+            chipGroup = dialog.findViewById(R.id.file_group);
+            ImageButton imageButton = dialog.findViewById(R.id.imageButton);
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openFilePicker();
+                }
+            });
+           /* Spinner spinner = dialog.findViewById(R.id.reject_location);
             SpinnerAdapter spinnerAdapter = new SpinnerAdapter(workLog.getSpinnerTypes(),getContext());
             spinner.setAdapter(spinnerAdapter);
-            int position = spinner.getSelectedItemPosition();
+            int position = spinner.getSelectedItemPosition();*/
             // 创建按钮来确认输入
             Button confirmButton = dialog.findViewById(R.id.reject_finished);
             Button cancel = dialog.findViewById(R.id.reject_cancel);
             dialog.show(); // 显示对话框
             confirmButton.setOnClickListener(ele -> {
                 String inputText = input.getText().toString();
+                if (StringUtils.isBlank(inputText)) {
+                    input.setError("原因不能为空");
+                    Toast.makeText(getContext(), "原因不能为空" ,Toast.LENGTH_SHORT).show();
+                    return;
+                } else {
+                    input.setError(null);
+                }
                 // 处理输入的文本
-                Map<String, Object> params = new HashMap<>();
-                params.put("trainLocationId", workLog.getTrainLocations().get(position).getId());
-                params.put("reason", inputText);
+                Map<String, RequestBody> params = new HashMap<>();
+                RequestBody id = RequestBody.create(MediaType.parse("text/plain"), workLog.getId());
+
+                RequestBody desc = RequestBody.create(MediaType.parse("text/plain"), inputText);
+
+
+                params.put("SubtaskId", id);
+                params.put("reason", desc);
+                if (!CollectionUtil.isEmpty(handleFiles)) {
+                    for (int i = 0; i < deleteList.size(); i++) {
+                        if (deleteList.get(i) == 1) {
+                            File file = FileUtil.getFileFromUri(handleFiles.get(i), getContext());
+                            String filename = FileUtil.getFileStr(handleFiles.get(i), getContext());
+                            RequestBody requestFile;
+                            if (OpenFileUtil.isVideo(filename)) {
+                                requestFile = RequestBody.create(MediaType.parse("video/" + OpenFileUtil.getFileExtension(filename)), file);
+                            } else {
+                                requestFile = RequestBody.create(MediaType.parse("image/" + OpenFileUtil.getFileExtension(filename)), file);
+                            }
+
+                            //注意：file就是与服务器对应的key,后面filename是服务器得到的文件名
+                            params.put("handleFiles\"; filename=\"" + filename, requestFile);
+                        }
+                    }
+
+                }
                 workLogService.reject(params).enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

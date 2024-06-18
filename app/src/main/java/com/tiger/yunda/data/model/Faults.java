@@ -1,5 +1,6 @@
 package com.tiger.yunda.data.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Faults {
+public class Faults implements Serializable {
     private String id;
     /**
      * 子任务id

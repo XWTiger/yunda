@@ -265,7 +265,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:background="@drawable/text_view_boder">
 
@@ -274,7 +274,7 @@
                 android:layout_width="wrap_content"
 
                 android:layout_height="wrap_content"
-                android:text="开始巡检时间:  "
+                android:text="得分:  "
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -291,6 +291,31 @@
                 android:textSize="16sp"
                 app:layout_constraintStart_toEndOf="@id/score_title"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/score_pj_title"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:text="评价得分:  "
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@+id/score_title"
+                app:layout_constraintTop_toBottomOf="@+id/score_title" />
+
+            <TextView
+                android:id="@+id/score_pj"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:text='@{log.appealScore + " 分"}'
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/score_pj_title"
+                app:layout_constraintStart_toEndOf="@id/score_pj_title"
+                app:layout_constraintTop_toBottomOf="@+id/score_title"
+                tools:text="9.7 分" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

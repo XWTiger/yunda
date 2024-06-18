@@ -92,6 +92,8 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
     private ChipGroup chipGroup;
 
     private List<Uri> handleFiles;
+
+    private List<Integer> deleteList;
     private BreakDownService breakDownService;
 
 
@@ -197,6 +199,7 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                         AtomicInteger index;
                         if (Objects.isNull(handleFiles)) {
                             handleFiles = new ArrayList<>();
+                            deleteList = new ArrayList<>();
                             index  = new AtomicInteger();
                         } else {
                             index = new AtomicInteger(handleFiles.size());
@@ -210,11 +213,13 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                                 @Override
                                 public void onClick(View v) {
                                     int ind = (int) v.getTag();
-                                    handleFiles.remove(ind);
+                                    //handleFiles.remove(ind);
+                                    deleteList.set(ind, 0);
                                     chipGroup.removeView(v);
                                 }
                             });
                             handleFiles.add(uri);
+                            deleteList.add(1);
                             chipGroup.addView(chip);
                             index.getAndIncrement();
                         });
@@ -311,38 +316,21 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                     params.put("HandleUserId", RequestBody.create(MediaType.parse("text/plain"), String.valueOf(user.getValue())));
 
                     if (!CollectionUtil.isEmpty(handleFiles)) {
-                        handleFiles.forEach( ele -> {
-                          /*  String path = ele.getEncodedPath();
-                            //File file = FileUtil.uri2File( ele, getContext(), false);
-                            path = Uri.decode(path);*/
-                            File file = FileUtil.getFileFromUri(ele, getContext());
-                            String filename = FileUtil.getFileStr(ele, getContext());
-                            RequestBody requestFile;
+                        for (int i = 0; i < deleteList.size(); i++) {
+                            if (deleteList.get(i) == 1) {
+                                File file = FileUtil.getFileFromUri(handleFiles.get(i), getContext());
+                                String filename = FileUtil.getFileStr(handleFiles.get(i), getContext());
+                                RequestBody requestFile;
+                                if (OpenFileUtil.isVideo(filename)) {
+                                    requestFile = RequestBody.create(MediaType.parse("video/" + OpenFileUtil.getFileExtension(filename)), file);
+                                } else {
+                                    requestFile = RequestBody.create(MediaType.parse("image/" + OpenFileUtil.getFileExtension(filename)), file);
+                                }
 
-
-                           /* if (cameraContentBean.getType() == CameraFileType.IMAGE) {
-                                File file = new File(cameraContentBean.getUri());
-                                RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpg"), file);
                                 //注意：file就是与服务器对应的key,后面filename是服务器得到的文件名
-                                bodyMap.put("HandleFiles\"; filename=\"" + cameraContentBean.getFilename() , requestFile);
+                                params.put("handleFiles\"; filename=\"" + filename, requestFile);
                             }
-                            if (cameraContentBean.getType() == CameraFileType.VIDEO) {
-                                File file = new File(cameraContentBean.getUri());
-                                RequestBody requestFile = RequestBody.create(MediaType.parse("video/mp4"), file);
-                                //注意：file就是与服务器对应的key,后面filename是服务器得到的文件名
-                                bodyMap.put("HandleFiles\"; filename=\"" + cameraContentBean.getFilename() , requestFile);
-                            }*/
-
-                            if (OpenFileUtil.isVideo(filename)) {
-                                requestFile = RequestBody.create(MediaType.parse("video/" + OpenFileUtil.getFileExtension(filename)), file);
-                            } else {
-                                requestFile = RequestBody.create(MediaType.parse("image/" + OpenFileUtil.getFileExtension(filename)), file);
-                            }
-
-                            //注意：file就是与服务器对应的key,后面filename是服务器得到的文件名
-                            params.put("handleFiles\"; filename=\"" + filename, requestFile);
-                        });
-
+                        }
                     }
                     binding.progressBar.setVisibility(View.VISIBLE);
                     binding.btnYes.setEnabled(false);
