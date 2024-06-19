@@ -121,6 +121,7 @@ public class MissionViewModel extends ViewModel {
 
             if (Objects.nonNull(MainActivity.loggedInUser)) {
                 body.put("deptId", MainActivity.loggedInUser.getDeptId());
+                body.put("leaderId", MainActivity.loggedInUser.getUserId());
             }
             //默认查待分发的任务
             body.put("state", 0);

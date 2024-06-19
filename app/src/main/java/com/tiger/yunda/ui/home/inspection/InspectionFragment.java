@@ -1,5 +1,7 @@
 package com.tiger.yunda.ui.home.inspection;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -41,7 +43,10 @@ import com.tiger.yunda.ui.home.ListViewAdapter;
 import com.tiger.yunda.ui.home.Mission;
 import com.tiger.yunda.ui.home.inspection.placeholder.PlaceholderContent;
 import com.tiger.yunda.utils.CollectionUtil;
+import com.tiger.yunda.utils.DownLoadUtil;
 import com.tiger.yunda.utils.JsonUtil;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -210,29 +215,46 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v) {
         //巡检任务完成
-        Call<ResponseBody> responseBodyCall = inspectionService.finishedMission(mission.getId());
-        responseBodyCall.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "完成任务", Toast.LENGTH_SHORT).show();
-                    navController.navigate(R.id.to_navigation_mission);
-                } else {
-                    try {
-                        String errStr = response.errorBody().string();
-                        ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
-                        Log.e("xiaweihu", "完成任务失败: ===========>" + errStr);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("更新")
+                .setMessage("已完成巡检，是否消除该防区门禁权限")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Call<ResponseBody> responseBodyCall = inspectionService.finishedMission(mission.getId());
+                        responseBodyCall.enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                if (response.isSuccessful()) {
+                                    Toast.makeText(getContext(), "完成任务", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                    navController.navigate(R.id.to_navigation_mission);
+                                } else {
+                                    try {
+                                        String errStr = response.errorBody().string();
+                                        ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                                        Log.e("xiaweihu", "完成任务失败: ===========>" + errStr);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+
+                            }
+                        });
+
                     }
-                }
-            }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable throwable) {
-
-            }
-        });
     }
 
     public class ViewHolder  implements View.OnClickListener {

@@ -111,7 +111,10 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
 
             logViewModel = new ViewModelProvider(this).get(LogViewModel.class);
             logViewModel.setContext(getContext());
-            logViewModel.getLogs(1, 10, 0, "", "").observe(getViewLifecycleOwner(), new Observer<List<WorkLog>>() {
+            Date startTime = TimeUtil.getStartOfDay(new Date());
+
+            Date endTime = TimeUtil.getEndOfDay(new Date());
+            logViewModel.getLogs(1, 30, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime)).observe(getViewLifecycleOwner(), new Observer<List<WorkLog>>() {
                 @Override
                 public void onChanged(List<WorkLog> workLogs) {
                     if (CollectionUtil.isEmpty(workLogs)) {
@@ -139,7 +142,9 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
 
     @Override
     public void onRefresh() {
-        logViewModel.getLogs(1, 10,  Objects.nonNull(MainActivity.loggedInUser)?Integer.valueOf(MainActivity.loggedInUser.getDeptId()): 0, "", "");
+        Date startTime = TimeUtil.getStartOfDay(new Date());
+        Date endTime = TimeUtil.getEndOfDay(new Date());
+        logViewModel.getLogs(1, 30,  Objects.nonNull(MainActivity.loggedInUser)?Integer.valueOf(MainActivity.loggedInUser.getDeptId()): 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -186,9 +191,9 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                         .setDisplayType(Arrays.asList(
                                 DateTimeConfig.YEAR,//显示年
                                 DateTimeConfig.MONTH,//显示月
-                                DateTimeConfig.DAY,//显示日
-                                DateTimeConfig.HOUR,//显示时
-                                DateTimeConfig.MIN))//显示分
+                                DateTimeConfig.DAY//显示日
+                               // DateTimeConfig.HOUR,//显示时 DateTimeConfig.MIN)//显示分
+                                ))
                         .setOnChoose("选择", aLong -> {
                             //aLong  = millisecond
                             Date start = new Date(aLong);
@@ -196,7 +201,7 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                             startTextTime.setText(TimeUtil.getDateYmdFromMs(start));
                             endTime = TimeUtil.getEndOfDay(start);
                             if (Objects.nonNull(startTime) && Objects.nonNull(endTime)) {
-                                logViewModel.getLogs(1, 10, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
+                                logViewModel.getLogs(1, 30, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
                             }
                             return null;
                         })
@@ -215,7 +220,7 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                             endTime = end;
                             endTextTime.setText(TimeUtil.getDateYmdFromMs(end));
                             if (Objects.nonNull(startTime) && Objects.nonNull(endTime)) {
-                                logViewModel.getLogs(1, 10, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
+                                logViewModel.getLogs(1, 30, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
                             }
                             return null;
                         })

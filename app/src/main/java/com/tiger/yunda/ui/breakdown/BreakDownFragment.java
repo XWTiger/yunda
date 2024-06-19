@@ -185,9 +185,8 @@ public class BreakDownFragment extends Fragment {
                         .setDisplayType(Arrays.asList(
                                 DateTimeConfig.YEAR,//显示年
                                 DateTimeConfig.MONTH,//显示月
-                                DateTimeConfig.DAY,//显示日
-                                DateTimeConfig.HOUR,//显示时
-                                DateTimeConfig.MIN))//显示分
+                                DateTimeConfig.DAY//显示日DateTimeConfig.HOUR,//显示时 DateTimeConfig.MIN
+                                ))//显示分
                         .setOnChoose("选择", aLong -> {
                             //aLong  = millisecond
                             Date start = new Date(aLong);
