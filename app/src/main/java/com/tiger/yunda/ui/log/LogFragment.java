@@ -31,6 +31,8 @@ import com.tiger.yunda.databinding.LogListBinding;
 import com.tiger.yunda.utils.CollectionUtil;
 import com.tiger.yunda.utils.TimeUtil;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -144,7 +146,7 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
     public void onRefresh() {
         Date startTime = TimeUtil.getStartOfDay(new Date());
         Date endTime = TimeUtil.getEndOfDay(new Date());
-        logViewModel.getLogs(1, 30,  Objects.nonNull(MainActivity.loggedInUser)?Integer.valueOf(MainActivity.loggedInUser.getDeptId()): 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
+        logViewModel.getLogs(1, 30,  0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -200,6 +202,7 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                             startTime = TimeUtil.getStartOfDay(start);
                             startTextTime.setText(TimeUtil.getDateYmdFromMs(start));
                             endTime = TimeUtil.getEndOfDay(start);
+                            String deptId = MainActivity.loggedInUser.getDeptId();
                             if (Objects.nonNull(startTime) && Objects.nonNull(endTime)) {
                                 logViewModel.getLogs(1, 30, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
                             }

@@ -65,10 +65,10 @@ public class LogViewModel extends ViewModel {
                 body.put("deptId", Integer.valueOf(MainActivity.loggedInUser.getDeptId()));
             }
         }
-        body.put("faultState", 0);
-        if (Objects.nonNull(MainActivity.loggedInUser)) {
+
+       /* if (Objects.nonNull(MainActivity.loggedInUser)) {
             body.put("inspectorId", Integer.valueOf(MainActivity.loggedInUser.getUserId()));
-        }
+        }*/
         Call<PageResult<WorkLog>> resultCall = workLogService.queryByPage(body);
         resultCall.enqueue(new Callback<PageResult<WorkLog>>() {
             @Override
