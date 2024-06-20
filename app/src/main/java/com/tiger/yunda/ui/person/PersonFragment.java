@@ -1,7 +1,9 @@
 package com.tiger.yunda.ui.person;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -34,6 +36,7 @@ import com.tiger.yunda.internet.BaseInterceptor;
 import com.tiger.yunda.service.DeviceService;
 import com.tiger.yunda.ui.home.MissionFragment;
 import com.tiger.yunda.ui.login.LoginActivity;
+import com.tiger.yunda.utils.DownLoadUtil;
 import com.tiger.yunda.utils.JsonUtil;
 
 import org.apache.commons.lang3.StringUtils;
@@ -289,6 +292,30 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        builder.setTitle("更新")
+                                .setMessage("解绑设备异常，是否强制退出")
+                                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        UserLoginInfo userLoginInfo = userLoginInfoDao.getSignedIn();
+                                        MainActivity.loggedInUser = null;
+                                        // 删除数据库登录信息
+                                        if (Objects.nonNull(userLoginInfo)) {
+                                            userLoginInfoDao.deleteByUid(userLoginInfo.getUid());
+                                        }
+                                        dialog.dismiss();
+
+                                        Intent intent = new Intent(getContext(), LoginActivity.class);
+                                        getActivity().startActivityForResult(intent, MainActivity.LOGIN_INTENT_RESULT_CODE);
+                                    }
+                                })
+                                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // 点击“Cancel”按钮后的操作
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .show();
                         Log.e("xiaweihu", "绑定设备失败: ===========>", throwable);
                     }
                 });

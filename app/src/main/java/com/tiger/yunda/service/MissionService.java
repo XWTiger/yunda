@@ -16,6 +16,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface MissionService {
@@ -86,4 +87,7 @@ public interface MissionService {
      */
     @POST("/api/PatrolTask/GetPage")
     Call<PageResult<DeliverTask>> queryMasterMission(@Body Map<String, Object> body);
+
+    @POST("/api/PatrolTask/Refuse/{taskId}")
+    Call<ResponseBody> rejectMission(@Path("taskId") String taskId);
 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.BlendMode;
 import android.graphics.Color;
@@ -36,8 +37,10 @@ import com.tiger.yunda.R;
 import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.databinding.FragmentHomeBinding;
 import com.tiger.yunda.databinding.LayoutMissionBinding;
+import com.tiger.yunda.entity.UserLoginInfo;
 import com.tiger.yunda.enums.RoleType;
 import com.tiger.yunda.service.MissionService;
+import com.tiger.yunda.ui.login.LoginActivity;
 import com.tiger.yunda.utils.CollectionUtil;
 import com.tiger.yunda.utils.JsonUtil;
 import com.tiger.yunda.utils.TimeUtil;
@@ -115,6 +118,10 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
             Mission mission =  objects.get(position);
             if (Objects.nonNull(mission.getMasterMission()) && mission.getMasterMission()) {
                 checkBox.setEnabled(false);
+            } else {
+                ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
+                btnReject.setBackgroundTintList(colorStateList);
+                btnReject.setEnabled(false);
             }
 
             int state = objects.get(position).getState();
@@ -256,7 +263,27 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                             .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     // 点击“OK”按钮后的操作
-                                    Toast.makeText(context, "点击确定", Toast.LENGTH_SHORT).show();
+                                    missionService.rejectMission(objects.get(position).getTaskId()).enqueue(new Callback<ResponseBody>() {
+                                        @Override
+                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                            if (response.isSuccessful()) {
+                                                Toast.makeText(context, "成功", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                try {
+                                                    String errStr = response.errorBody().string();
+                                                    ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                                                    Log.e("xiaweihu", "拒绝任务失败: ===========>" + errStr);
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                                            Log.e("xiaweihu", "拒绝任务失败: ===========>", throwable);
+                                        }
+                                    });
                                     dialog.dismiss();
                                 }
                             })
