@@ -125,6 +125,16 @@ public class RetrofitClient {
         return retrofitClient;
     }
 
+    public static RetrofitClient newInstance(Context context, String url, Map<String, String> headers) {
+            synchronized (BASE_URL) {
+                if (context != null) {
+                    mContext = context;
+                }
+                return new RetrofitClient(context, url, headers);
+            }
+
+    }
+
     public MainActivity getMainActivity() {
         return mainActivity;
     }

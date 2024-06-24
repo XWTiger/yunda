@@ -39,6 +39,7 @@ public class LoginDataSource extends Thread {
             LoginDataSource lds = new LoginDataSource();
             lds.setUsername(username);
             lds.setPassword(password);
+
             lds.setLoginService(LoginActivity.retrofitClient.create(LoginService.class));
             Thread thread = lds;
 

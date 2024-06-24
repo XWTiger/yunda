@@ -132,6 +132,10 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             binding.serviceAddr.setText("10.60.0.190:9291");
         }
+        if (Objects.isNull(retrofitClient)) {
+            baseUrl =  binding.serviceAddr.getText().toString();
+            retrofitClient = RetrofitClient.getInstance(getApplicationContext(), "http://" + binding.serviceAddr.getText().toString(), new HashMap<>());
+        }
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
@@ -245,7 +249,8 @@ public class LoginActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                retrofitClient = RetrofitClient.getInstance(getApplicationContext(), "http://" + binding.serviceAddr.getText().toString(), new HashMap<>());
+                baseUrl = binding.serviceAddr.getText().toString();
+                retrofitClient = RetrofitClient.newInstance(getApplicationContext(), "http://" + binding.serviceAddr.getText().toString(), new HashMap<>());
                 SharedPreferences sharedPreferences =  getApplicationContext().getSharedPreferences(MainActivity.TOKEN_FLAG, Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(MainActivity.SERVICE_ADDR_FLAG, binding.serviceAddr.getText().toString());
