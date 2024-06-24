@@ -268,6 +268,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                                             if (response.isSuccessful()) {
                                                 Toast.makeText(context, "成功", Toast.LENGTH_SHORT).show();
+                                                missionViewModel.getData(1, 30, null, null, MissionFragment.masterMission);
                                             } else {
                                                 try {
                                                     String errStr = response.errorBody().string();

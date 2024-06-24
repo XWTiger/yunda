@@ -11,8 +11,8 @@
 
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -54,8 +54,8 @@
 
     <ImageButton
         android:id="@+id/camera_button"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
+        android:layout_width="88dp"
+        android:layout_height="88dp"
         android:layout_marginLeft="10dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="13dp"
@@ -69,8 +69,8 @@
 
     <ImageButton
         android:id="@+id/capture_button"
-        android:layout_width="96dp"
-        android:layout_height="0dp"
+        android:layout_width="88dp"
+        android:layout_height="88dp"
         android:background="@drawable/ic_start"
         android:contentDescription="@string/capture"
         android:translationX="48dp"
@@ -84,8 +84,8 @@
         android:id="@+id/stop_button"
         android:background="@drawable/ic_stop"
         android:visibility="invisible"
-        android:layout_width="96dp"
-        android:layout_height="0dp"
+        android:layout_width="88dp"
+        android:layout_height="88dp"
         android:layout_marginStart="16dp"
         android:contentDescription="@string/stop"
         android:translationX="48dp"
@@ -97,8 +97,8 @@
 
     <ImageButton
         android:id="@+id/camera_out"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
+        android:layout_width="88dp"
+        android:layout_height="88dp"
         android:background="@drawable/ic_camera_out"
         android:layout_marginLeft="100dp"
         app:layout_constraintBottom_toBottomOf="@+id/capture_button"
