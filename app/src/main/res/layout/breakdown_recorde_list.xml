@@ -70,7 +70,7 @@
             android:id="@+id/problem_detail_button"
             android:layout_width="70dp"
             android:layout_height="20dp"
-            android:layout_marginStart="300dp"
+            android:layout_marginStart="280dp"
             android:background='@{record.stateText == "未处理" ? @drawable/bg_detail_white_btn : @drawable/bg_detail_btn}'
             tools:background="@color/selector_detail_button"
             android:textColor="@color/selector_text_color" />

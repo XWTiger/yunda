@@ -217,7 +217,7 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
         //巡检任务完成
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("更新")
+        builder.setTitle("注意")
                 .setMessage("已完成巡检，是否消除该防区门禁权限")
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
