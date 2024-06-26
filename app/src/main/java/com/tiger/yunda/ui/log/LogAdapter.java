@@ -61,9 +61,9 @@ public class LogAdapter extends ArrayAdapter<WorkLog> {
                 // 设置layout_marginStart的值
                 ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) layoutParams;
                        if (Objects.nonNull(workLogList.get(position).getScore()) && workLogList.get(position).getScore().length() >= 2) {
-                           marginLayoutParams.setMarginStart(-75); // 设置layout_marginStart的值为24dp
+                           marginLayoutParams.setMarginStart(-60); // 设置layout_marginStart的值为24dp 75
                         } else {
-                           marginLayoutParams.setMarginStart(-60);
+                           marginLayoutParams.setMarginStart(-50);
                         }
 
                 logListBinding.textScore.setLayoutParams(marginLayoutParams); // 将修改后的LayoutParams重新设置给View

@@ -41,17 +41,17 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="170dp"
+                android:layout_marginStart="140dp"
                 android:background="@drawable/start" />
             <TextView
                 android:id="@+id/text_score"
-                android:layout_marginStart="-25dp"
+                android:layout_marginStart="-10dp"
                 android:textSize="10sp"
                 android:textColor="@color/green"
                 android:layout_marginTop="1dp"
                 android:text="@{log.score}"
 
-                tools:text="9"
+                tools:text="10.0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 

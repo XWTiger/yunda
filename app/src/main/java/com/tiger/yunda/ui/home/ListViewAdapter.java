@@ -226,7 +226,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                                             /*getNavController().navigate(R.id.to_inspection_mission, bundle);*/
                                             missionViewModel.getData(1, 30, null, null, false);
                                         } else {
-                                            Toast.makeText(context, "接受任务失败", Toast.LENGTH_SHORT).show();
+                                            //Toast.makeText(context, "接受任务失败", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                     //to_accept_mission

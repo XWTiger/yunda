@@ -2,11 +2,14 @@ package com.tiger.yunda.ui.home;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.data.model.DeliverTask;
 import com.tiger.yunda.data.model.ErrorResult;
@@ -27,6 +30,7 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -265,6 +269,8 @@ public class MissionViewModel extends ViewModel {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         Call<ResponseBody> responseBodyCall = missionService.acceptMission(subtaskId);
         AtomicBoolean result = new AtomicBoolean();
+        AtomicReference<String> errMsg = new AtomicReference<>(null);
+
         MainActivity.threadPoolExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -274,6 +280,7 @@ public class MissionViewModel extends ViewModel {
                         result.set(true);
                     } else {
                         String errStr = response.errorBody().string();
+                        errMsg.set(errStr);
                         Log.e("xiaweihu", "查询主任务列表失败: ===========>" + errStr);
                     }
                     countDownLatch.countDown();
@@ -284,7 +291,14 @@ public class MissionViewModel extends ViewModel {
         });
 
         try {
+
             countDownLatch.await();
+            if (Objects.nonNull(errMsg.get())) {
+                Gson gson = new GsonBuilder().create();
+                ErrorResult errorResult = gson.fromJson(errMsg.get(), ErrorResult.class);
+                Toast toast = Toast.makeText(context, errorResult.getTitle(), Toast.LENGTH_SHORT);
+                toast.show();
+            }
         } catch (InterruptedException e) {
            e.printStackTrace();
         }
@@ -310,6 +324,8 @@ public class MissionViewModel extends ViewModel {
                         }
                     } else {
                         try {
+                            String errStr = response.errorBody().string();
+                            JsonUtil.getObject(errStr, getContext());
                             Log.e("xiaweihu", "批量接受任务: ===========>" + response.errorBody().string());
                         } catch (IOException e) {
                             e.printStackTrace();
