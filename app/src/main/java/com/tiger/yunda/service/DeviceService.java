@@ -7,6 +7,7 @@ import java.util.Map;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 
 public interface DeviceService {
@@ -18,7 +19,7 @@ public interface DeviceService {
      * @return
      */
     @POST("/api/Pad/BindDevice")
-    Call<ResponseBody> bindMac(@Body Map<String, String> body);
+    Call<ResponseBody> bindMac(@Header ("Authorization") String auth,  @Body Map<String, String> body);
 
 
     @POST("/api/Pad/UnbindDevice")

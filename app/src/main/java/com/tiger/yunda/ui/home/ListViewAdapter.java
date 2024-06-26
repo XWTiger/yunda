@@ -180,7 +180,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                                 try {
                                     String errStr = response.errorBody().string();
                                     ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
-                                    Log.e("xiaweihu", "绑定设备失败: ===========>" + errStr);
+                                    Log.e("xiaweihu", "巡检失败: ===========>" + errStr);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }

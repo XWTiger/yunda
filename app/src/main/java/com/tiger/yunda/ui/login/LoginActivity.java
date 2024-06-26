@@ -37,13 +37,16 @@ import android.widget.Toast;
 
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
+import com.tiger.yunda.dao.UserLoginInfoDao;
 import com.tiger.yunda.data.model.DeliverTask;
 import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.data.model.PageResult;
 import com.tiger.yunda.data.model.Version;
 import com.tiger.yunda.entity.ResourceLocationEntity;
+import com.tiger.yunda.entity.UserLoginInfo;
 import com.tiger.yunda.internet.AuthInterceptor;
 import com.tiger.yunda.internet.RetrofitClient;
+import com.tiger.yunda.service.DeviceService;
 import com.tiger.yunda.service.LoginService;
 import com.tiger.yunda.service.MissionService;
 import com.tiger.yunda.ui.home.Mission;
@@ -61,11 +64,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -108,6 +113,7 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "网络不可用", Toast.LENGTH_SHORT).show();
             return;
         }
+        AuthInterceptor.loginFlag.getAndIncrement();
 
         String androidId = Settings.System.getString(getContentResolver(), Settings.System.ANDROID_ID);
         if (Objects.isNull(loginService)) {
@@ -175,12 +181,43 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 if (loginResult.getSuccess() != null) {
                     updateUiWithUser(loginResult.getSuccess());
-                    Intent intent = new Intent();
-                    intent.putExtra(LOGIN_RESULT_KEY,  loginResult.getLoggedInUser());
 
-                    setResult(Activity.RESULT_OK, intent);
-                    //Complete and destroy login activity once successful
-                    finish();
+                    //绑定设备mac 地址
+                    String ANDROID_ID = Settings.System.getString(getContentResolver(), Settings.System.ANDROID_ID);
+                    Map<String, String> body = new HashMap<>();
+                    body.put("mac", ANDROID_ID);
+                    DeviceService deviceService = retrofitClient.create(DeviceService.class);
+                    Call<ResponseBody> call = deviceService.bindMac("Bearer " + loginResult.getLoggedInUser().getToken(), body);
+                    call.enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            if (response.isSuccessful()) {
+                                Intent intent = new Intent();
+                                intent.putExtra(LOGIN_RESULT_KEY,  loginResult.getLoggedInUser());
+
+                                setResult(Activity.RESULT_OK, intent);
+                                //Complete and destroy login activity once successful
+                                finish();
+                            } else {
+                                try {
+                                    String errStr = response.errorBody().string();
+                                    ErrorResult errorResult = JsonUtil.getObject(errStr, getApplicationContext());
+                                    Log.e("xiaweihu", "绑定设备失败: ===========>" + errStr);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            AuthInterceptor.loginFlag.getAndDecrement();
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                            Log.e("xiaweihu", "网络异常绑定设备失败: ===========>", throwable);
+                            Toast.makeText(getApplicationContext(), "网络异常绑定设备失败", Toast.LENGTH_SHORT).show();
+                            AuthInterceptor.loginFlag.getAndDecrement();
+                        }
+                    });
+
                 }
 
 

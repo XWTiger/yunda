@@ -275,14 +275,17 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
                             if (Objects.nonNull(userLoginInfo)) {
                                 userLoginInfoDao.deleteByUid(userLoginInfo.getUid());
                             }
-
+                            SharedPreferences sharedPreferences = getContext().getSharedPreferences(MainActivity.TOKEN_FLAG, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.remove(MainActivity.TOKEN_STR_KEY);
+                            editor.apply();
                             Intent intent = new Intent(getContext(), LoginActivity.class);
                             getActivity().startActivityForResult(intent, MainActivity.LOGIN_INTENT_RESULT_CODE);
                         } else {
                             try {
                                 String errStr = response.errorBody().string();
                                 ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
-                                Log.e("xiaweihu", "绑定设备失败: ===========>" + errStr);
+                                Log.e("xiaweihu", "解绑设备失败: ===========>" + errStr);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -316,16 +319,17 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
                                     }
                                 })
                                 .show();
-                        Log.e("xiaweihu", "绑定设备失败: ===========>", throwable);
+                        Log.e("xiaweihu", "解绑设备失败: ===========>", throwable);
                     }
                 });
             } else {
                 Intent intent = new Intent(getContext(), LoginActivity.class);
                 getActivity().startActivityForResult(intent, MainActivity.LOGIN_INTENT_RESULT_CODE);
             }
-            SharedPreferences sharedPreferences = getContext().getSharedPreferences(MainActivity.TOKEN_FLAG, Context.MODE_PRIVATE);
-            sharedPreferences.edit().remove(MainActivity.TOKEN_STR_KEY);
-            sharedPreferences.edit().apply();
+           /* SharedPreferences sharedPreferences = getContext().getSharedPreferences(MainActivity.TOKEN_FLAG, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.remove(MainActivity.TOKEN_STR_KEY);
+            editor.apply();*/
             //MainActivity.retrofitClient.clearHeaders();
         }
     }

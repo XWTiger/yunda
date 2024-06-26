@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if (Objects.isNull(loggedInUser) && StringUtils.isBlank(token)) {
+        if (Objects.isNull(loggedInUser) && StringUtils.isBlank(token) && AuthInterceptor.loginFlag.get() == 0) {
             AuthInterceptor.loginFlag.getAndIncrement();
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -232,62 +232,33 @@ public class MainActivity extends AppCompatActivity {
             Map<String, String> headers = new HashMap<>();
             headers.put("Authorization", "Bearer " + loggedInUser.getToken());
             MainActivity.retrofitClient.addHeaders(headers);
-            DeviceService deviceService = retrofitClient.create(DeviceService.class);
             if (AuthInterceptor.loginFlag.get() >= 1) {
                 AuthInterceptor.loginFlag.getAndDecrement();
             }
-            MissionFragment.missionFlag.getAndDecrement();
+            //MissionFragment.missionFlag.getAndDecrement();
 
 
 
-            //绑定设备mac 地址
-            String ANDROID_ID = Settings.System.getString(getContentResolver(), Settings.System.ANDROID_ID);
+            UserLoginInfoDao userLoginInfoDao = appDatabase.userLoginInfoDao();
+            UserLoginInfo userLoginInfo = userLoginInfoDao.getByAccount(loggedInUser.getAccount());
+            if (Objects.isNull(userLoginInfo)) {
+                userLoginInfoDao.insert(UserLoginInfo.builder()
+                        .uid(loggedInUser.getUserId())
+                        .account(loggedInUser.getAccount())
+                        .bindStatus(true)
+                        .token(loggedInUser.getToken())
+                        .deptId(loggedInUser.getDeptId())
+                        .deptName(loggedInUser.getDeptName())
+                        .role(loggedInUser.getRole())
+                        .roleId(loggedInUser.getRoleId())
+                        .roleName(loggedInUser.getRoleName())
+                        .build());
 
-
-            Map<String, String> body = new HashMap<>();
-            body.put("mac", ANDROID_ID);
-            Call<ResponseBody> call = deviceService.bindMac(body);
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    if (response.isSuccessful()) {
-                        UserLoginInfoDao userLoginInfoDao = appDatabase.userLoginInfoDao();
-                        UserLoginInfo userLoginInfo = userLoginInfoDao.getByAccount(loggedInUser.getAccount());
-                        if (Objects.isNull(userLoginInfo)) {
-                            userLoginInfoDao.insert(UserLoginInfo.builder()
-                                    .uid(loggedInUser.getUserId())
-                                    .account(loggedInUser.getAccount())
-                                    .bindStatus(true)
-                                    .token(loggedInUser.getToken())
-                                    .deptId(loggedInUser.getDeptId())
-                                            .deptName(loggedInUser.getDeptName())
-                                            .role(loggedInUser.getRole())
-                                            .roleId(loggedInUser.getRoleId())
-                                            .roleName(loggedInUser.getRoleName())
-                                    .build());
-
-                        } else {
-                            userLoginInfo.setToken(loggedInUser.getToken());
-                            userLoginInfo.setBindStatus(true);
-                            userLoginInfoDao.update(userLoginInfo);
-                        }
-                    } else {
-                        try {
-
-                            String errStr = response.errorBody().string();
-                            ErrorResult errorResult = JsonUtil.getObject(errStr, getApplicationContext());
-                            Log.e("xiaweihu", "绑定设备失败: ===========>" + errStr);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable throwable) {
-
-                }
-            });
+            } else {
+                userLoginInfo.setToken(loggedInUser.getToken());
+                userLoginInfo.setBindStatus(true);
+                userLoginInfoDao.update(userLoginInfo);
+            }
 
         }
     }

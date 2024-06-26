@@ -25,6 +25,12 @@ public class BaseInterceptor implements Interceptor {
                 builder.addHeader(headerKey, headers.get(headerKey)).build();
             }
         }
+        if (chain.request().headers().size() > 0) {
+            Request request = builder
+                    .headers(chain.request().headers())
+                    .build();
+            return chain.proceed(request);
+        }
         return chain.proceed(builder.build());
 
     }
