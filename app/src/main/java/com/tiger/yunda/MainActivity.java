@@ -152,9 +152,9 @@ public class MainActivity extends AppCompatActivity {
             UserLoginInfoDao userLoginInfoDao = appDatabase.userLoginInfoDao();
             UserLoginInfo userLoginInfo = userLoginInfoDao.getSignedIn();
             if (Objects.nonNull(userLoginInfo)) {
-                Map<String, String> headers = new HashMap<>();
+               /* Map<String, String> headers = new HashMap<>();
                 headers.put("Authorization", "Bearer " + userLoginInfo.token);
-                retrofitClient.addHeaders(headers);
+                retrofitClient.addHeaders(headers);*/
                 loggedInUser = new LoggedInUser();
                 JWTUtil.decoder(userLoginInfo.getToken(), loggedInUser);
                 loggedInUser.setUserId(userLoginInfo.getUid());

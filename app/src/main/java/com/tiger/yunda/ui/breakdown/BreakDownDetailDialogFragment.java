@@ -34,6 +34,7 @@ import com.tiger.yunda.databinding.FragmentBreakDownDetailDialogBinding;
 import com.tiger.yunda.enums.CameraFileType;
 import com.tiger.yunda.service.BreakDownService;
 import com.tiger.yunda.ui.common.SpinnerAdapter;
+import com.tiger.yunda.ui.home.MissionFragment;
 import com.tiger.yunda.utils.CollectionUtil;
 import com.tiger.yunda.utils.FileUtil;
 import com.tiger.yunda.utils.JsonUtil;
@@ -186,6 +187,10 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
             binding.btnEdit.setVisibility(View.INVISIBLE);
         } else {
             finisehd = false;
+        }
+
+        if (!MissionFragment.masterMission) {
+            binding.btnEdit.setVisibility(View.INVISIBLE);
         }
 
         chipGroup = binding.fileGroup;

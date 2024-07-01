@@ -70,6 +70,13 @@
             </com.google.android.material.chip.ChipGroup>
         </LinearLayout>
     </LinearLayout>
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:visibility="gone"
+        android:indeterminate="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <LinearLayout
         android:gravity="center"
         android:layout_width="match_parent"

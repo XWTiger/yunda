@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -310,6 +311,7 @@ public class LogDialogFragment extends BottomSheetDialogFragment implements View
             // 找到布局中的EditText
             EditText input = dialog.findViewById(R.id.reject_reason);
             chipGroup = dialog.findViewById(R.id.file_group);
+            ProgressBar bar = dialog.findViewById(R.id.progressBar);
             ImageButton imageButton = dialog.findViewById(R.id.imageButton);
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -356,18 +358,23 @@ public class LogDialogFragment extends BottomSheetDialogFragment implements View
                             }
 
                             //注意：file就是与服务器对应的key,后面filename是服务器得到的文件名
-                            params.put("handleFiles\"; filename=\"" + filename, requestFile);
+                            params.put("Files\"; filename=\"" + filename, requestFile);
                         }
                     }
 
                 }
+                bar.setVisibility(View.VISIBLE);
+                confirmButton.setEnabled(false);
                 workLogService.reject(params).enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         if (response.isSuccessful()) {
                             Toast.makeText( getContext(), "提交成功", Toast.LENGTH_SHORT).show();
                             // 关闭对话框
+                            confirmButton.setEnabled(true);
+                            bar.setVisibility(View.GONE);
                             dialog.dismiss();
+                            dismiss();
                         } else {
                             try {
                                 String errStr = response.errorBody().string();

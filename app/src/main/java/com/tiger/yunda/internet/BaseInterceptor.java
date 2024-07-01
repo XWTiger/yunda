@@ -1,7 +1,10 @@
 package com.tiger.yunda.internet;
 
+import com.tiger.yunda.MainActivity;
+
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import okhttp3.Interceptor;
@@ -25,7 +28,7 @@ public class BaseInterceptor implements Interceptor {
                 builder.addHeader(headerKey, headers.get(headerKey)).build();
             }
         }
-        if (chain.request().headers().size() > 0) {
+        if (chain.request().headers().size() > 0 && Objects.isNull(MainActivity.loggedInUser)) {
             Request request = builder
                     .headers(chain.request().headers())
                     .build();
