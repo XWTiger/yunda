@@ -113,11 +113,7 @@ public class BreakDownListDialogFragment extends BottomSheetDialogFragment imple
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Objects.isNull(inspectionService)) {
-            inspectionService =  MainActivity.retrofitClient.create(InspectionService.class);
-        }
-
-
+        inspectionService =  MainActivity.retrofitClient.create(InspectionService.class);
         viewModel = new ViewModelProvider(this).get(BreakDownListViewModel.class);
         viewModel.setInspectionService(inspectionService);
 
