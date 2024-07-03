@@ -5,6 +5,7 @@
         <domain includeSubdomains="true">10.60.0.3</domain>
         <domain includeSubdomains="true">10.60.0.2</domain>
         <domain includeSubdomains="true">10.60.0.190</domain>
+        <domain includeSubdomains="true">10.1.9.37</domain>
     </domain-config>
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">10.1.8.105</domain>
