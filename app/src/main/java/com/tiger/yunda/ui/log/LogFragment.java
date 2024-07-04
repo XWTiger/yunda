@@ -2,6 +2,11 @@ package com.tiger.yunda.ui.log;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,28 +15,13 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
-
 import com.loper7.date_time_picker.DateTimeConfig;
 import com.loper7.date_time_picker.dialog.CardDatePickerDialog;
 import com.tiger.yunda.MainActivity;
-import com.tiger.yunda.R;
 import com.tiger.yunda.data.model.WorkLog;
 import com.tiger.yunda.databinding.FragmentLogBinding;
-import com.tiger.yunda.databinding.LogListBinding;
 import com.tiger.yunda.utils.CollectionUtil;
 import com.tiger.yunda.utils.TimeUtil;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -116,7 +106,7 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
             Date startTime = TimeUtil.getStartOfDay(new Date());
 
             Date endTime = TimeUtil.getEndOfDay(new Date());
-            logViewModel.getLogs(1, 30, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime)).observe(getViewLifecycleOwner(), new Observer<List<WorkLog>>() {
+            logViewModel.getLogs(1, 50, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime)).observe(getViewLifecycleOwner(), new Observer<List<WorkLog>>() {
                 @Override
                 public void onChanged(List<WorkLog> workLogs) {
                     if (CollectionUtil.isEmpty(workLogs)) {

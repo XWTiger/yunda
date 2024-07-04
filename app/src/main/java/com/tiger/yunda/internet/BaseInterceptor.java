@@ -29,6 +29,10 @@ public class BaseInterceptor implements Interceptor {
             }
         }
         if (chain.request().headers().size() > 0 && Objects.isNull(MainActivity.loggedInUser)) {
+            //解决切换用户token 未刷新问题
+            String token = chain.request().headers().get("Authorization");
+            headers.clear();
+            headers.put("Authorization", token);
             Request request = builder
                     .headers(chain.request().headers())
                     .build();
