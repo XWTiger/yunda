@@ -39,4 +39,5 @@ public class BreakRecord implements Serializable {
     private String deptName; //巡检班组
     private List<Attachments> attachments;//故障附件
     private List<HandleAttachments> handleAttachments;//故障处理附件
+    private String memo;
 }

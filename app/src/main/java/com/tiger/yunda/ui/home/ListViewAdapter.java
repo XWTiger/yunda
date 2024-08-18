@@ -60,6 +60,8 @@ import retrofit2.Response;
 public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
 
     public static String MISSION_KEY = "mission";
+
+    private static final int MISSION_STATE_WAIT = 0; //待分发
     private static final int MISSION_STATE_DELIVERING = 1;//下发中
     private static final int MISSION_STATE_DELIVERED = 2; //已下发
     private static final int MISSION_STATE_INSPECTION = 3; //巡检中
@@ -118,6 +120,12 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
             Mission mission =  objects.get(position);
             if (Objects.nonNull(mission.getMasterMission()) && mission.getMasterMission()) {
                 checkBox.setEnabled(false);
+                //派发任务 如果不是待分发 就不能点击拒绝
+                if (MISSION_STATE_WAIT != mission.getState()) {
+                    ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
+                    btnReject.setBackgroundTintList(colorStateList);
+                    btnReject.setEnabled(false);
+                }
             } else {
                 ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
                 btnReject.setBackgroundTintList(colorStateList);

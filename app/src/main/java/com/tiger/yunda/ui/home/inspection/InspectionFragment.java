@@ -156,6 +156,7 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
             binding.inspectionAction.setText(null);
         }
         PlaceholderContent.addInspectionPositionData(mission);
+        binding.inspTitle.setText("巡检对象:     " + mission.getInspectionUnit());
         ViewHolder viewHolder =  new ViewHolder(binding, PlaceholderContent.ITEMS);
        // NavController navController = NavHostFragment.findNavController(this);
 
@@ -283,6 +284,7 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
             if (Objects.isNull(breakDownInfo)) {
                 breakDownInfo = new BreakDownInfo();
             }
+
 
             if (Objects.isNull(this.linearLayout)) {
 
@@ -417,7 +419,9 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable throwable) {
-
+                        if (StringUtils.isNotBlank(throwable.getMessage())) {
+                            Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
             }
@@ -470,7 +474,9 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable throwable) {
-
+                        if (StringUtils.isNotBlank(throwable.getMessage())) {
+                            Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
 
@@ -504,7 +510,9 @@ public class InspectionFragment extends Fragment implements View.OnClickListener
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable throwable) {
-
+                        if (StringUtils.isNotBlank(throwable.getMessage())) {
+                            Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
             }

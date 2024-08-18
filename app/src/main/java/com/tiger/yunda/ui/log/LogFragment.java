@@ -106,7 +106,7 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
             Date startTime = TimeUtil.getStartOfDay(new Date());
 
             Date endTime = TimeUtil.getEndOfDay(new Date());
-            logViewModel.getLogs(1, 50, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime)).observe(getViewLifecycleOwner(), new Observer<List<WorkLog>>() {
+            logViewModel.getLogs(1, 5000, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime)).observe(getViewLifecycleOwner(), new Observer<List<WorkLog>>() {
                 @Override
                 public void onChanged(List<WorkLog> workLogs) {
                     if (CollectionUtil.isEmpty(workLogs)) {
@@ -136,7 +136,7 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
     public void onRefresh() {
         Date startTime = TimeUtil.getStartOfDay(new Date());
         Date endTime = TimeUtil.getEndOfDay(new Date());
-        logViewModel.getLogs(1, 30,  0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
+        logViewModel.getLogs(1, 3000,  0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -194,7 +194,7 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                             endTime = TimeUtil.getEndOfDay(start);
                             String deptId = MainActivity.loggedInUser.getDeptId();
                             if (Objects.nonNull(startTime) && Objects.nonNull(endTime)) {
-                                logViewModel.getLogs(1, 30, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
+                                logViewModel.getLogs(1, 3000, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
                             }
                             return null;
                         })
@@ -213,7 +213,7 @@ public class LogFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                             endTime = end;
                             endTextTime.setText(TimeUtil.getDateYmdFromMs(end));
                             if (Objects.nonNull(startTime) && Objects.nonNull(endTime)) {
-                                logViewModel.getLogs(1, 30, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
+                                logViewModel.getLogs(1, 3000, 0, TimeUtil.getSTrFromMs(startTime), TimeUtil.getSTrFromMs(endTime));
                             }
                             return null;
                         })

@@ -137,7 +137,11 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                 Uri uri = Uri.parse(attachment.getUrl());
                 ImageView imageView = new ImageView(getContext());
 
-                ViewGroup.LayoutParams params  = new ViewGroup.LayoutParams(300, 300);
+                ViewGroup.MarginLayoutParams params  = new ViewGroup.MarginLayoutParams(300, 300);
+                params.bottomMargin = 8;// 你想要的margin值
+                params.leftMargin = 8;
+
+
                 imageView.setLayoutParams(params);
 
                 imageView.setOnClickListener(this);
@@ -190,7 +194,8 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
         }
 
         if (!MissionFragment.masterMission) {
-            binding.btnEdit.setVisibility(View.INVISIBLE);
+            binding.btnEdit.setVisibility(View.GONE);
+            binding.btnYes.setVisibility(View.GONE);
         }
 
         chipGroup = binding.fileGroup;
@@ -308,7 +313,7 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                     // 故障处理人
                     String describe = binding.desc.getText().toString();
                     if (StringUtils.isBlank(describe)) {
-                        Toast.makeText(getContext(), "描述不能为空", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "描述不能为空,请先编辑", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     int pindex = binding.spinnerPerson.getSelectedItemPosition();
@@ -361,6 +366,9 @@ public class BreakDownDetailDialogFragment  extends Fragment implements View.OnC
                         @Override
                         public void onFailure(Call<ResponseBody> call, Throwable throwable) {
                             Log.e("xiaweihu", "处理故障失败: ===========>", throwable);
+                            if (StringUtils.isNotBlank(throwable.getMessage())) {
+                                Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
                         }
                     });
                 }

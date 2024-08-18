@@ -115,6 +115,9 @@ public class MissionViewModel extends ViewModel {
                 public void onFailure(Call<MissionResult> call, Throwable throwable) {
                     throwable.printStackTrace();
                     Log.e("xiaweihu", "onFailure: ===========", throwable);
+                    if (StringUtils.isNotBlank(throwable.getMessage())) {
+                        Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
 
                 }
             });

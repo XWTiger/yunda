@@ -144,8 +144,10 @@ public class LogDialogFragment extends BottomSheetDialogFragment implements View
                         fault.getAttachments().forEach(attachments -> {
                             Uri uri = Uri.parse(attachments.getUrl());
                             ImageView imageView = new ImageView(getContext());
-                            ViewGroup.LayoutParams params  = new ViewGroup.LayoutParams(300, 300);
 
+                            ViewGroup.MarginLayoutParams params  = new ViewGroup.MarginLayoutParams(300, 300);
+                            params.bottomMargin = 8;// 你想要的margin值
+                            params.leftMargin = 8;
                             imageView.setLayoutParams(params);
                             binding.problemDetail.addView(imageView);
                             Glide.with(this).load(uri).into(imageView);

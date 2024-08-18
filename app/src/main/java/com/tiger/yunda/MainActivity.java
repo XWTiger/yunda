@@ -5,8 +5,10 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.net.MacAddress;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -28,6 +30,7 @@ import androidx.room.Room;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.tiger.yunda.broadcast_receiver.NetworkChangeReceiver;
 import com.tiger.yunda.dao.AppDatabase;
 import com.tiger.yunda.dao.UserLoginInfoDao;
 import com.tiger.yunda.data.model.ErrorResult;
@@ -77,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static  AppDatabase appDatabase;
 
+    private NetworkChangeReceiver networkChangeReceiver;
+
     private String[] REQUIRED_PERMISSIONS = {
             Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -123,6 +128,10 @@ public class MainActivity extends AppCompatActivity {
             finish();
             return;
         }
+        //注册广播接收
+        networkChangeReceiver = new NetworkChangeReceiver();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkChangeReceiver, filter);
 
         if (Objects.isNull(appDatabase)) {
             appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "yunda-database").allowMainThreadQueries().build();
@@ -213,9 +222,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(networkChangeReceiver);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

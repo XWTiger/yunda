@@ -38,6 +38,7 @@ import com.tiger.yunda.ui.home.MissionFragment;
 import com.tiger.yunda.ui.login.LoginActivity;
 import com.tiger.yunda.utils.DownLoadUtil;
 import com.tiger.yunda.utils.JsonUtil;
+import com.tiger.yunda.utils.NetworkUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -208,15 +209,22 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
                 fragmentPersonBinding.newPassword.setError(null);
             }
 
-            String newPa = fragmentPersonBinding.newPassword.getText().toString();
+            String newPa = fragmentPersonBinding.newPasswordAgain.getText().toString();
             if (StringUtils.isBlank(newPa)) {
                 fragmentPersonBinding.newPasswordAgain.setError("密码不能为空");
                 return;
             } else {
                 fragmentPersonBinding.newPasswordAgain.setError(null);
             }
+            if (StringUtils.isBlank(newP) || newP.length() > 16 || StringUtils.isBlank(newPa) || newPa.length() > 16) {
+                fragmentPersonBinding.newPassword.setError("密码位数需在1-16之间");
+                return;
+            } else {
+                fragmentPersonBinding.newPassword.setError(null);
+            }
             if (!newP.equals(newPa)) {
                 fragmentPersonBinding.newPasswordAgain.setError("两次新密码不一致");
+                return;
             } else {
                 fragmentPersonBinding.newPasswordAgain.setError(null);
             }
@@ -235,6 +243,9 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
                         fragmentPersonBinding.passwordLayout.setVisibility(View.GONE);
                         fragmentPersonBinding.newPasswordLayout.setVisibility(View.GONE);
                         fragmentPersonBinding.ok.setVisibility(View.GONE);
+                        View view = new View(getContext());
+                        view.setTag(TAG_LOGOUT);
+                        onClick(view);
                     } else {
                         String errStr = null;
                         try {
@@ -250,6 +261,9 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable throwable) {
                     Log.e("xiaweihu", "修改密码失败: ===========>" , throwable);
+                    if (StringUtils.isNotBlank(throwable.getMessage())) {
+                        Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         }
@@ -257,6 +271,11 @@ public class PersonFragment extends Fragment implements View.OnClickListener {
         if (TAG_LOGOUT.equals(tag)) {
             // 解绑设备
             //绑定设备mac 地址
+            if (!NetworkUtil.isNetworkAvailable(getContext())) {
+                Toast.makeText(getContext(), "网络异常, 暂时无法退出登录，稍后重试！", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
 
             if (AuthInterceptor.loginFlag.get() <= 0) {
                 AuthInterceptor.loginFlag.getAndIncrement();

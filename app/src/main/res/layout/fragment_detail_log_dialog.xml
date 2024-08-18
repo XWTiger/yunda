@@ -8,6 +8,7 @@
         <variable
             name="log"
             type="com.tiger.yunda.data.model.WorkLog" />
+        <import type="com.tiger.yunda.utils.BusinessUtil"/>
 
 
     </data>
@@ -191,7 +192,7 @@
 
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text='@{log.faultState==0?"否":"是"}'
+                android:text='@{log.faultState==1?"是":"否"}'
                 tools:text="是"
                 android:textColor="@color/black"
                 android:textSize="16sp"
@@ -216,7 +217,7 @@
 
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text="是"
+                android:text='@{log.faultStateText}'
                 tools:text="是"
                 android:textColor="@color/black"
                 android:textSize="16sp"
@@ -244,7 +245,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text='@{log.faults != null &amp;&amp; log.faults.size()>0 ? log.faults.get(0).desc : ""}'
+                android:text='@{BusinessUtil.getFaultDetailStr(log.faults)}'
                 tools:text="双规轮子偏差，手动阀第三方，阿斯顿发斯蒂芬，阿斯adsasdf"
                 android:textColor="@color/black"
                 android:textSize="16sp" />

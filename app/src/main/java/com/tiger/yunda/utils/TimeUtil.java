@@ -79,6 +79,16 @@ public class TimeUtil {
         }
     }
 
+    public static long getMillionByYYYYMMMDDString(String timeStr) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date = sdf.parse(timeStr);
+            return date.getTime();
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * 返回 yyyy-MM-dd HH:mm:ss
      * @param date

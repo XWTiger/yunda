@@ -2,9 +2,11 @@ package com.tiger.yunda.internet;
 
 import android.content.Context;
 import android.content.Intent;
+import android.widget.Toast;
 
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.ui.login.LoginActivity;
+import com.tiger.yunda.utils.NetworkUtil;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,6 +28,13 @@ public class AuthInterceptor implements Interceptor {
 
     @Override
     public Response intercept(Chain chain) throws IOException {
+
+        //添加网络状态请求
+        if (!NetworkUtil.isNetworkAvailable(context)) {
+            //Toast.makeText(context, "网络异常", Toast.LENGTH_SHORT).show();
+            throw new IOException("网络异常");
+        }
+
         Response response = chain.proceed(chain.request());
 
         // 检查HTTP状态码是否为401

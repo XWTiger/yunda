@@ -61,7 +61,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private Button missionyButton;
     private SwipeRefreshLayout swipeRefreshLayout;
     private  ListViewAdapter listViewAdapter;
-    private MissionViewModel missionViewModel;
+    private static MissionViewModel missionViewModel;
 
 
     private ListView listView;
@@ -98,7 +98,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
         this.customHeaderBar(actionBar);
         if (Objects.nonNull(MainActivity.loggedInUser) && MainActivity.loggedInUser.getRole().name().equals(RoleType.WORKER_LEADER.name())) {
             leader = true;
-            masterMission = true;
+            masterMission = false;
             if (masterMission) {
                 tabLayout.getTabAt(0).select();
             } else {
@@ -113,14 +113,13 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
                              ViewGroup container, Bundle savedInstanceState) {
         if (Objects.nonNull(MainActivity.loggedInUser) && MainActivity.loggedInUser.getRole().name().equals(RoleType.WORKER_LEADER.name())) {
             leader = true;
-            masterMission = true;
+            masterMission = false;
         } else {
             leader = false;
             masterMission = false;
         }
         if (Objects.isNull(missionViewModel)) {
-            missionViewModel =
-                new ViewModelProvider(this).get(MissionViewModel.class);
+            missionViewModel = new ViewModelProvider(this).get(MissionViewModel.class);
             missionViewModel.setContext(getContext());
         }
 
@@ -155,7 +154,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
         }
 
-        missionViewModel.getData(1, 30 , null, null, masterMission).observe(getViewLifecycleOwner(), new Observer<MissionResult>() {
+        missionViewModel.getData(1, 300 , null, null, masterMission).observe(getViewLifecycleOwner(), new Observer<MissionResult>() {
             @Override
             public void onChanged(MissionResult missionResult) {
                 if (missionFlag.get() < 1) {
@@ -207,9 +206,10 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public void onResume() {
         super.onResume();
+
         if (Objects.nonNull(MainActivity.loggedInUser) && MainActivity.loggedInUser.getRole() == RoleType.WORKER_LEADER) {
             leader = true;
-            masterMission = true;
+            masterMission = false;
         } else {
             leader = false;
             masterMission = false;
@@ -240,7 +240,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if (Objects.nonNull(missionFlag) && missionFlag.get() ==  1) {
             checkUpdate();
             missionViewModel.updateService();
-            missionViewModel.getData(1, 30, null, null, masterMission);
+            missionViewModel.getData(1, 300, null, null, masterMission);
             missionFlag.getAndIncrement();
             if (masterMission) {
                 tabLayout.getTabAt(0).select();
@@ -312,8 +312,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
                             masterMission = false;
                         }
                         if (Objects.nonNull(missionFlag) && missionFlag.get() >=  1) {
-
-                        missionViewModel.getData(1, 30, null, null, masterMission);
+                            missionViewModel.getData(1, 300, null, null, masterMission);
                         }
                     }
 

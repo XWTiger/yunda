@@ -2,6 +2,7 @@ package com.tiger.yunda.ui.home.viewmodel;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -16,6 +17,8 @@ import com.tiger.yunda.data.model.User;
 import com.tiger.yunda.service.MissionService;
 import com.tiger.yunda.utils.CollectionUtil;
 import com.tiger.yunda.utils.JsonUtil;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -82,7 +85,9 @@ public class DeliverMissionViewModel extends ViewModel {
 
                 @Override
                 public void onFailure(Call<List<DeliverMissionDTO>> call, Throwable throwable) {
-
+                    if (StringUtils.isNotBlank(throwable.getMessage())) {
+                        Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
       /*  }*/
@@ -110,7 +115,9 @@ public class DeliverMissionViewModel extends ViewModel {
 
             @Override
             public void onFailure(Call<List<User>> call, Throwable throwable) {
-
+                if (StringUtils.isNotBlank(throwable.getMessage())) {
+                    Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

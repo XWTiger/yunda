@@ -68,7 +68,7 @@ public class WorkLog implements Serializable {
         /**
          * 计划时长、耗时
          */
-        private int duration;
+        private Double duration;
         /**
          * 评分
          */

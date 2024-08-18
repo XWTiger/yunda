@@ -14,6 +14,8 @@ import com.tiger.yunda.data.model.WorkLog;
 import com.tiger.yunda.service.WorkLogService;
 import com.tiger.yunda.utils.JsonUtil;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,16 +46,18 @@ public class LogViewModel extends ViewModel {
         Map<String, Object> body = new HashMap<>();
         body.put("page", pageNo);
         body.put("limit", pageSize);
+        body.put("faultState", 0);
         List<Map> sortsList = new ArrayList<>();
         Map<String, Object> sorts = new HashMap<>();
         sorts.put("filed", "IssuTime");
         sorts.put("type", 1);
         sortsList.add(sorts);
         body.put("sorts", sortsList);
-        /*if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+        if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
             body.put("startTime", startTime);
             body.put("endTime", endTime);
         }
+        /*
         if (deptId > 0) {
             body.put("deptId", deptId);
         } else {

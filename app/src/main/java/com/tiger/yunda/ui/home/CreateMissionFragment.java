@@ -33,6 +33,7 @@ import com.tiger.yunda.utils.TimeUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.Time;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -247,6 +248,14 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
             }
             if (StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
                 Toast.makeText(getContext(), "请选择时间", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
+                long start = TimeUtil.getMillionByYYYYMMMDDString(startTime);
+                long end = TimeUtil.getMillionByYYYYMMMDDString(endTime);
+                if (start > end) {
+                    Toast.makeText(getContext(), "开始时间不能晚于结束时间", Toast.LENGTH_SHORT).show();
+                }
                 return;
             }
             if (StringUtils.isBlank(createMission.getTrainNoStr().get())) {
