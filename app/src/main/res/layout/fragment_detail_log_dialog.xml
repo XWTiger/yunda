@@ -192,7 +192,7 @@
 
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text='@{log.faultState==1?"是":"否"}'
+                android:text='@{log.faults.size()>0?"是":"否"}'
                 tools:text="是"
                 android:textColor="@color/black"
                 android:textSize="16sp"
