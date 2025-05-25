@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.Observable;
+import androidx.databinding.adapters.AdapterViewBindingAdapter;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.navigation.NavController;
@@ -15,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,9 +28,13 @@ import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.R;
 import com.tiger.yunda.data.model.CreateMission;
 import com.tiger.yunda.data.model.Train;
+import com.tiger.yunda.data.model.TrainPlace;
 import com.tiger.yunda.databinding.FragmentCreateMissionBinding;
+import com.tiger.yunda.databinding.FragmentTrainPlaceBinding;
+import com.tiger.yunda.ui.common.SpinnerAdapter;
 import com.tiger.yunda.ui.common.TrainListDialogFragment;
 import com.tiger.yunda.ui.home.viewmodel.CreateMissionViewModel;
+import com.tiger.yunda.utils.CollectionUtil;
 import com.tiger.yunda.utils.TimeUtil;
 
 import org.apache.commons.lang3.StringUtils;
@@ -67,6 +73,8 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
 
     private TrainListDialogFragment trainListDialogFragment;
     private FragmentCreateMissionBinding binding;
+
+
     //private DateTimePicker dateTimePicker;
 
     //private DateTimePicker dateTimePickerEnd;
@@ -79,6 +87,8 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
 
     private List<Train> trainList;
 
+     private List<Train> positionList;
+
     private CreateMissionViewModel createMissionViewModel;
 
     private String startTime;
@@ -86,6 +96,9 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
     private String endTime;
 
     private NavController navController;
+
+    final String[] trainNo = {""};
+    final String[] trainPlace = {""};
 
 
     /**
@@ -133,8 +146,7 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
         binding.trainNoAdd.setTag(ACTION_TRAIN_ADD);
         binding.trainNoSub.setTag(ACTION_TRAIN_SUB);
         binding.trainNoSub.setOnClickListener(this);
-        binding.trainNoSub.setVisibility(View.INVISIBLE);
-        binding.trainNoText.setVisibility(View.INVISIBLE);
+
         binding.finishedCreation.setTag(ACTION_FINISHED);
         binding.finishedCreation.setOnClickListener(this);
         if (Objects.isNull(createMissionViewModel)) {
@@ -152,6 +164,14 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
                 trainList = trains;
             }
         });
+
+        createMissionViewModel.getPositions().observe(getViewLifecycleOwner(), new Observer<List<Train>>() {
+            @Override
+            public void onChanged(List<Train> trains) {
+                positionList = trains;
+            }
+        });
+
         startTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -215,26 +235,91 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
     public void onItemClicked(String text) {
         CreateMission createMission =  binding.getCreation();
         createMission.addOneTrain(text);
-        binding.trainNoText.setVisibility(View.VISIBLE);
         trainListDialogFragment.dismiss();
     }
 
     @Override
     public void onClick(View v) {
         String tag = (String) v.getTag();
+
         if (ACTION_TRAIN_ADD.equals(tag)) {
-            trainListDialogFragment = TrainListDialogFragment.newInstance(trainList);
+            /*trainListDialogFragment = TrainListDialogFragment.newInstance(trainList);
             trainListDialogFragment.setCreateMissionFragment(this);
             trainListDialogFragment.show(getFragmentManager(), "select_train");
             if (StringUtils.isNotBlank(binding.trainNoText.getText().toString())) {
                 binding.trainNoSub.setVisibility(View.VISIBLE);
             } else {
                 binding.trainNoSub.setVisibility(View.INVISIBLE);
-            }
+            }*/
+
+            LayoutInflater inflater = LayoutInflater.from(getContext());
+            View view = inflater.inflate(R.layout.fragment_train_place, null);
+            FragmentTrainPlaceBinding trainPlaceBinding = FragmentTrainPlaceBinding.bind(view);
+
+
+            //车位置
+            SpinnerAdapter spinnerPlaceAdapter = new SpinnerAdapter(CollectionUtil.covertTrainToSpinnerObj(positionList), getContext());
+            trainPlaceBinding.trainPlace.setAdapter(spinnerPlaceAdapter);
+            //trainPlaceBinding.trainPlace.setSelection();
+
+            trainPlaceBinding.trainPlace.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    trainPlace[0] = String.valueOf(positionList.get(position).getValue());
+                    //调用接口 获取车列位
+
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+            //车号
+            SpinnerAdapter spinnerAdapter = new SpinnerAdapter(CollectionUtil.covertTrainToSpinnerObj(trainList), getContext());
+            trainPlaceBinding.trainNoSp.setAdapter(spinnerAdapter);
+            trainPlaceBinding.trainNoSp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    trainNo[0] = trainList.get(position).getText();
+                    //调用接口 获取车列位
+                    createMissionViewModel.getPositionByTrainNo(trainNo[0]).observe(getViewLifecycleOwner(), new Observer<Integer>() {
+                        @Override
+                        public void onChanged(Integer integer) {
+                            if (Objects.nonNull(integer) && integer > 0) {
+                                for (int i = 0; i < positionList.size(); i++) {
+                                    if (positionList.get(i).getValue() == integer) {
+                                        trainPlaceBinding.trainPlace.setSelection(i);
+                                        trainPlace[0] = String.valueOf(positionList.get(i).getValue());
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+            CreateMission createMission =  binding.getCreation();
+            createMission.addTrain(new TrainPlace(trainList.get(0).getText(), null, positionList.get(0).getValue()));
+            binding.trainDetailLayout.addView(view);
+
+
+
         }
         if (ACTION_TRAIN_SUB.equals(tag)) {
             CreateMission createMission =  binding.getCreation();
-            createMission.subOneTrain();
+            int count = binding.trainDetailLayout.getChildCount();
+            createMission.subTrain(count - 1);
+            binding.trainDetailLayout.removeViewAt(count - 1);
+
         }
 
         if (ACTION_FINISHED.equals(tag)) {
@@ -258,10 +343,13 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
                 }
                 return;
             }
-            if (StringUtils.isBlank(createMission.getTrainNoStr().get())) {
-                Toast.makeText(getContext(), "请选择车号", Toast.LENGTH_SHORT).show();
+            if (CollectionUtil.isEmpty(createMission.getTrains())) {
+                Toast.makeText(getContext(), "请选择作业车辆或者作业位置", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+
+
             createMission.setPlanStartTime(startTime);
             createMission.setPlanEndTime(endTime);
             createMissionViewModel.createMission(createMission).observe(getViewLifecycleOwner(), new Observer<String>() {

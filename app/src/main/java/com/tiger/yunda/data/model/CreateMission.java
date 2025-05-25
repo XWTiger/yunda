@@ -2,6 +2,8 @@ package com.tiger.yunda.data.model;
 
 import androidx.databinding.ObservableField;
 
+import com.tiger.yunda.utils.CollectionUtil;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -27,6 +29,7 @@ public class CreateMission  implements Serializable {
     private String planEndTime;
     private List<String> trainNo;
     private ObservableField<String> trainNoStr;
+    private List<TrainPlace> trains;
 
 
     public void covertTrainNoStr() {
@@ -48,6 +51,18 @@ public class CreateMission  implements Serializable {
             trainNoStr.set(name);
         } else {
             trainNoStr.set(trainNoStr.get() + "," + name);
+        }
+    }
+
+    public void addTrain(TrainPlace trainPlace) {
+        if (CollectionUtil.isEmpty(trains)) {
+            trains = new ArrayList<>();
+        }
+        trains.add(trainPlace);
+    }
+    public void subTrain(int position) {
+        if (!CollectionUtil.isEmpty(trains)) {
+            trains.remove(position);
         }
     }
 

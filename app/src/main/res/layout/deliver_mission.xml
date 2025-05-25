@@ -37,9 +37,11 @@
         <Spinner
             android:id="@+id/spinner_person"
             android:layout_marginTop="11dp"
+            android:textSize="16sp"
             android:layout_weight="1"
             android:layout_height="40dp"
             android:layout_width="120dp"
+            android:theme="@style/TextAppearance.AppCompat.Large"
             />
     </LinearLayout>
 </layout>

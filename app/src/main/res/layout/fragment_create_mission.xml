@@ -142,38 +142,77 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="添加车号:"
+            android:text="巡检车辆位:"
             android:textColor="@color/black" />
 
         <LinearLayout
+            android:id="@+id/train_detail_layout"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <!--<LinearLayout
 
-            android:gravity="left"
+                android:gravity="left"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/train_no_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="车辆号:"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+                   <Spinner
+                       android:id="@+id/train_no_sp"
+                       android:layout_marginTop="15dp"
+                       android:layout_marginLeft="15dp"
+                       android:layout_width="match_parent"
+                       android:layout_height="50dp"/>
+
+
+
+            </LinearLayout>
+            <LinearLayout
+
+                android:gravity="left"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/train_Lo_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="列位位置:"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+                <Spinner
+                    android:id="@+id/train_place"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"/>
+            </LinearLayout>-->
+        </LinearLayout>
+        <LinearLayout
+
+            android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/train_no_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="@{creation.trainNoStr}"
-                android:textColor="@color/black"
-                android:textSize="18sp" />
             <ImageButton
                 android:id="@+id/train_no_add"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginTop="10dp"
                 android:background="@drawable/ic_add" />
             <ImageButton
                 android:id="@+id/train_no_sub"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginTop="10dp"
                 android:background="@drawable/ic_subtract" />
 
 
-
         </LinearLayout>
+
 
         <Button
             android:id="@+id/finished_creation"

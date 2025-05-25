@@ -1,6 +1,7 @@
 package com.tiger.yunda.utils;
 
 import com.tiger.yunda.data.BreakDownType;
+import com.tiger.yunda.data.model.Train;
 import com.tiger.yunda.data.model.User;
 
 import java.util.ArrayList;
@@ -25,6 +26,20 @@ public class CollectionUtil {
         }
         List<BreakDownType> types = new ArrayList<>();
         users.forEach(user ->  {
+            BreakDownType breakDownType = new BreakDownType();
+            breakDownType.setName(user.getText());
+            breakDownType.setType(user.getValue());
+            types.add(breakDownType);
+        });
+        return types;
+    }
+
+    public static List<BreakDownType> covertTrainToSpinnerObj(List<Train> trainList) {
+        if (Objects.isNull(trainList) || trainList.size() == 0) {
+            return Collections.EMPTY_LIST;
+        }
+        List<BreakDownType> types = new ArrayList<>();
+        trainList.forEach(user ->  {
             BreakDownType breakDownType = new BreakDownType();
             breakDownType.setName(user.getText());
             breakDownType.setType(user.getValue());

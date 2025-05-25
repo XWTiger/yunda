@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -32,7 +33,10 @@ public class CreateMissionViewModel extends ViewModel {
     private MutableLiveData<List<Train>> trains = new MutableLiveData<>();
     private MutableLiveData<CreateMission> creation = new MutableLiveData<>();
 
+    private MutableLiveData<List<Train>> positions = new MutableLiveData<>();
     private MissionService missionService;
+
+    private MutableLiveData<Integer> postion = new MutableLiveData<>();
 
     private Context context;
 
@@ -55,6 +59,47 @@ public class CreateMissionViewModel extends ViewModel {
             }
         });
         return trains;
+    }
+
+    public LiveData<List<Train>> getPositions() {
+        Call<List<Train>> listCall = missionService.queryPositions();
+        listCall.enqueue(new Callback<List<Train>>() {
+            @Override
+            public void onResponse(Call<List<Train>> call, Response<List<Train>> response) {
+                positions.setValue(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<List<Train>> call, Throwable throwable) {
+
+            }
+        });
+        return positions;
+    }
+
+    public LiveData<Integer> getPositionByTrainNo(String trainNo) {
+        Call<ResponseBody> responseBodyCall = missionService.getPositionByTrainNo(trainNo);
+           responseBodyCall.enqueue(new Callback<ResponseBody>() {
+               @Override
+               public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                   try {
+                       if (Objects.isNull(response.body())) {
+                           postion.setValue(0);
+                       } else {
+                           postion.setValue(Integer.valueOf(response.body().string()));
+                       }
+                   } catch (IOException e) {
+                       throw new RuntimeException(e);
+                   }
+               }
+
+               @Override
+               public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+
+               }
+           });
+        return postion;
+
     }
 
     public LiveData<CreateMission> getCreation() {

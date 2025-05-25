@@ -66,7 +66,15 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
     private static final int MISSION_STATE_DELIVERED = 2; //已下发
     private static final int MISSION_STATE_INSPECTION = 3; //巡检中
     private static final int MISSION_STATE_FINISHED = 4; //完成
-    private static final int MISSION_STATE_ACCEPTED = 5; //已接受
+    private static final int MISSION_STATE_ACCEPTED = 5; //已接受(允许作业)
+
+
+    /**
+     * 禁止作业
+     */
+    private static final int MISSION_STATE_FORBID_WORK = 7; //禁止作业
+
+
     private Context context;
     private NavController navController;
     private FragmentManager fragmentManager;
@@ -118,6 +126,16 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
             Button inspectionBtn = binding.buttonInspection;
             inspectionBtn.setTag(position);
             Mission mission =  objects.get(position);
+            //允许作业标签
+            Button buttonShowWork = binding.buttonShowWork;
+
+            if (!MissionFragment.masterMission) {
+                //巡检员隐藏 拒绝按钮
+                btnReject.setVisibility(View.GONE);
+            }
+
+
+
             if (Objects.nonNull(mission.getMasterMission()) && mission.getMasterMission()) {
                 checkBox.setEnabled(false);
                 //派发任务 如果不是待分发 就不能点击拒绝
@@ -133,6 +151,12 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
             }
 
             int state = objects.get(position).getState();
+            //控制允许作业标签
+            if (state == MISSION_STATE_FORBID_WORK) {
+                buttonShowWork.setText("禁止作业");
+                ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
+                buttonShowWork.setBackgroundTintList(colorStateList);
+            }
             if ((state == MISSION_STATE_ACCEPTED || MISSION_STATE_INSPECTION == state) && StringUtils.isNotBlank(objects.get(position).getId())) {
                 btnReject.setVisibility(View.GONE);
                 btnItem.setEnabled(false);

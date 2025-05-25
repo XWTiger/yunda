@@ -15,6 +15,7 @@ import java.util.Map;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -47,6 +48,8 @@ public interface MissionService {
     @POST("/api/Train/GetNameList")
     Call<List<Train>> queryTrains();
 
+    @POST("/api/Position/GetNameList")
+    Call<List<Train>> queryPositions();
     /**
      * 通过部门id 查用户列表
      * @param deptId
@@ -80,6 +83,7 @@ public interface MissionService {
     Call<ResponseBody> inspection(@Query("id") String id);
 
 
+
     /**
      * 查询主任务
      * @param body
@@ -90,4 +94,13 @@ public interface MissionService {
 
     @POST("/api/PatrolTask/Refuse/{taskId}")
     Call<ResponseBody> rejectMission(@Path("taskId") String taskId);
+
+
+    /**
+     * 通过列车号 查询 列车位置
+     * @param trainNo 车号
+     * @return
+     */
+    @POST("/api/Train/GetPosId/{trainNo}")
+    Call<ResponseBody> getPositionByTrainNo(@Path("trainNo") String trainNo);
 }
