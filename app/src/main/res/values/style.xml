@@ -5,4 +5,8 @@
         <!-- 在这里设置你的样式属性 -->
     </style>
 
+    <style name="TabLayoutStyle" parent="Widget.Design.TabLayout">
+        <item name="tabBackground">@drawable/tab_item_bg</item>
+        <item name="tabIndicatorColor">@color/white</item> <!-- 隐藏默认指示器 -->
+    </style>
 </resources>
