@@ -76,6 +76,7 @@
         android:layout_height="30dp"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="50dp"
+        android:visibility="gone"
         android:background="@drawable/button_corner_radius"
         android:text="允许作业"
         android:textColor="@color/white"

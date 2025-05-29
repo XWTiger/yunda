@@ -6,7 +6,7 @@
     </item>
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@android:color/transparent" /> <!-- 默认透明 -->
+            <solid android:color="@android:color/darker_gray" /> <!-- 默认透明 -->
         </shape>
     </item>
 </selector>

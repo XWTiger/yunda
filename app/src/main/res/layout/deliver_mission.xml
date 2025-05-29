@@ -15,18 +15,32 @@
         >
         <TextView
             android:id="@+id/check_unit"
-            android:layout_width="70dp"
+            android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:textColor="@color/black"
-            android:text="巡检单元" />
+            android:text="单元" />
 
         <TextView
             android:id="@+id/spinner_unit"
             android:layout_weight="1"
             android:layout_width="80dp"
             android:layout_height="40dp"
-            android:text="@{deliver.positionName +'-'+ deliver.inspectionUnit}" />
+            android:text="@{deliver.inspectionUnit}" />
+        <TextView
+            android:id="@+id/check_place"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:textColor="@color/black"
+            android:text="位置" />
 
+        <Spinner
+            android:id="@+id/spinner_place"
+            android:textSize="16sp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:layout_width="wrap_content"
+            android:theme="@style/TextAppearance.AppCompat.Large"
+            />
         <TextView
             android:id="@+id/check_user"
             android:layout_width="60dp"
@@ -36,11 +50,10 @@
 
         <Spinner
             android:id="@+id/spinner_person"
-            android:layout_marginTop="11dp"
             android:textSize="16sp"
             android:layout_weight="1"
             android:layout_height="40dp"
-            android:layout_width="120dp"
+            android:layout_width="wrap_content"
             android:theme="@style/TextAppearance.AppCompat.Large"
             />
     </LinearLayout>

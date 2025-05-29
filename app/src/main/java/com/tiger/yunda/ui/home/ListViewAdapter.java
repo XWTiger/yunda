@@ -72,7 +72,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
     /**
      * 禁止作业
      */
-    private static final int MISSION_STATE_FORBID_WORK = 7; //禁止作业
+    private static final int MISSION_STATE_FORBID_WORK = 6; //禁止作业
 
 
     private Context context;
@@ -132,6 +132,9 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
             if (!MissionFragment.masterMission) {
                 //巡检员隐藏 拒绝按钮
                 btnReject.setVisibility(View.GONE);
+                if (mission.getState() == MISSION_STATE_ACCEPTED) {
+                    buttonShowWork.setVisibility(View.VISIBLE);
+                }
             }
 
 
@@ -139,7 +142,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
             if (Objects.nonNull(mission.getMasterMission()) && mission.getMasterMission()) {
                 checkBox.setEnabled(false);
                 //派发任务 如果不是待分发 就不能点击拒绝
-                if (MISSION_STATE_WAIT != mission.getState()) {
+                if (MISSION_STATE_WAIT != mission.getState() && MISSION_STATE_DELIVERING != mission.getState()) {
                     ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
                     btnReject.setBackgroundTintList(colorStateList);
                     btnReject.setEnabled(false);
@@ -153,6 +156,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
             int state = objects.get(position).getState();
             //控制允许作业标签
             if (state == MISSION_STATE_FORBID_WORK) {
+                buttonShowWork.setVisibility(View.VISIBLE);
                 buttonShowWork.setText("禁止作业");
                 ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
                 buttonShowWork.setBackgroundTintList(colorStateList);
@@ -200,30 +204,35 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                 public void onClick(View view) {
                     int position = (int) view.getTag();
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable(MISSION_KEY, objects.get(position));
-                    Call<ResponseBody> responseBodyCall = missionService.inspection(objects.get(position).getId());
-                    responseBodyCall.enqueue(new Callback<ResponseBody>() {
-                        @Override
-                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                            if (response.code() == MissionService.HTTP_OK) {
-                                getNavController().navigate(R.id.to_inspection_mission, bundle);
-                            } else {
+                    Mission subMission = objects.get(position);
+                    bundle.putSerializable(MISSION_KEY, subMission);
+                    if (MISSION_STATE_INSPECTION == subMission.getState()) {
+                        getNavController().navigate(R.id.to_inspection_mission, bundle);
+                    } else {
+                        Call<ResponseBody> responseBodyCall = missionService.inspection(objects.get(position).getId());
+                        responseBodyCall.enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                if (response.code() == MissionService.HTTP_OK) {
+                                    getNavController().navigate(R.id.to_inspection_mission, bundle);
+                                } else {
 
-                                try {
-                                    String errStr = response.errorBody().string();
-                                    ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
-                                    Log.e("xiaweihu", "巡检失败: ===========>" + errStr);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                                    try {
+                                        String errStr = response.errorBody().string();
+                                        ErrorResult errorResult = JsonUtil.getObject(errStr, getContext());
+                                        Log.e("xiaweihu", "巡检失败: ===========>" + errStr);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                             }
-                        }
 
-                        @Override
-                        public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable throwable) {
 
-                        }
-                    });
+                            }
+                        });
+                    }
                 }
             });
 
@@ -337,8 +346,8 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
         }
         TextView textView = viewHolder.getTvItem();
         final Mission item = getItem(position);
-        textView.setText(item.getInspectionUnit());
-        textView.setTooltipText(item.getInspectionUnit());
+        textView.setText(item.getInspectionUnit() + "," + item.getPositionName());
+        textView.setTooltipText(item.getInspectionUnit()+ "," + item.getPositionName());
         return convertView;
     }
 

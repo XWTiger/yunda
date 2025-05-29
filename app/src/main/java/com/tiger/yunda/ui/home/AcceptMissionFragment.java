@@ -20,6 +20,7 @@ import com.tiger.yunda.R;
 import com.tiger.yunda.data.model.DeliverMissionDTO;
 import com.tiger.yunda.data.model.DeliverMssion;
 import com.tiger.yunda.data.model.SaveMission;
+import com.tiger.yunda.data.model.Train;
 import com.tiger.yunda.data.model.User;
 import com.tiger.yunda.databinding.DeliverMissionBinding;
 import com.tiger.yunda.databinding.FragmentAcceptMissionBinding;
@@ -50,6 +51,8 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
     public static String BTN_DELIVER_TAG = "deliver";
     public static String BTN_SAVE_TAG = "save";
 
+    private List<Train> positionList;
+
     public AcceptMissionFragment() {
 
     }
@@ -77,6 +80,7 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
             Bundle bundle = getArguments();
             mission = (Mission) bundle.getSerializable(ListViewAdapter.MISSION_KEY);
         }
+
         setHasOptionsMenu(true);
     }
 
@@ -104,6 +108,14 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
         if (Objects.isNull(acceptMissionViewModel)) {
             acceptMissionViewModel = new DeliverMissionViewModel(getContext());
         }
+        acceptMissionViewModel.getPositions().observe(getViewLifecycleOwner(), new Observer<List<Train>>() {
+            @Override
+            public void onChanged(List<Train> trains) {
+                positionList = trains;
+            }
+        });
+
+
 
         List<User> dusers = new ArrayList<>();
         acceptMissionViewModel.getUsers(MainActivity.loggedInUser.getDeptId()).observe(getViewLifecycleOwner(), new Observer<List<User>>() {
@@ -114,7 +126,7 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
                 acceptMissionViewModel.getDatas(mission.getTaskId(), mission.getId().equals("-1")?1:0).observe(getViewLifecycleOwner(), new Observer<List<DeliverMssion>>() {
                     @Override
                     public void onChanged(List<DeliverMssion> deliverMssions) {
-                        DeliverMissionAdapter deliverMissionAdapter = new DeliverMissionAdapter(getContext(), binding.listItem.getId(),  deliverMssions, dusers);
+                        DeliverMissionAdapter deliverMissionAdapter = new DeliverMissionAdapter(getContext(), binding.listItem.getId(),  deliverMssions, dusers, positionList);
                         binding.listItem.setAdapter(deliverMissionAdapter);
                     }
                 });

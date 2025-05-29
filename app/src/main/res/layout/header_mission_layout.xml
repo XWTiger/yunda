@@ -12,23 +12,29 @@
         android:background="@drawable/ic_will_do" />
   <com.google.android.material.tabs.TabLayout
        android:id="@+id/tab_layout"
-      android:theme="@style/Widget.Design.TabLayout"
+      android:theme="@style/TabLayoutStyle"
+      android:layout_marginTop="10dp"
+      android:layout_marginLeft="5dp"
+      app:tabIndicatorColor="@color/white"
       app:tabTextColor="@color/white"
+      app:tabSelectedTextColor="@color/green"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="30dp">
 
 
 
     <com.google.android.material.tabs.TabItem
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:text="派发任务" >
     </com.google.android.material.tabs.TabItem>
 
     <com.google.android.material.tabs.TabItem
 
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
+        android:background="@drawable/ic_header_button"
+        android:textColor="@color/green"
         android:text="巡检任务" >
     </com.google.android.material.tabs.TabItem>
 

@@ -13,6 +13,7 @@ import com.tiger.yunda.data.model.DeliverMissionDTO;
 import com.tiger.yunda.data.model.DeliverMssion;
 import com.tiger.yunda.data.model.ErrorResult;
 import com.tiger.yunda.data.model.SaveMission;
+import com.tiger.yunda.data.model.Train;
 import com.tiger.yunda.data.model.User;
 import com.tiger.yunda.service.MissionService;
 import com.tiger.yunda.utils.CollectionUtil;
@@ -40,6 +41,8 @@ public class DeliverMissionViewModel extends ViewModel {
     private MissionService missionService;
 
     private Context context;
+
+    private MutableLiveData<List<Train>> positions = new MutableLiveData<>();
 
 
     public DeliverMissionViewModel(Context context) {
@@ -152,5 +155,21 @@ public class DeliverMissionViewModel extends ViewModel {
         } else {
             return false;
         }
+    }
+
+    public LiveData<List<Train>> getPositions() {
+        Call<List<Train>> listCall = missionService.queryPositions();
+        listCall.enqueue(new Callback<List<Train>>() {
+            @Override
+            public void onResponse(Call<List<Train>> call, Response<List<Train>> response) {
+                positions.setValue(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<List<Train>> call, Throwable throwable) {
+
+            }
+        });
+        return positions;
     }
 }
