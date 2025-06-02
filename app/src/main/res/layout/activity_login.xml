@@ -48,7 +48,7 @@
         android:layout_marginStart="30dp"
 
         android:hint="127.0.0.1:9291"
-        android:text="10.60.0.190:9291"
+        android:text=""
         app:layout_constraintBottom_toBottomOf="@+id/service_title"
         app:layout_constraintStart_toEndOf="@+id/service_title"
         app:layout_constraintTop_toTopOf="@+id/service_title"

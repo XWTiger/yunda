@@ -9,4 +9,8 @@
         <item name="tabBackground">@drawable/tab_item_bg</item>
 
     </style>
+    <style name="SpinnerDropdownStyle">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textSize">50sp</item>
+    </style>
 </resources>

@@ -43,6 +43,7 @@ public class SpinnerAdapter extends BaseAdapter  {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             convertView = LayoutInflater.from(context).inflate(R.layout.fragment_breakdownt_dialog_list_dialog, null);
             TextView view =(TextView)convertView.findViewById(R.id.spinner_item);
+            view.setTextSize(20);
             view.setTag(position);
             view.setText(types.get(position).getName());
         return convertView;

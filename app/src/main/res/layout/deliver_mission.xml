@@ -10,48 +10,48 @@
     <LinearLayout
         android:id="@+id/grid_mission"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="70dp"
         android:layout_gravity="center"
         >
-        <TextView
+       <!-- <TextView
             android:id="@+id/check_unit"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:textColor="@color/black"
-            android:text="单元" />
+            android:text="单元" />-->
 
         <TextView
             android:id="@+id/spinner_unit"
             android:layout_weight="1"
-            android:layout_width="80dp"
+            android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:text="@{deliver.inspectionUnit}" />
-        <TextView
+       <!-- <TextView
             android:id="@+id/check_place"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:textColor="@color/black"
-            android:text="位置" />
+            android:text="位置" />-->
 
         <Spinner
             android:id="@+id/spinner_place"
             android:textSize="16sp"
-            android:layout_weight="1"
             android:layout_height="40dp"
             android:layout_width="wrap_content"
             android:theme="@style/TextAppearance.AppCompat.Large"
             />
-        <TextView
+       <!-- <TextView
             android:id="@+id/check_user"
             android:layout_width="60dp"
             android:layout_height="40dp"
             android:textColor="@color/black"
-            android:text="巡检人" />
+            android:text="巡检人" />-->
 
         <Spinner
             android:id="@+id/spinner_person"
             android:textSize="16sp"
             android:layout_weight="1"
+            android:dropDownWidth="100dp"
             android:layout_height="40dp"
             android:layout_width="wrap_content"
             android:theme="@style/TextAppearance.AppCompat.Large"

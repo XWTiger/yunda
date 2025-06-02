@@ -47,6 +47,7 @@ public class ResourceViewModel extends ViewModel {
     }
 
     public LiveData<List<OperationResource>> queryData(Integer pageNo, Integer pageSize , String search) {
+        resourceService = MainActivity.retrofitClient.create(ResourceService.class);
         List<OperationResource> data = new ArrayList<>();
         /*data.add(OperationResource.builder()
                         .id("1")

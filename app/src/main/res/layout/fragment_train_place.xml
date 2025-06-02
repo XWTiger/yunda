@@ -19,11 +19,13 @@
             android:textSize="18sp" />
         <Spinner
             android:id="@+id/train_no_sp"
-            android:textSize="16sp"
-            android:theme="@style/TextAppearance.AppCompat.Large"
+            android:textSize="20sp"
+            android:theme="@style/SpinnerDropdownStyle"
             android:layout_marginTop="15dp"
             android:layout_marginLeft="15dp"
             android:layout_width="match_parent"
+            android:dropDownWidth="70dp"
+
             android:layout_height="50dp"/>
 
 
