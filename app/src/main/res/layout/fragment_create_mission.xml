@@ -51,7 +51,7 @@
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:text="@{creation.deptId}"
+                android:text="@{creation.deptIdStr}"
                 android:hint="请输入编号" />
 
         </LinearLayout>
@@ -71,7 +71,7 @@
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:text="@{creation.leaderId}"
+                android:text="@{creation.leaderIdStr}"
                 android:hint="请输入编号" />
 
         </LinearLayout>

@@ -16,6 +16,8 @@ public class TrainPlace {
     private String no;
     private String id;
 
+    private Integer index;
+
     /**
      * 车列位
      */

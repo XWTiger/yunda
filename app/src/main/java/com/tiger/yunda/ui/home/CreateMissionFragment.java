@@ -100,6 +100,8 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
     final String[] trainNo = {""};
     final String[] trainPlace = {""};
 
+    private int trainPositionIndex = 0;
+
 
     /**
      * Use this factory method to create a new instance of
@@ -261,14 +263,21 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
             SpinnerAdapter spinnerPlaceAdapter = new SpinnerAdapter(CollectionUtil.covertTrainToSpinnerObj(positionList), getContext());
             trainPlaceBinding.trainPlace.setAdapter(spinnerPlaceAdapter);
             //trainPlaceBinding.trainPlace.setSelection();
+            trainPositionIndex++;
+            trainPlaceBinding.trainPlace.setTag(trainPositionIndex);
+            trainPlaceBinding.trainNoSp.setTag(trainPositionIndex);
+            trainPlaceBinding.trainNoLin1.setTag(trainPositionIndex);
+            trainPlaceBinding.trainNoLin2.setTag(trainPositionIndex);
+            CreateMission createMission =  binding.getCreation();
 
             trainPlaceBinding.trainPlace.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
 
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    Integer location = (Integer) parent.getTag();
                     trainPlace[0] = String.valueOf(positionList.get(position).getValue());
                     //调用接口 获取车列位
-
+                    createMission.addTrain(new TrainPlace(null,  null,location, positionList.get(position).getValue()));
                 }
 
                 @Override
@@ -283,11 +292,14 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
 
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    Integer location = (Integer) parent.getTag();
                     trainNo[0] = trainList.get(position).getText();
+                    createMission.addTrain(new TrainPlace(trainNo[0],  null,location, null));
                     //调用接口 获取车列位
                     createMissionViewModel.getPositionByTrainNo(trainNo[0]).observe(getViewLifecycleOwner(), new Observer<Integer>() {
                         @Override
                         public void onChanged(Integer integer) {
+
                             if (Objects.nonNull(integer) && integer > 0) {
                                 for (int i = 0; i < positionList.size(); i++) {
                                     if (positionList.get(i).getValue() == integer) {
@@ -307,8 +319,12 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
 
                 }
             });
-            CreateMission createMission =  binding.getCreation();
-            createMission.addTrain(new TrainPlace(trainList.get(0).getText(), null, positionList.get(0).getValue()));
+
+            if (StringUtils.isNotBlank(trainNo[0]) && StringUtils.isNotBlank(trainPlace[0])) {
+                createMission.addTrain(new TrainPlace(trainNo[0], String.valueOf(trainPositionIndex), null, Integer.parseInt(trainPlace[0])));
+            } else {
+                createMission.addTrain(new TrainPlace(trainList.get(0).getText(), String.valueOf(trainPositionIndex), null, positionList.get(0).getValue()));
+            }
             binding.trainDetailLayout.addView(view);
 
 
@@ -319,6 +335,7 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
             int count = binding.trainDetailLayout.getChildCount();
             createMission.subTrain(count - 1);
             binding.trainDetailLayout.removeViewAt(count - 1);
+            trainPositionIndex--;
 
         }
 
@@ -352,9 +369,14 @@ public class CreateMissionFragment extends Fragment implements View.OnClickListe
 
             createMission.setPlanStartTime(startTime);
             createMission.setPlanEndTime(endTime);
+            createMission.fillContent();
             createMissionViewModel.createMission(createMission).observe(getViewLifecycleOwner(), new Observer<String>() {
                 @Override
                 public void onChanged(String s) {
+                    trainPositionIndex = 0;
+                    trainNo[0] = "";
+                    trainPlace[0] = "";
+                    createMission.clearAll();
                     Mission mission = new Mission();
                     mission.setId("-1");
                     mission.setTaskId(s);

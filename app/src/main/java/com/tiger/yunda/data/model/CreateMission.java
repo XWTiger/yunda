@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,8 +24,11 @@ public class CreateMission  implements Serializable {
 
     private ObservableField<String> nameObserver ;
     private String name;
-    private String deptId;
-    private String leaderId;
+    private String deptIdStr;
+    private String leaderIdStr;
+
+    private Integer deptId;
+    private Integer leaderId;
     private String planStartTime;
     private String planEndTime;
     private List<String> trainNo;
@@ -44,6 +48,10 @@ public class CreateMission  implements Serializable {
         //name = nameObserver.get();
     }
 
+    public void fillContent() {
+        deptId = Integer.valueOf(deptIdStr);
+        leaderId = Integer.valueOf(leaderIdStr);
+    }
 
 
     public void addOneTrain(String name) {
@@ -58,7 +66,17 @@ public class CreateMission  implements Serializable {
         if (CollectionUtil.isEmpty(trains)) {
             trains = new ArrayList<>();
         }
-        trains.add(trainPlace);
+        if (Objects.nonNull(trainPlace.getIndex()) && trainPlace.getIndex() > 0) {
+            if (StringUtils.isNotBlank(trainPlace.getNo())) {
+                trains.get(trainPlace.getIndex() - 1).setNo(trainPlace.getNo());
+            }
+
+            if (Objects.nonNull(trainPlace.getPositionId())) {
+                trains.get(trainPlace.getIndex() - 1).setPositionId(trainPlace.getPositionId());
+            }
+        } else {
+            trains.add(trainPlace);
+        }
     }
     public void subTrain(int position) {
         if (!CollectionUtil.isEmpty(trains)) {
@@ -76,5 +94,8 @@ public class CreateMission  implements Serializable {
             content = content.substring(0,start);
             trainNoStr.set(content);
         }
+    }
+    public void clearAll() {
+        trains = new ArrayList<>();
     }
 }

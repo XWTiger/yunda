@@ -108,8 +108,8 @@ public class CreateMissionViewModel extends ViewModel {
             return creation;
         }
         CreateMission createMission = CreateMission.builder()
-                .deptId(MainActivity.loggedInUser.getDeptId())
-                .leaderId(MainActivity.loggedInUser.getUserId())
+                .deptIdStr(MainActivity.loggedInUser.getDeptId())
+                .leaderIdStr(MainActivity.loggedInUser.getUserId())
                 .nameObserver(new ObservableField<String>())
                 .trainNoStr(new ObservableField<String>(""))
                 .build();

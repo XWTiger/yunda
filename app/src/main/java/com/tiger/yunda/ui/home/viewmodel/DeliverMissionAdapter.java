@@ -70,7 +70,7 @@ public class DeliverMissionAdapter extends ArrayAdapter<DeliverMssion> implement
         DeliverMssion deliverMssion = deliverMissionBinding.getDeliver();
         int index = getDefaultPosition(positionList, deliverMssion.getPositionId().get());
         if (index >= 0) {
-            deliverMissionBinding.spinnerPlace.setSelection(index + 1);
+            deliverMissionBinding.spinnerPlace.setSelection(index);
         }
         deliverMissionBinding.spinnerPlace.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
 
