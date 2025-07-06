@@ -296,10 +296,10 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 todoTv = headerMissionLayoutBinding.todoMission;
                 if (leader) {
                     masterMission = true;
-                    missionyButton.setVisibility(View.VISIBLE);
+                    //missionyButton.setVisibility(View.VISIBLE);
                     tabLayout.setVisibility(View.VISIBLE);
                 } else {
-                    missionyButton.setVisibility(View.GONE);
+                    //missionyButton.setVisibility(View.GONE);
                     tabLayout.setVisibility(View.GONE);
                 }
                 tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

@@ -33,8 +33,41 @@ public interface MissionService {
     @POST("/api/PatrolTask/GetSubtaskPage")
     Call<MissionResult> query(@Body Map<String, Object> body);
 
+
+    /**
+     * {
+     *   "page": 1,
+     *   "limit": 10,
+     *   "sorts": [],
+     *   "search": "",
+     *   "id": "string"
+     * }
+     * @param body
+     * @return
+     */
+    @POST("/api/PatrolTask/GetAllowUpdateSubtask")
+    Call<MissionResult> queryUpdateSubtaskPage(@Body Map<String, Object> body);
+
     @POST("/api/PatrolTask/Create")
     Call<Map<String, String>> createMission(@Body CreateMission createMission);
+
+
+    /**
+     * {
+     *   "id": "string", 主任务id
+     *   "subtasks": [
+     *     {
+     *       "id": "string", 子任务id
+     *       "inspectorId": 0, 巡检人id
+     *       "positionId": 0 巡检列位
+     *     }
+     *   ]
+     * }
+     * @param body
+     * @return
+     */
+    @POST("/api/PatrolTask/UpdateAllowUpdateSubtask")
+    Call<ResponseBody> updateSubtaskMission(@Body SaveMission body);
 
     /**
      * 查看任务

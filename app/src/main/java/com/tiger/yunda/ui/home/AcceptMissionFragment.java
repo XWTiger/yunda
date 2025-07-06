@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -30,6 +31,7 @@ import com.tiger.yunda.utils.CollectionUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -98,6 +100,10 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
             binding.deliverButton.setOnClickListener(this);
             binding.saveBtn.setTag(BTN_SAVE_TAG);
             binding.saveBtn.setOnClickListener(this);
+            //主任务点击的变更按钮
+            if (Objects.nonNull(mission.getChangeMission()) && mission.getChangeMission()) {
+                binding.deliverButton.setVisibility(View.GONE);
+            }
         }
 
 
@@ -123,13 +129,24 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
             public void onChanged(List<User> users) {
                 dusers.clear();
                 dusers.addAll(users);
-                acceptMissionViewModel.getDatas(mission.getTaskId(), mission.getId().equals("-1")?1:0).observe(getViewLifecycleOwner(), new Observer<List<DeliverMssion>>() {
-                    @Override
-                    public void onChanged(List<DeliverMssion> deliverMssions) {
-                        DeliverMissionAdapter deliverMissionAdapter = new DeliverMissionAdapter(getContext(), binding.listItem.getId(),  deliverMssions, dusers, positionList);
-                        binding.listItem.setAdapter(deliverMissionAdapter);
-                    }
-                });
+                //变更 查询
+                if (Objects.nonNull(mission.getChangeMission()) && mission.getChangeMission()) {
+                    acceptMissionViewModel.queryUpdateSubtaskMission(mission.getTaskId()).observe(getViewLifecycleOwner(), new Observer<List<DeliverMssion>>() {
+                        @Override
+                        public void onChanged(List<DeliverMssion> deliverMssions) {
+                            DeliverMissionAdapter deliverMissionAdapter = new DeliverMissionAdapter(getContext(), binding.listItem.getId(), deliverMssions, dusers, positionList);
+                            binding.listItem.setAdapter(deliverMissionAdapter);
+                        }
+                    });
+                } else { //正常派发
+                    acceptMissionViewModel.getDatas(mission.getTaskId(), mission.getId().equals("-1") ? 1 : 0).observe(getViewLifecycleOwner(), new Observer<List<DeliverMssion>>() {
+                        @Override
+                        public void onChanged(List<DeliverMssion> deliverMssions) {
+                            DeliverMissionAdapter deliverMissionAdapter = new DeliverMissionAdapter(getContext(), binding.listItem.getId(), deliverMssions, dusers, positionList);
+                            binding.listItem.setAdapter(deliverMissionAdapter);
+                        }
+                    });
+                }
             }
         });
 
@@ -169,6 +186,7 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
         }
         SaveMission saveMission = SaveMission.builder()
                 .taskId(mission.getTaskId())
+                .id(mission.getTaskId())
                 .action(1).build();
         List<DeliverMissionDTO> subMissions = new ArrayList<>();
         subList.forEach(deliverMssion -> {
@@ -179,6 +197,7 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
                     .positionName(deliverMssion.getPositionName().get())
                     .inspectionUnit(deliverMssion.getInspectionUnit().get())
                     .duration(deliverMssion.getDuration().get())
+                    .id(deliverMssion.getId().get())
                     .build();
             subMissions.add(deliverMissionDTO);
         });
@@ -194,13 +213,25 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
             }
         }
         if (tag.equals(BTN_SAVE_TAG)) {
-            saveMission.setAction(2);
 
-            if (acceptMissionViewModel.saveSubMissions(saveMission)) {
-                Toast.makeText(getContext(), "保存成功", Toast.LENGTH_SHORT).show();
-                navController.navigate(R.id.back_to_mission);
+            if (Objects.nonNull(mission.getChangeMission()) && mission.getChangeMission()) {
+                LiveData<Map<String, Object>> result = acceptMissionViewModel.updateSubtaskMission(saveMission);
+                result.observe(getViewLifecycleOwner(), new Observer<Map<String, Object>>() {
+                    @Override
+                    public void onChanged(Map<String, Object> stringObjectMap) {
+                        Toast.makeText(getContext(), "保存成功", Toast.LENGTH_SHORT).show();
+                        navController.navigate(R.id.back_to_mission);
+                    }
+                });
             } else {
-                Toast.makeText(getContext(), "保存失败", Toast.LENGTH_SHORT).show();
+                saveMission.setAction(2);
+
+                if (acceptMissionViewModel.saveSubMissions(saveMission)) {
+                    Toast.makeText(getContext(), "保存成功", Toast.LENGTH_SHORT).show();
+                    navController.navigate(R.id.back_to_mission);
+                } else {
+                    Toast.makeText(getContext(), "保存失败", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }

@@ -18,6 +18,7 @@ public class DeliverMissionDTO implements Serializable {
     private String positionName;
     private String inspectionUnit;
     private String duration;
+    private String id;
 
 
     public DeliverMssion covertToDeliverMission() {

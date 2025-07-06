@@ -55,6 +55,8 @@ public class Mission implements Serializable {
     private int appealState;
     private String appealStateText;
 
+    private Boolean changeMission;
+
 
 
 }

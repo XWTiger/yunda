@@ -15,5 +15,6 @@ import lombok.NoArgsConstructor;
 public class SaveMission implements Serializable {
     private String taskId;
     private int action;
+    private String id;
     private List<DeliverMissionDTO> subtasks;
 }

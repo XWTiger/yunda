@@ -51,7 +51,7 @@ public class DeliverTask implements Serializable {
                 .inspectionUnit(position + plan)
 
                 .masterMission(true)
-                .inspectorId(0).positionId(0).build();
+                .inspectorId(0).positionId(0).faultState(0).appealState(0).build();
         return mission;
     }
 

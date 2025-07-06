@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.gson.Gson;
 import com.tiger.yunda.MainActivity;
 import com.tiger.yunda.data.model.DeliverMissionDTO;
 import com.tiger.yunda.data.model.DeliverMssion;
@@ -16,14 +17,18 @@ import com.tiger.yunda.data.model.SaveMission;
 import com.tiger.yunda.data.model.Train;
 import com.tiger.yunda.data.model.User;
 import com.tiger.yunda.service.MissionService;
+import com.tiger.yunda.ui.home.MissionResult;
 import com.tiger.yunda.utils.CollectionUtil;
 import com.tiger.yunda.utils.JsonUtil;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
@@ -38,6 +43,8 @@ public class DeliverMissionViewModel extends ViewModel {
 
     private MutableLiveData<List<User>> users = new MutableLiveData<>();
 
+    private MutableLiveData<Map<String, Object>> mapMutableLiveData = new MutableLiveData<>();
+
     private MissionService missionService;
 
     private Context context;
@@ -49,6 +56,90 @@ public class DeliverMissionViewModel extends ViewModel {
         missionService = MainActivity.retrofitClient.create(MissionService.class);
         this.context = context;
     }
+    /**
+     * {
+     *   "id": "string", 主任务id
+     *   "subtasks": [
+     *     {
+     *       "id": "string", 子任务id
+     *       "inspectorId": 0, 巡检人id
+     *       "positionId": 0 巡检列位
+     *     }
+     *   ]
+     * }
+     * @param body
+     * @return
+     */
+    public LiveData<Map<String, Object>> updateSubtaskMission(SaveMission body) {
+
+        Call<ResponseBody> result = missionService.updateSubtaskMission(body);
+        result.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.code() == MissionService.HTTP_OK) {
+                    mapMutableLiveData.setValue(new HashMap<>());
+                } else {
+                    try {
+                        String errStr = response.errorBody().string();
+                        ErrorResult errorResult = JsonUtil.getObject(errStr, context);
+                        Log.e("xiaweihu", "查询任务: ===========>" + errStr);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                if (StringUtils.isNotBlank(throwable.getMessage())) {
+                    Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+
+        });
+        return mapMutableLiveData;
+    }
+
+    public LiveData<List<DeliverMssion>> queryUpdateSubtaskMission(String masterTaskId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("page", 1);
+        params.put("limit", 20);
+        params.put("id", masterTaskId);
+
+        List<DeliverMssion> list = new ArrayList<>();
+        Call<MissionResult> resultCall =  missionService.queryUpdateSubtaskPage(params);
+        resultCall.enqueue(new Callback<MissionResult>() {
+            @Override
+            public void onResponse(Call<MissionResult> call, Response<MissionResult> response) {
+                if (response.code() == MissionService.HTTP_OK) {
+                    MissionResult missionResult = response.body();
+                    if (missionResult.getCount() > 0) {
+                        missionResult.getData().forEach(mission -> {
+                            list.add(JsonUtil.covertToDeliverMssion(mission));
+                        });
+                    }
+                    deliverMissions.setValue(list);
+                } else {
+                    try {
+                        String errStr = response.errorBody().string();
+                        ErrorResult errorResult = JsonUtil.getObject(errStr, context);
+                        Log.e("xiaweihu", "查询任务: ===========>" + errStr);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MissionResult> call, Throwable throwable) {
+                if (StringUtils.isNotBlank(throwable.getMessage())) {
+                    Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        return deliverMissions;
+    }
+
 
     /**
      * type 0 正常查询 1  调用查看任务

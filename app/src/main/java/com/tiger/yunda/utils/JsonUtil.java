@@ -12,7 +12,9 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.tiger.yunda.R;
+import com.tiger.yunda.data.model.DeliverMssion;
 import com.tiger.yunda.data.model.ErrorResult;
+import com.tiger.yunda.ui.home.Mission;
 
 import java.util.Objects;
 
@@ -33,6 +35,17 @@ public class JsonUtil {
         }
 
         return errorResult;
+    }
+
+
+    /**
+     * 子任务转化
+     * @return
+     */
+    public static DeliverMssion covertToDeliverMssion(Mission mission) {
+        DeliverMssion deliverMssion = new DeliverMssion(mission.getInspectorId(), mission.getInspector(), mission.getPositionId(), mission.getPositionName(), mission.getInspectionUnit(), mission.getDuration());
+        deliverMssion.getId().set(mission.getId());
+        return deliverMssion;
     }
 
 

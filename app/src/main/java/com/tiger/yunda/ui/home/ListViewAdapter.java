@@ -61,18 +61,42 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
 
     public static String MISSION_KEY = "mission";
 
+    //子任务状态，1:下发中、2:已下发、3:巡检中、4:完成、5:已接收、6:禁止作业、7:允许作业
+    //主任务状态，1:待分配、2:待下发、3:已下发、4:巡检中、5:完成、6:作废、7:已拒绝
     private static final int MISSION_STATE_WAIT = 0; //待分发
-    private static final int MISSION_STATE_DELIVERING = 1;//下发中
-    private static final int MISSION_STATE_DELIVERED = 2; //已下发
-    private static final int MISSION_STATE_INSPECTION = 3; //巡检中
-    private static final int MISSION_STATE_FINISHED = 4; //完成
-    private static final int MISSION_STATE_ACCEPTED = 5; //已接受(允许作业)
+
+    /**
+     * 子任务： 下发中， 主任务： 待分配
+     */
+    private static final int MISSION_STATE_DELIVERING = 1;//子任务： 下发中， 主任务： 待分配
+    /**
+     * 子任务： 已下发， 主任务： 待下发
+     */
+    private static final int MISSION_STATE_DELIVERED = 2; //子任务： 已下发， 主任务： 待下发
+    /**
+     * 子任务： 巡检中， 主任务：已下发
+     */
+    private static final int MISSION_STATE_INSPECTION = 3; //子任务： 巡检中， 主任务：已下发
+
+    /**
+     * 子任务： 完成， 主任务：巡检中
+     */
+    private static final int MISSION_STATE_FINISHED = 4; //子任务： 完成， 主任务：巡检中
+    /**
+     *子任务： 已接受， 主任务：完成
+     */
+    private static final int MISSION_STATE_ACCEPTED = 5; //子任务： 已接受， 主任务：完成
 
 
     /**
-     * 禁止作业
+     * 子任务：禁止作业， 主任务： 作废
      */
-    private static final int MISSION_STATE_FORBID_WORK = 6; //禁止作业
+    private static final int MISSION_STATE_FORBID_WORK = 6; //子任务：禁止作业， 主任务： 作废
+
+    /**
+     *子任务：允许作业， 主任务： 已拒绝
+     */
+    private static final int MISSION_STATE_ALLOW_WORK = 7; //子任务：允许作业， 主任务： 已拒绝
 
 
     private Context context;
@@ -87,7 +111,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
     private MissionService missionService;
 
     private MissionViewModel missionViewModel;
-    private MissionFragment missionFragment;
+
 
 
 
@@ -124,6 +148,8 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
             checkBox.setTag(position);
             checkBox.setOnCheckedChangeListener(this);
             Button inspectionBtn = binding.buttonInspection;
+            Button masterChangeButton = binding.buttonMasterChange;
+            masterChangeButton.setTag(position);
             inspectionBtn.setTag(position);
             Mission mission =  objects.get(position);
             //允许作业标签
@@ -132,14 +158,11 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
             if (!MissionFragment.masterMission) {
                 //巡检员隐藏 拒绝按钮
                 btnReject.setVisibility(View.GONE);
-                if (mission.getState() == MISSION_STATE_ACCEPTED) {
-                    buttonShowWork.setVisibility(View.VISIBLE);
-                }
             }
 
 
 
-            if (Objects.nonNull(mission.getMasterMission()) && mission.getMasterMission()) {
+            if (Objects.nonNull(mission.getMasterMission()) && mission.getMasterMission()) {//主任务
                 checkBox.setEnabled(false);
                 //派发任务 如果不是待分发 就不能点击拒绝
                 if (MISSION_STATE_WAIT != mission.getState() && MISSION_STATE_DELIVERING != mission.getState()) {
@@ -147,19 +170,32 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                     btnReject.setBackgroundTintList(colorStateList);
                     btnReject.setEnabled(false);
                 }
-            } else {
+                //显示变更按钮
+                if (mission.getState() == MISSION_STATE_INSPECTION || mission.getState() == MISSION_STATE_FINISHED) {
+                    masterChangeButton.setVisibility(View.VISIBLE);
+                }
+            } else { //子任务
                 ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
                 btnReject.setBackgroundTintList(colorStateList);
                 btnReject.setEnabled(false);
+                //子任务允许作业 才显示接受 和允许作业
+                if (MISSION_STATE_ALLOW_WORK == mission.getState()) {
+                    btnItem.setEnabled(true);
+                    colorStateList = ColorStateList.valueOf(Color.GREEN);
+                    btnItem.setBackgroundTintList(colorStateList);
+                    buttonShowWork.setVisibility(View.VISIBLE);
+                }
             }
 
             int state = objects.get(position).getState();
-            //控制允许作业标签
+            //子任务禁止作业
             if (state == MISSION_STATE_FORBID_WORK) {
                 buttonShowWork.setVisibility(View.VISIBLE);
                 buttonShowWork.setText("禁止作业");
                 ColorStateList colorStateList = ColorStateList.valueOf(Color.GRAY);
                 buttonShowWork.setBackgroundTintList(colorStateList);
+                btnItem.setEnabled(false);
+                btnItem.setBackgroundTintList(colorStateList);
             }
             if ((state == MISSION_STATE_ACCEPTED || MISSION_STATE_INSPECTION == state) && StringUtils.isNotBlank(objects.get(position).getId())) {
                 btnReject.setVisibility(View.GONE);
@@ -197,6 +233,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                     btnItem.setText("已完成");
                 }
             }
+
 
             //点击巡检按钮
             inspectionBtn.setOnClickListener(new View.OnClickListener() {
@@ -339,6 +376,41 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
 
                 }
             });
+
+            //主任务点击变更，只有主任务有这个按钮
+            masterChangeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = (int) v.getTag();
+                    Bundle bundle = new Bundle();
+                    //设置是变更还是普通派发
+                    Mission masterToBeChanged = objects.get(position);
+                    masterToBeChanged.setChangeMission(true);
+                    bundle.putSerializable(MISSION_KEY, masterToBeChanged);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("系统提示")
+                            .setMessage("确认要变更该任务吗？")
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+
+
+                                    //to_accept_mission
+                                    if (StringUtils.isNotBlank(objects.get(position).getTaskId()) && StringUtils.isBlank(objects.get(position).getId())) {
+                                        //工班长 的主任务
+                                        getNavController().navigate(R.id.to_accept_mission, bundle);
+                                    }
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // 点击“Cancel”按钮后的操作
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
+                }
+            });
              viewHolder = new ViewHolder(tvItem, btnItem, btnReject, checkBox);
             convertView.setTag(viewHolder);
         } else {
@@ -346,7 +418,7 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
         }
         TextView textView = viewHolder.getTvItem();
         final Mission item = getItem(position);
-        textView.setText(item.getInspectionUnit() + "," + item.getPositionName());
+        textView.setText(item.getInspectionUnit() + "," + item.getPositionName() + "\n 状态：" + item.getStateText());
         textView.setTooltipText(item.getInspectionUnit()+ "," + item.getPositionName());
         return convertView;
     }

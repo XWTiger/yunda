@@ -19,6 +19,9 @@ public class DeliverMssion {
     private ObservableField<String> duration = new ObservableField<>(); //计划时长、耗时
 
 
+    private ObservableField<String> id = new ObservableField<>();//主任务或者子任务id
+
+
     public DeliverMssion(Integer inspectorId, String inspector, Integer positionId, String positionName, String inspectionUnit, String duration) {
         this.inspectorId.set(inspectorId);
         this.inspector.set(inspector);
@@ -27,6 +30,8 @@ public class DeliverMssion {
         this.inspectionUnit.set(inspectionUnit);
         this.duration.set(duration);
     }
+
+
 
     public DeliverMssion(ObservableInt inspectorId, ObservableField<String> inspector, ObservableInt positionId, ObservableField<String> positionName, ObservableField<String> inspectionUnit, ObservableField<String> duration) {
         this.inspectorId = inspectorId;
@@ -83,5 +88,13 @@ public class DeliverMssion {
 
     public void setDuration(ObservableField<String> duration) {
         this.duration = duration;
+    }
+
+    public ObservableField<String> getId() {
+        return id;
+    }
+
+    public void setId(ObservableField<String> id) {
+        this.id = id;
     }
 }
