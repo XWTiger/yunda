@@ -1,7 +1,6 @@
 package com.tiger.yunda.ui.home;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -135,6 +134,8 @@ public class AcceptMissionFragment extends Fragment implements View.OnClickListe
                         @Override
                         public void onChanged(List<DeliverMssion> deliverMssions) {
                             DeliverMissionAdapter deliverMissionAdapter = new DeliverMissionAdapter(getContext(), binding.listItem.getId(), deliverMssions, dusers, positionList);
+
+
                             binding.listItem.setAdapter(deliverMissionAdapter);
                         }
                     });

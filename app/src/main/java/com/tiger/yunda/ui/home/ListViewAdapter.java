@@ -181,8 +181,8 @@ public class ListViewAdapter extends ArrayAdapter<Mission> implements CompoundBu
                 //子任务允许作业 才显示接受 和允许作业
                 if (MISSION_STATE_ALLOW_WORK == mission.getState()) {
                     btnItem.setEnabled(true);
-                    colorStateList = ColorStateList.valueOf(Color.GREEN);
-                    btnItem.setBackgroundTintList(colorStateList);
+                    //colorStateList = ColorStateList.valueOf(Color.GREEN);
+                    //btnItem.setBackgroundTintList(colorStateList);
                     buttonShowWork.setVisibility(View.VISIBLE);
                 }
             }

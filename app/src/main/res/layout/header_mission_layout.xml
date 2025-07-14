@@ -49,17 +49,7 @@
         android:textColor="@color/white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
-    <Button
-        android:id="@+id/create_mission"
-        android:text="新建任务"
-        android:layout_marginTop="10dp"
-        android:visibility="gone"
-        android:textColor="@color/green"
-        android:background="@drawable/ic_header_button"
-        android:layout_marginLeft="10dp"
-        android:theme="@android:style/Theme.NoDisplay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+
 
     <Button
         android:id="@+id/accept_all"

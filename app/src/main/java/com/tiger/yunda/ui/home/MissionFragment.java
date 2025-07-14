@@ -58,7 +58,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     private Button myButton; //一键接受
 
-    private Button missionyButton;
+    //private Button missionyButton;
     private SwipeRefreshLayout swipeRefreshLayout;
     private  ListViewAdapter listViewAdapter;
     private static MissionViewModel missionViewModel;
@@ -228,7 +228,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if (Objects.nonNull(headerMissionLayoutBinding)) {
             myButton = headerMissionLayoutBinding.acceptAll;
 
-            missionyButton = headerMissionLayoutBinding.createMission;
+            //missionyButton = headerMissionLayoutBinding.createMission;
             tabLayout = headerMissionLayoutBinding.tabLayout;
             todoTv = headerMissionLayoutBinding.todoMission;
         }
@@ -249,11 +249,11 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
         }
         if (leader) {
-            missionyButton.setVisibility(View.VISIBLE);
+           // missionyButton.setVisibility(View.VISIBLE);
             tabLayout.setVisibility(View.VISIBLE);
             todoTv.setVisibility(View.GONE);
         } else {
-            missionyButton.setVisibility(View.GONE);
+            //missionyButton.setVisibility(View.GONE);
             tabLayout.setVisibility(View.GONE);
             todoTv.setVisibility(View.VISIBLE);
         }
@@ -291,7 +291,20 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                 myButton = headerMissionLayoutBinding.acceptAll;
 
-                missionyButton = headerMissionLayoutBinding.createMission;
+                /**
+                 *   <Button
+                 *         android:id="@+id/create_mission"
+                 *         android:text="新建任务"
+                 *         android:layout_marginTop="10dp"
+                 *         android:visibility="gone"
+                 *         android:textColor="@color/green"
+                 *         android:background="@drawable/ic_header_button"
+                 *         android:layout_marginLeft="10dp"
+                 *         android:theme="@android:style/Theme.NoDisplay"
+                 *         android:layout_width="wrap_content"
+                 *         android:layout_height="wrap_content"/>
+                 */
+               // missionyButton = headerMissionLayoutBinding.createMission;
                 tabLayout = headerMissionLayoutBinding.tabLayout;
                 todoTv = headerMissionLayoutBinding.todoMission;
                 if (leader) {
@@ -339,7 +352,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
 
                 //新建任务
-                missionyButton.setOnClickListener(new View.OnClickListener() {
+               /* missionyButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         // 按钮点击后的操作
@@ -349,7 +362,7 @@ public class MissionFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         actionBar.setDisplayShowTitleEnabled(true);
                         //actionBar
                     }
-                });
+                });*/
 
             }
             // 设置自定义视图

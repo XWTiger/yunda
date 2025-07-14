@@ -1,6 +1,7 @@
 package com.tiger.yunda.ui.home.viewmodel;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,8 @@ import com.tiger.yunda.ui.common.SpinnerAdapter;
 import com.tiger.yunda.ui.common.SpinnerCallBack;
 import com.tiger.yunda.utils.CollectionUtil;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +42,8 @@ public class DeliverMissionAdapter extends ArrayAdapter<DeliverMssion> implement
 
     public DeliverMissionAdapter(@NonNull Context context, int resource, @NonNull List<DeliverMssion> objects, List<User> users, List<Train> positionList) {
         super(context, resource, objects);
-        this.deliverMissions = objects;
+        this.deliverMissions = new ArrayList<>();
+        deliverMissions.addAll(objects);
         this.users = users;
         this.positionList = positionList;
     }
@@ -52,10 +56,12 @@ public class DeliverMissionAdapter extends ArrayAdapter<DeliverMssion> implement
         if (convertView == null) {
             deliverMissionBinding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.deliver_mission, parent, false);;
             convertView = deliverMissionBinding.getRoot();
-            deliverMissionBinding.setDeliver(deliverMissions.get(position));
         } else {
             deliverMissionBinding = DataBindingUtil.getBinding(convertView);
         }
+        //shit 复用视图需要重新绑定数据
+        deliverMissionBinding.setDeliver(deliverMissions.get(position));
+        Log.i("xiaweihu", "巡检任务数量: ===========>" + position);
         SpinnerAdapter spinnerAdapter = new SpinnerAdapter(covertUserToSpinnerObj(users), getContext());
         deliverMissionBinding.spinnerPerson.setAdapter(spinnerAdapter);
         deliverMissionBinding.spinnerPerson.setTag(position);
